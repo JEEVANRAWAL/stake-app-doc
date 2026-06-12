@@ -619,6 +619,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#available-vs-staked-balance-and-how-much-to-stake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available vs staked balance — and how much to stake
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#esewa-top-up-flow-redirect-status-pull" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1276,6 +1287,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#available-vs-staked-balance-and-how-much-to-stake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available vs staked balance — and how much to stake
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#esewa-top-up-flow-redirect-status-pull" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1463,6 +1485,74 @@ in the local market — at that moment the user is hostile and won't complete a 
   <code>402 COMMITMENT_FUNDING_REQUIRED</code> with a top-up prompt. This is what gives "capture money up front" teeth.
 - <strong>Returned (un-forfeited) deposit</strong> goes back to <em>available balance</em>, <strong>not</strong> auto-refunded to card (local-rail refunds are painful/lossy) — offer explicit withdrawal instead.
 - <strong>Store policy:</strong> unlocks/penalties are arguably digital goods → check Apple/Google billing rules; top-up provider stays behind the abstraction so it's swappable (may be forced to IAP on iOS).</p>
+<h2 id="available-vs-staked-balance-and-how-much-to-stake">Available vs staked balance — and how much to stake<a class="headerlink" href="#available-vs-staked-balance-and-how-much-to-stake" title="Permanent link">&para;</a></h2>
+<p>Money lives in <strong>two buckets</strong> in the ledger: <strong><code>user_available</code></strong> (spendable — usable for unlocks,
+withdrawable) and <strong><code>user_locked</code></strong> (staked behind a commitment — frozen until it resolves). The <strong>stake
+amount</strong> is simply how much moves <code>available → locked</code> when a commitment is armed.</p>
+<p><strong>Lifecycle of a stake:</strong>
+- Top-up → <code>available</code>
+- Arm commitment → move the stake <code>available → locked</code>
+- <strong>Keep it</strong> → <code>locked → available</code> (stake returned in full)
+- <strong>Break it</strong> → penalty debits <code>locked</code> first (then <code>available</code>) → forfeited to <code>system_forfeit_revenue</code>;
+  any remainder released back to <code>available</code></p>
+<p>Worked example — Rs. 1000 top-up, stake Rs. 600, one Rs. 50 penalty:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Available</th>
+<th>Locked</th>
+<th>Forfeited</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Top up 1000</td>
+<td>1000</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Stake 600</td>
+<td>400</td>
+<td>600</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Rs. 50 penalty (locked first)</td>
+<td>400</td>
+<td>550</td>
+<td>50</td>
+</tr>
+<tr>
+<td>Commitment kept</td>
+<td>950</td>
+<td>0</td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+<p><code>available + locked + forfeited</code> is conserved at every step (double-entry); the wallet never goes negative,
+and max penalty exposure is capped to the staked/pre-funded balance at creation.</p>
+<p><strong>How much to stake — two intensities of the same plumbing:</strong>
+- <strong>Wallet-only (small balance):</strong> keep just enough to <em>cover</em> penalties (≥ the Rs. 100 minimum). One
+  violation debits Rs. 50; no large lock needed. <strong>This is the MVP default.</strong>
+- <strong>Commitment deposit (large stake):</strong> lock a deliberately large amount as a <strong>behavioral device</strong> — its
+  value is psychological, not arithmetic. (Option C above; a fast-follow.)</p>
+<p><strong>Why stake more than a single penalty</strong> (the common confusion — "if a slip is only Rs. 50, why lock Rs. 600?"):
+1. <strong>A commitment spans many possible violations, not one.</strong> Rs. 50 is one slip; a 30-day commitment can be
+   tempted dozens of times. Stake only Rs. 50 and the teeth vanish after the first slip — the stake must
+   cover <em>cumulative</em> exposure over the whole period.
+2. <strong>Loss aversion scales with what's at risk.</strong> Rs. 50 is shruggable; Rs. 600 locked up and eroding with
+   every slip is a far stronger deterrent. This is the product's behavioral engine.
+3. <strong>"Win your money back" is the reward.</strong> A bigger stake returned on success = bigger motivation + a
+   retention hook.
+4. <strong>User-chosen — "stake more = commit harder" is a feature.</strong> Gentle nudge → Rs. 100; serious quit
+   attempt → Rs. 5,000.</p>
+<p><strong>The reframe:</strong> a stake that only matches one penalty looks pointless <em>in hindsight</em> (you slip once, lose
+Rs. 50, get the rest back) — but the amount <em>at risk</em> is what deterred the <em>other</em> slips you never made. The
+stake's job is deterrence across the whole period, not to price a single violation. <strong>Stake small = "cover
+my penalties"; stake big = "make failure genuinely painful so I follow through."</strong></p>
 <h2 id="esewa-top-up-flow-redirect-status-pull">eSewa top-up flow (redirect + status-pull)<a class="headerlink" href="#esewa-top-up-flow-redirect-status-pull" title="Permanent link">&para;</a></h2>
 <p>eSewa is touched <strong>only</strong> during a cooperative wallet top-up — never at enforcement time.
 Unlike Stripe, <strong>eSewa ePay v2 has no asynchronous server-to-server webhook</strong>: confirmation
