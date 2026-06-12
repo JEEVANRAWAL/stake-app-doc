@@ -228,16 +228,60 @@ paths:
         content:
           application/json:
             schema: { $ref: '#/components/schemas/WithdrawalCreate' }
+            example:
+              amount: "500.0000"
+              currency: NPR
+              destination:
+                bank_code: NICENPKA
+                account_no: "0123010000123"
+                account_name: Jeevan Rawal
       responses:
         '201':
           description: Funds held, queued for review
-          content: { application/json: { schema: { $ref: '#/components/schemas/Withdrawal' } } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Withdrawal' }
+              example:
+                withdrawal_id: 3c91aa12-7b2a-4f10-9d22-0a1b2c3d4e5f
+                status: under_review
+                amount: "500.0000"
+                fee_amount: "10.0000"
+                payout_amount: "490.0000"
+                currency: NPR
+                wallet:
+                  available_balance: "0.0000"
+                  locked_balance: "200.0000"
+                  payout_pending_balance: "500.0000"
+                  currency: NPR
+                ledger_journal_id: 88d4c2aa-1111-4222-8333-444455556666
+                estimated_completion: "1-2 business days"
+                requested_at: "2026-06-12T04:20:00Z"
         '403':
           description: KYC / bank-name verification required (WITHDRAWAL_KYC_REQUIRED)
-          content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example:
+                type: https://api.stakeapp.io/errors/withdrawal-kyc-required
+                code: WITHDRAWAL_KYC_REQUIRED
+                title: Identity verification required before withdrawal
+                status: 403
+                detail: A bank-account name match (KYC tier 1) is required before your first payout.
+                instance: /v1/wallet/withdrawals
+                meta: { required_tier: 1 }
         '409':
           description: Insufficient available balance, below minimum, or over velocity cap
-          content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example:
+                type: https://api.stakeapp.io/errors/insufficient-available-balance
+                code: INSUFFICIENT_AVAILABLE_BALANCE
+                title: Amount exceeds withdrawable balance
+                status: 409
+                detail: Only settled, un-staked funds are withdrawable.
+                instance: /v1/wallet/withdrawals
+                meta: { available_balance: "300.0000" }
 
   /wallet/withdrawals/{id}:
     get:
@@ -247,7 +291,21 @@ paths:
       responses:
         '200':
           description: Withdrawal
-          content: { application/json: { schema: { $ref: '#/components/schemas/Withdrawal' } } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Withdrawal' }
+              example:
+                withdrawal_id: 3c91aa12-7b2a-4f10-9d22-0a1b2c3d4e5f
+                status: paid
+                amount: "500.0000"
+                fee_amount: "10.0000"
+                payout_amount: "490.0000"
+                currency: NPR
+                provider: manual_bank
+                disburse_reference: BNK-20260613-0042
+                requested_at: "2026-06-12T04:20:00Z"
+                approved_at: "2026-06-12T05:00:00Z"
+                paid_at: "2026-06-13T09:10:00Z"
         '404': { $ref: '#/components/responses/Problem' }
 
   /wallet/withdrawals/{id}/cancel:
@@ -266,9 +324,26 @@ paths:
                   withdrawal_id: { type: string, format: uuid }
                   status: { $ref: '#/components/schemas/WithdrawalStatus' }
                   wallet: { $ref: '#/components/schemas/Wallet' }
+              example:
+                withdrawal_id: 3c91aa12-7b2a-4f10-9d22-0a1b2c3d4e5f
+                status: cancelled
+                wallet:
+                  available_balance: "500.0000"
+                  locked_balance: "200.0000"
+                  payout_pending_balance: "0.0000"
+                  currency: NPR
         '409':
           description: Already in/after processing (WITHDRAWAL_NOT_CANCELLABLE)
-          content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example:
+                type: https://api.stakeapp.io/errors/withdrawal-not-cancellable
+                code: WITHDRAWAL_NOT_CANCELLABLE
+                title: Withdrawal can no longer be cancelled
+                status: 409
+                detail: A disbursement is already in flight.
+                instance: /v1/wallet/withdrawals/3c91aa12-7b2a-4f10-9d22-0a1b2c3d4e5f/cancel
 
   /commitment-deposits:
     post:
