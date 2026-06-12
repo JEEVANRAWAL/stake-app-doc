@@ -63,6 +63,7 @@ paths:
               type: object
               required: [refresh_token]
               properties: { refresh_token: { type: string } }
+            example: { refresh_token: rt_9f2c8a4b1e7d }
       responses:
         '200':
           content: { application/json: { schema: { $ref: '#/components/schemas/TokenPair' } } }
@@ -178,6 +179,7 @@ paths:
               properties:
                 applied_at: { type: string, format: date-time }
                 shield_lifted: { type: boolean }
+            example: { applied_at: "2026-06-12T04:10:03Z", shield_lifted: true }
       responses:
         '200':
           content:
@@ -187,6 +189,7 @@ paths:
                 properties:
                   status: { $ref: '#/components/schemas/UnlockStatus' }
                   expires_at: { type: string, format: date-time }
+              example: { status: granted, expires_at: "2026-06-12T04:15:02Z" }
           description: Recorded
 
   /wallet:
@@ -390,6 +393,7 @@ paths:
                   type: string
                   enum: [increase_limit, disable_limit, remove_app]
                 target_id: { type: string, format: uuid }
+            example: { reason: increase_limit, target_id: 0c2b1100-0000-4000-8000-000000000008 }
       responses:
         '200':
           description: Fee paid, break token issued
@@ -401,6 +405,7 @@ paths:
                   break_token: { type: string }
                   fee: { $ref: '#/components/schemas/MoneyAmount' }
                   expires_at: { type: string, format: date-time }
+              example: { break_token: brk_7c2a91, fee: { amount: "50.0000", currency: NPR }, expires_at: "2026-06-12T05:10:02Z" }
         '402': { $ref: '#/components/responses/Problem' }
 
   /screen-time-rules/{id}/limit:
@@ -418,6 +423,7 @@ paths:
               properties:
                 daily_limit_seconds: { type: integer, minimum: 0 }
                 break_token: { type: string, description: Required when increasing/disabling }
+            example: { daily_limit_seconds: 2700, break_token: brk_7c2a91 }
       responses:
         '200':
           content: { application/json: { schema: { $ref: '#/components/schemas/ScreenTimeRule' } } }
@@ -464,6 +470,7 @@ paths:
               type: object
               required: [break_token]
               properties: { break_token: { type: string } }
+            example: { break_token: brk_7c2a91 }
       responses:
         '200':
           description: Scheduled for removal
@@ -474,6 +481,7 @@ paths:
                 properties:
                   status: { $ref: '#/components/schemas/RuleStatus' }
                   removed_at: { type: string, format: date-time, nullable: true }
+              example: { status: removed, removed_at: "2026-06-15T00:00:00Z" }
         '402': { $ref: '#/components/responses/Problem' }
 
   /webhooks/{provider}:
@@ -625,6 +633,10 @@ components:
         password: { type: string }
         oauth_code: { type: string }
         otp: { type: string }
+      example:
+        provider: phone_otp
+        phone_e164: "+9779812345678"
+        otp: "418209"
     TokenPair:
       type: object
       required: [access_token, refresh_token, expires_in]
@@ -633,6 +645,11 @@ components:
         refresh_token: { type: string }
         token_type: { type: string, default: Bearer }
         expires_in: { type: integer, example: 600 }
+      example:
+        access_token: eyJhbGciOiJFZERTQSJ9.eyJzdWIiOiJ1XzkxYSJ9.sig
+        refresh_token: rt_9f2c8a4b1e7d
+        token_type: Bearer
+        expires_in: 600
 
     DevicePermissions:
       type: object
@@ -661,6 +678,23 @@ components:
         push_provider: { type: string, enum: [fcm, apns] }
         permissions: { $ref: '#/components/schemas/DevicePermissions' }
         attestation: { $ref: '#/components/schemas/Attestation' }
+      example:
+        os_platform: android
+        os_version: "15"
+        app_version: 1.4.2
+        device_model: Pixel 8
+        hardware_id_hash: b8e5c2a1f09d4471aa33bc01e5f7a2d8
+        push_token: fcm:dQw4w9WgXcQ
+        push_provider: fcm
+        permissions:
+          accessibility_granted: true
+          usage_access_granted: true
+          overlay_granted: true
+          family_controls_granted: false
+          battery_optimized: false
+        attestation:
+          type: play_integrity
+          token: eyJ...PlayIntegrityJWT
     DeviceRegistrationResult:
       type: object
       properties:
@@ -670,6 +704,13 @@ components:
         heartbeat_interval_seconds: { type: integer }
         signing_key_id: { type: string }
         server_time: { type: string, format: date-time }
+      example:
+        device_id: 5f3a2c10-9b1e-4a77-8d2c-1f0e9a7b6c54
+        integrity_verified: true
+        protection_status: healthy
+        heartbeat_interval_seconds: 60
+        signing_key_id: dk_2026_06_a
+        server_time: "2026-06-12T04:21:00Z"
 
     HeartbeatRequest:
       type: object
@@ -695,6 +736,28 @@ components:
             clone_environment: { type: boolean }
             developer_mode: { type: boolean }
         attestation: { $ref: '#/components/schemas/Attestation' }
+      example:
+        seq: 88421
+        device_local_time: "2026-06-12T09:53:31+05:45"
+        monotonic_uptime_ms: 184523910
+        active_commitments: [c91a0000-0000-4000-8000-000000000001]
+        permissions:
+          accessibility_granted: true
+          usage_access_granted: true
+          overlay_granted: true
+          family_controls_granted: false
+          battery_optimized: false
+        enforcement_state:
+          shield_active_app_ids: [3f2c9a00-0000-4000-8000-000000000002]
+          last_block_at: "2026-06-12T09:40:12Z"
+        integrity:
+          root_detected: false
+          hook_framework_detected: false
+          clone_environment: false
+          developer_mode: false
+        attestation:
+          type: play_integrity
+          token: eyJ...
     HeartbeatAction:
       type: object
       required: [type]
@@ -723,6 +786,14 @@ components:
             expires_at: { type: string, format: date-time }
             penalty_on_expiry: { $ref: '#/components/schemas/MoneyAmount' }
         next_heartbeat_seconds: { type: integer }
+      example:
+        ack_seq: 88421
+        server_time: "2026-06-12T04:08:31Z"
+        clock_skew_ms: 142
+        clock_verdict: ok
+        protection_status: healthy
+        actions: []
+        next_heartbeat_seconds: 60
 
     UsageEvent:
       type: object
@@ -742,6 +813,15 @@ components:
         events:
           type: array
           items: { $ref: '#/components/schemas/UsageEvent' }
+      example:
+        batch_id: 9c1e7f20-3a44-4b91-9c0e-77aa1234bcde
+        device_id: 5f3a2c10-9b1e-4a77-8d2c-1f0e9a7b6c54
+        events:
+          - user_restricted_app_id: 3f2c9a00-0000-4000-8000-000000000002
+            event_type: foreground
+            duration_seconds: 312
+            device_local_ts: "2026-06-12T09:30:00+05:45"
+            monotonic_elapsed_ms: 184211900
     RuleState:
       type: object
       properties:
@@ -760,6 +840,17 @@ components:
         rule_state:
           type: array
           items: { $ref: '#/components/schemas/RuleState' }
+      example:
+        batch_id: 9c1e7f20-3a44-4b91-9c0e-77aa1234bcde
+        accepted_events: 2
+        rejected_events: 0
+        server_time: "2026-06-12T04:08:40Z"
+        rule_state:
+          - user_restricted_app_id: 3f2c9a00-0000-4000-8000-000000000002
+            current_usage_seconds: 1798
+            daily_limit_seconds: 1800
+            cooldown_state: none
+            limit_reached: false
 
     UnlockRequestCreate:
       type: object
@@ -769,6 +860,11 @@ components:
         device_id: { type: string, format: uuid }
         duration_seconds: { type: integer, enum: [300, 900, 3600] }
         funding_source: { type: string, enum: [wallet], default: wallet }
+      example:
+        user_restricted_app_id: 3f2c9a00-0000-4000-8000-000000000002
+        device_id: 5f3a2c10-9b1e-4a77-8d2c-1f0e9a7b6c54
+        duration_seconds: 300
+        funding_source: wallet
     UnlockGranted:
       type: object
       required: [unlock_request_id, status, authorization_token, expires_at]
@@ -784,6 +880,17 @@ components:
         authorization_token: { type: string, description: EdDSA-signed, device+app+exp bound }
         wallet: { $ref: '#/components/schemas/Wallet' }
         ledger_journal_id: { type: string, format: uuid }
+      example:
+        unlock_request_id: 7b2a9100-0000-4000-8000-000000000003
+        status: granted
+        user_restricted_app_id: 3f2c9a00-0000-4000-8000-000000000002
+        duration_seconds: 300
+        fee: { amount: "50.0000", currency: NPR }
+        granted_at: "2026-06-12T04:10:02Z"
+        expires_at: "2026-06-12T04:15:02Z"
+        authorization_token: eyJhbGciOiJFZERTQSIsImtpZCI6ImRrXzIwMjZfMDZfYSJ9.payload.sig
+        wallet: { available_balance: "430.0000", locked_balance: "200.0000", payout_pending_balance: "0.0000", currency: NPR, status: active }
+        ledger_journal_id: 5c8e1200-0000-4000-8000-000000000004
     UnlockFundingRequired:
       type: object
       properties:
@@ -797,6 +904,15 @@ components:
             available_balance: { $ref: '#/components/schemas/Money' }
             shortfall: { $ref: '#/components/schemas/Money' }
             topup_endpoint: { type: string }
+      example:
+        unlock_request_id: 7b2a9100-0000-4000-8000-000000000003
+        status: payment_pending
+        fee: { amount: "50.0000", currency: NPR }
+        funding_required:
+          reason: insufficient_wallet_balance
+          available_balance: "10.0000"
+          shortfall: "40.0000"
+          topup_endpoint: /v1/wallet/topup
 
     Wallet:
       type: object
@@ -806,6 +922,12 @@ components:
         payout_pending_balance: { $ref: '#/components/schemas/Money' }
         currency: { $ref: '#/components/schemas/Currency' }
         status: { type: string, enum: [active, frozen, closed] }
+      example:
+        available_balance: "430.0000"
+        locked_balance: "200.0000"
+        payout_pending_balance: "0.0000"
+        currency: NPR
+        status: active
     TopupCreate:
       type: object
       required: [amount, currency, provider]
@@ -814,6 +936,11 @@ components:
         currency: { $ref: '#/components/schemas/Currency' }
         provider: { $ref: '#/components/schemas/PaymentProvider' }
         return_url: { type: string }
+      example:
+        amount: "500.0000"
+        currency: NPR
+        provider: khalti
+        return_url: https://link.stakeapp.io/topup/return
     PaymentIntent:
       type: object
       properties:
@@ -829,6 +956,15 @@ components:
             type: { type: string, enum: [redirect, sdk, qr] }
             url: { type: string }
         expires_at: { type: string, format: date-time }
+      example:
+        payment_id: a91c3300-0000-4000-8000-000000000005
+        status: pending
+        provider: khalti
+        amount: "500.0000"
+        currency: NPR
+        provider_intent_id: khalti_pidx_9aZ2
+        checkout: { type: redirect, url: "https://pay.khalti.com/?pidx=9aZ2" }
+        expires_at: "2026-06-12T04:40:00Z"
 
     DepositCreate:
       type: object
@@ -837,6 +973,10 @@ components:
         staked_amount: { $ref: '#/components/schemas/Money' }
         currency: { $ref: '#/components/schemas/Currency' }
         commitment_end: { type: string, format: date-time }
+      example:
+        staked_amount: "1000.0000"
+        currency: NPR
+        commitment_end: "2026-07-12T00:00:00Z"
     Deposit:
       type: object
       properties:
@@ -850,6 +990,17 @@ components:
         ledger_journal_id: { type: string, format: uuid }
         commitment_start: { type: string, format: date-time }
         commitment_end: { type: string, format: date-time, nullable: true }
+      example:
+        deposit_id: 4471aa00-0000-4000-8000-000000000006
+        status: active
+        staked_amount: "1000.0000"
+        forfeited_amount: "0.0000"
+        returned_amount: "0.0000"
+        currency: NPR
+        wallet: { available_balance: "0.0000", locked_balance: "1200.0000", payout_pending_balance: "0.0000", currency: NPR, status: active }
+        ledger_journal_id: 77c2a100-0000-4000-8000-000000000007
+        commitment_start: "2026-06-12T00:00:00Z"
+        commitment_end: "2026-07-12T00:00:00Z"
 
     WithdrawalDestination:
       type: object
@@ -893,6 +1044,14 @@ components:
         current_usage_seconds: { type: integer }
         cooldown_state: { $ref: '#/components/schemas/CooldownState' }
         status: { $ref: '#/components/schemas/RuleStatus' }
+      example:
+        id: 0c2b1100-0000-4000-8000-000000000008
+        user_restricted_app_id: 3f2c9a00-0000-4000-8000-000000000002
+        daily_limit_seconds: 1800
+        min_committed_seconds: 0
+        current_usage_seconds: 1798
+        cooldown_state: none
+        status: active
     UserRestrictedAppCreate:
       type: object
       properties:
@@ -902,6 +1061,9 @@ components:
       anyOf:
         - required: [app_catalog_id]
         - required: [ios_application_token]
+      example:
+        app_catalog_id: aa11bb22-0000-4000-8000-000000000009
+        label_override: Instagram
     UserRestrictedApp:
       type: object
       properties:
@@ -912,3 +1074,11 @@ components:
         status: { $ref: '#/components/schemas/RuleStatus' }
         added_at: { type: string, format: date-time }
         removed_at: { type: string, format: date-time, nullable: true }
+      example:
+        id: bb22cc33-0000-4000-8000-00000000000a
+        app_catalog_id: aa11bb22-0000-4000-8000-000000000009
+        ios_application_token: null
+        label_override: Instagram
+        status: active
+        added_at: "2026-06-01T10:00:00Z"
+        removed_at: null
