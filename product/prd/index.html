@@ -1646,12 +1646,12 @@ classification, taxes, trust, and IAP requirement all flow from this. See
 <ol>
 <li>~~<strong>Penalty money flow</strong>~~ <strong>Resolved:</strong> → <strong>company revenue</strong> (<code>system_forfeit_revenue</code>), legal-gated (not gambling); charity is the fallback.</li>
 <li>~~<strong>Stake vs. charge-on-event</strong>~~ <strong>Resolved:</strong> pre-funded <strong>wallet/stake (Model A)</strong>.</li>
-<li><strong>iOS entitlement go/no-go</strong> — <em>still open (external):</em> Apple's Family Controls distribution entitlement is gated and can be denied — submit early. Tracked as launch blocker #1.</li>
-<li>~~<strong>Launch platform</strong>~~ <strong>Resolved:</strong> <strong>Android-first</strong> (richer enforcement + custom pay screen).</li>
+<li><strong>iOS entitlement go/no-go</strong> — <em>deferred with iOS:</em> Apple's Family Controls entitlement (gated, can be denied) is only relevant once iOS resumes; not in the active Android-only scope.</li>
+<li>~~<strong>Launch platform</strong>~~ <strong>Resolved:</strong> <strong>Android-only</strong> for now (richer enforcement + custom pay screen); iOS deferred (fast-follow).</li>
 <li>~~"Increase limit takes effect when?"~~ <strong>Resolved:</strong> next logical day (anti-binge); same-day need is served by paid unlocks (FR-2). See FR-4.</li>
 </ol>
 <h2 id="11-phase-1-cutline-mvp">11. Phase 1 Cutline (MVP)<a class="headerlink" href="#11-phase-1-cutline-mvp" title="Permanent link">&para;</a></h2>
-<p>Android-first · FR-1 + FR-3 + FR-2 (5-min unlock) + FR-4 asymmetric edits · pre-funded wallet ·
+<p><strong>Android-only</strong> · FR-1 + FR-3 + FR-2 (5-min unlock) + FR-4 asymmetric edits · pre-funded wallet ·
 server-authoritative rules + heartbeat + Play Integrity · honest "we detect &amp; charge, we don't physically prevent" framing.
 Defer iOS, clone-detection, charity-forfeit, multi-device to Phase 2.</p>
 

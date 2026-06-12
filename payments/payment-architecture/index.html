@@ -1875,10 +1875,10 @@ disbursement is unrecoverable real money. Each withdrawal carries an <strong>ide
 <blockquote>
 <p>The connectIPS/NPI swap replaces the Ops + bank-portal steps with a <code>PayoutProvider.disburse()</code> API
 call + <code>fetchPayoutStatus()</code> poll — the request, hold, review, ledger, and reconciliation are unchanged.</p>
-<p><strong>iOS synergy:</strong> an extension cannot present a payment sheet, so on iOS "pay to unlock" is done
-as <strong>pre-authorized unlocks</strong> — the user buys unlock credit/time <em>in the app</em> (cooperative,
-gateway-friendly) and the <code>ShieldAction</code> extension just verifies &amp; consumes a token from the
-App Group. The wallet model maps cleanly onto this constraint.</p>
+<p><strong>iOS synergy</strong> <em>(deferred — iOS fast-follow, not active scope):</em> an extension cannot present a payment
+sheet, so on iOS "pay to unlock" is done as <strong>pre-authorized unlocks</strong> — the user buys unlock credit/time
+<em>in the app</em> (cooperative, gateway-friendly) and the <code>ShieldAction</code> extension just verifies &amp; consumes a
+token from the App Group. The wallet model maps cleanly onto this constraint.</p>
 </blockquote>
 
 
