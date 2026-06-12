@@ -1,0 +1,769 @@
+openapi: 3.1.0
+info:
+  title: Stake API
+  version: 1.0.0
+  description: >
+    Commitment-based digital discipline platform. The device is treated as
+    untrusted; the server is the sole authority for time, balances, rule state,
+    and unlock grants. All money-moving endpoints are idempotent and require
+    request signing.
+  contact: { name: Stake Platform, email: api@stakeapp.io }
+servers:
+  - url: https://api.stakeapp.io/v1
+    description: Production
+  - url: https://sandbox.api.stakeapp.io/v1
+    description: Sandbox
+
+tags:
+  - { name: Auth }
+  - { name: Devices }
+  - { name: Usage }
+  - { name: Unlocks }
+  - { name: Wallet }
+  - { name: Deposits }
+  - { name: Rules }
+  - { name: RestrictedApps }
+  - { name: Webhooks }
+
+security:
+  - bearerAuth: []
+
+paths:
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Authenticate and obtain device-bound tokens
+      security: []
+      parameters: [ { $ref: '#/components/parameters/DeviceId' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Tokens issued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TokenPair' }
+        '401': { $ref: '#/components/responses/Problem' }
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Rotate refresh token, issue new access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties: { refresh_token: { type: string } }
+      responses:
+        '200':
+          content: { application/json: { schema: { $ref: '#/components/schemas/TokenPair' } } }
+          description: Rotated
+        '401': { $ref: '#/components/responses/Problem' }
+
+  /devices:
+    post:
+      tags: [Devices]
+      summary: Register or update a device
+      parameters:
+        - { $ref: '#/components/parameters/DeviceAttestation' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DeviceRegistration' }
+      responses:
+        '201':
+          description: Registered
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeviceRegistrationResult' }
+        '422': { $ref: '#/components/responses/Problem' }
+
+  /devices/{deviceId}/heartbeat:
+    post:
+      tags: [Devices]
+      summary: Anti-tamper heartbeat (clock, permissions, integrity, enforcement)
+      parameters:
+        - { $ref: '#/components/parameters/DeviceIdPath' }
+        - { $ref: '#/components/parameters/SignatureHeader' }
+        - { $ref: '#/components/parameters/TimestampHeader' }
+        - { $ref: '#/components/parameters/NonceHeader' }
+        - { $ref: '#/components/parameters/DeviceAttestation' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/HeartbeatRequest' }
+      responses:
+        '200':
+          description: Acknowledged with server verdict and actions
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HeartbeatResponse' }
+        '401': { $ref: '#/components/responses/Problem' }
+        '409':
+          description: Replay or stale signature
+          content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+
+  /usage/sync:
+    post:
+      tags: [Usage]
+      summary: Batch-sync raw usage events (untrusted until reconciled)
+      parameters:
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+        - { $ref: '#/components/parameters/SignatureHeader' }
+        - { $ref: '#/components/parameters/TimestampHeader' }
+        - { $ref: '#/components/parameters/NonceHeader' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UsageSyncRequest' }
+      responses:
+        '202':
+          description: Accepted for async aggregation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UsageSyncResult' }
+        '401': { $ref: '#/components/responses/Problem' }
+
+  /unlock-requests:
+    post:
+      tags: [Unlocks]
+      summary: Request a paid temporary unlock during a restriction
+      parameters:
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+        - { $ref: '#/components/parameters/SignatureHeader' }
+        - { $ref: '#/components/parameters/TimestampHeader' }
+        - { $ref: '#/components/parameters/NonceHeader' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UnlockRequestCreate' }
+      responses:
+        '200':
+          description: Granted (wallet funded) — signed authorization token returned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UnlockGranted' }
+        '402':
+          description: Insufficient wallet balance — funding required
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UnlockFundingRequired' }
+        '409': { $ref: '#/components/responses/Problem' }
+
+  /unlock-requests/{id}/applied:
+    post:
+      tags: [Unlocks]
+      summary: Native module confirms the shield was lifted
+      parameters: [ { $ref: '#/components/parameters/IdPath' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [applied_at, shield_lifted]
+              properties:
+                applied_at: { type: string, format: date-time }
+                shield_lifted: { type: boolean }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { $ref: '#/components/schemas/UnlockStatus' }
+                  expires_at: { type: string, format: date-time }
+          description: Recorded
+
+  /wallet:
+    get:
+      tags: [Wallet]
+      summary: Get wallet balances
+      responses:
+        '200':
+          content: { application/json: { schema: { $ref: '#/components/schemas/Wallet' } } }
+          description: Wallet
+
+  /wallet/topup:
+    post:
+      tags: [Wallet]
+      summary: Create a wallet top-up via a payment provider
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TopupCreate' }
+      responses:
+        '201':
+          description: Payment intent created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaymentIntent' }
+
+  /wallet/withdrawals:
+    post:
+      tags: [Wallet]
+      summary: Withdraw available balance
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, currency, provider]
+              properties:
+                amount: { $ref: '#/components/schemas/Money' }
+                currency: { $ref: '#/components/schemas/Currency' }
+                provider: { $ref: '#/components/schemas/PaymentProvider' }
+      responses:
+        '201':
+          content: { application/json: { schema: { $ref: '#/components/schemas/PaymentIntent' } } }
+          description: Withdrawal initiated
+        '402': { $ref: '#/components/responses/Problem' }
+
+  /commitment-deposits:
+    post:
+      tags: [Deposits]
+      summary: Lock a stake from available balance (Option C)
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DepositCreate' }
+      responses:
+        '201':
+          content: { application/json: { schema: { $ref: '#/components/schemas/Deposit' } } }
+          description: Staked
+        '402': { $ref: '#/components/responses/Problem' }
+    get:
+      tags: [Deposits]
+      summary: List the caller's deposits
+      parameters: [ { $ref: '#/components/parameters/StatusFilter' } ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Deposit' }
+          description: Deposits
+
+  /commitment-breaks:
+    post:
+      tags: [Rules]
+      summary: Pay a commitment-break fee, returns a single-use break token
+      parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason, target_id]
+              properties:
+                reason:
+                  type: string
+                  enum: [increase_limit, disable_limit, remove_app]
+                target_id: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Fee paid, break token issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  break_token: { type: string }
+                  fee: { $ref: '#/components/schemas/MoneyAmount' }
+                  expires_at: { type: string, format: date-time }
+        '402': { $ref: '#/components/responses/Problem' }
+
+  /screen-time-rules/{id}/limit:
+    patch:
+      tags: [Rules]
+      summary: Change a daily limit (decrease free; increase requires break_token)
+      parameters: [ { $ref: '#/components/parameters/IdPath' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [daily_limit_seconds]
+              properties:
+                daily_limit_seconds: { type: integer, minimum: 0 }
+                break_token: { type: string, description: Required when increasing/disabling }
+      responses:
+        '200':
+          content: { application/json: { schema: { $ref: '#/components/schemas/ScreenTimeRule' } } }
+          description: Updated
+        '409':
+          description: Increase forbidden without payment
+          content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+
+  /user-restricted-apps:
+    get:
+      tags: [RestrictedApps]
+      summary: List restricted apps
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/UserRestrictedApp' }
+          description: List
+    post:
+      tags: [RestrictedApps]
+      summary: Add an app to the restriction list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UserRestrictedAppCreate' }
+      responses:
+        '201':
+          content: { application/json: { schema: { $ref: '#/components/schemas/UserRestrictedApp' } } }
+          description: Added
+
+  /user-restricted-apps/{id}:
+    delete:
+      tags: [RestrictedApps]
+      summary: Remove an app (requires break_token; effective after active window)
+      parameters: [ { $ref: '#/components/parameters/IdPath' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [break_token]
+              properties: { break_token: { type: string } }
+      responses:
+        '200':
+          description: Scheduled for removal
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { $ref: '#/components/schemas/RuleStatus' }
+                  removed_at: { type: string, format: date-time, nullable: true }
+        '402': { $ref: '#/components/responses/Problem' }
+
+  /webhooks/{provider}:
+    post:
+      tags: [Webhooks]
+      summary: Provider payment webhook receiver (signature-gated, not JWT)
+      security: []
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/PaymentProvider' }
+      requestBody:
+        required: true
+        description: Raw provider payload; signature verified on the unparsed body.
+        content:
+          application/json: { schema: { type: object, additionalProperties: true } }
+      responses:
+        '200': { description: Acknowledged (idempotent) }
+        '400': { description: Signature verification failed }
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    DeviceId:
+      name: X-Device-Id
+      in: header
+      required: true
+      schema: { type: string, format: uuid }
+    DeviceIdPath:
+      name: deviceId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, format: uuid }
+    SignatureHeader:
+      name: X-Signature
+      in: header
+      required: true
+      schema: { type: string }
+      description: base64 HMAC-SHA256 over METHOD\nPATH\nX-Timestamp\nX-Nonce\nsha256(body)
+    TimestampHeader:
+      name: X-Timestamp
+      in: header
+      required: true
+      schema: { type: string, format: date-time }
+    NonceHeader:
+      name: X-Nonce
+      in: header
+      required: true
+      schema: { type: string, description: 128-bit random, single-use }
+    DeviceAttestation:
+      name: X-Device-Attestation
+      in: header
+      required: false
+      schema: { type: string, description: Play Integrity / App Attest token }
+    StatusFilter:
+      name: status
+      in: query
+      required: false
+      schema: { type: string }
+
+  responses:
+    Problem:
+      description: RFC-9457 problem
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+
+  schemas:
+
+    Money:
+      type: string
+      pattern: '^-?\d{1,10}(\.\d{1,4})?$'
+      description: Decimal string, 4 dp. Never a float.
+      example: "50.0000"
+    Currency:
+      type: string
+      minLength: 3
+      maxLength: 3
+      example: NPR
+    OsPlatform: { type: string, enum: [android, ios] }
+    PaymentProvider:
+      type: string
+      enum: [stripe, esewa, khalti, fonepay, apple_iap, google_iap, wallet_internal]
+    PaymentStatus:
+      type: string
+      enum: [initiated, pending, authorized, succeeded, failed, cancelled, refunded, partially_refunded, disputed]
+    DepositStatus:
+      type: string
+      enum: [active, completed_returned, forfeited, partially_forfeited, cancelled]
+    RuleStatus: { type: string, enum: [active, paused, removed] }
+    CooldownState:
+      type: string
+      enum: [none, limit_reached, in_paid_unlock, locked_window]
+    UnlockStatus:
+      type: string
+      enum: [requested, payment_pending, granted, expired, denied]
+    ViolationType:
+      type: string
+      enum: [schedule_block, time_limit_reached, permission_revoked, force_stop, app_uninstalled, clock_tamper, clone_detected]
+    ClockVerdict: { type: string, enum: [ok, warn, tamper_suspected] }
+    ProtectionStatus: { type: string, enum: [healthy, degraded, unprotected] }
+
+    MoneyAmount:
+      type: object
+      required: [amount, currency]
+      properties:
+        amount: { $ref: '#/components/schemas/Money' }
+        currency: { $ref: '#/components/schemas/Currency' }
+
+    Problem:
+      type: object
+      required: [type, code, title, status]
+      properties:
+        type: { type: string, format: uri }
+        code: { type: string, example: RULE_INCREASE_FORBIDDEN }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
+        meta: { type: object, additionalProperties: true }
+
+    LoginRequest:
+      type: object
+      required: [provider]
+      properties:
+        provider: { type: string, enum: [password, google, apple, phone_otp] }
+        email: { type: string, format: email }
+        phone_e164: { type: string }
+        password: { type: string }
+        oauth_code: { type: string }
+        otp: { type: string }
+    TokenPair:
+      type: object
+      required: [access_token, refresh_token, expires_in]
+      properties:
+        access_token: { type: string }
+        refresh_token: { type: string }
+        token_type: { type: string, default: Bearer }
+        expires_in: { type: integer, example: 600 }
+
+    DevicePermissions:
+      type: object
+      properties:
+        accessibility_granted: { type: boolean }
+        usage_access_granted: { type: boolean }
+        overlay_granted: { type: boolean }
+        family_controls_granted: { type: boolean }
+        battery_optimized: { type: boolean }
+    Attestation:
+      type: object
+      required: [type, token]
+      properties:
+        type: { type: string, enum: [play_integrity, app_attest, device_check] }
+        token: { type: string }
+    DeviceRegistration:
+      type: object
+      required: [os_platform, app_version, hardware_id_hash]
+      properties:
+        os_platform: { $ref: '#/components/schemas/OsPlatform' }
+        os_version: { type: string }
+        app_version: { type: string }
+        device_model: { type: string }
+        hardware_id_hash: { type: string }
+        push_token: { type: string }
+        push_provider: { type: string, enum: [fcm, apns] }
+        permissions: { $ref: '#/components/schemas/DevicePermissions' }
+        attestation: { $ref: '#/components/schemas/Attestation' }
+    DeviceRegistrationResult:
+      type: object
+      properties:
+        device_id: { type: string, format: uuid }
+        integrity_verified: { type: boolean }
+        protection_status: { $ref: '#/components/schemas/ProtectionStatus' }
+        heartbeat_interval_seconds: { type: integer }
+        signing_key_id: { type: string }
+        server_time: { type: string, format: date-time }
+
+    HeartbeatRequest:
+      type: object
+      required: [seq, monotonic_uptime_ms, permissions]
+      properties:
+        seq: { type: integer }
+        device_local_time: { type: string, format: date-time }
+        monotonic_uptime_ms: { type: integer, format: int64 }
+        active_commitments:
+          type: array
+          items: { type: string, format: uuid }
+        permissions: { $ref: '#/components/schemas/DevicePermissions' }
+        enforcement_state:
+          type: object
+          properties:
+            shield_active_app_ids: { type: array, items: { type: string, format: uuid } }
+            last_block_at: { type: string, format: date-time }
+        integrity:
+          type: object
+          properties:
+            root_detected: { type: boolean }
+            hook_framework_detected: { type: boolean }
+            clone_environment: { type: boolean }
+            developer_mode: { type: boolean }
+        attestation: { $ref: '#/components/schemas/Attestation' }
+    HeartbeatAction:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [RECORD_VIOLATION, SHOW_WARNING, REQUIRE_REATTESTATION, REARM_SHIELD]
+        violation_type: { $ref: '#/components/schemas/ViolationType' }
+        message: { type: string }
+    HeartbeatResponse:
+      type: object
+      required: [ack_seq, server_time, clock_verdict, protection_status]
+      properties:
+        ack_seq: { type: integer }
+        server_time: { type: string, format: date-time }
+        clock_skew_ms: { type: integer, format: int64 }
+        clock_verdict: { $ref: '#/components/schemas/ClockVerdict' }
+        protection_status: { $ref: '#/components/schemas/ProtectionStatus' }
+        actions:
+          type: array
+          items: { $ref: '#/components/schemas/HeartbeatAction' }
+        grace:
+          type: object
+          nullable: true
+          properties:
+            expires_at: { type: string, format: date-time }
+            penalty_on_expiry: { $ref: '#/components/schemas/MoneyAmount' }
+        next_heartbeat_seconds: { type: integer }
+
+    UsageEvent:
+      type: object
+      required: [user_restricted_app_id, event_type, duration_seconds, monotonic_elapsed_ms]
+      properties:
+        user_restricted_app_id: { type: string, format: uuid }
+        event_type: { type: string, enum: [foreground, background, heartbeat, threshold] }
+        duration_seconds: { type: integer, minimum: 0 }
+        device_local_ts: { type: string, format: date-time }
+        monotonic_elapsed_ms: { type: integer, format: int64 }
+    UsageSyncRequest:
+      type: object
+      required: [batch_id, device_id, events]
+      properties:
+        batch_id: { type: string, format: uuid }
+        device_id: { type: string, format: uuid }
+        events:
+          type: array
+          items: { $ref: '#/components/schemas/UsageEvent' }
+    RuleState:
+      type: object
+      properties:
+        user_restricted_app_id: { type: string, format: uuid }
+        current_usage_seconds: { type: integer }
+        daily_limit_seconds: { type: integer }
+        cooldown_state: { $ref: '#/components/schemas/CooldownState' }
+        limit_reached: { type: boolean }
+    UsageSyncResult:
+      type: object
+      properties:
+        batch_id: { type: string, format: uuid }
+        accepted_events: { type: integer }
+        rejected_events: { type: integer }
+        server_time: { type: string, format: date-time }
+        rule_state:
+          type: array
+          items: { $ref: '#/components/schemas/RuleState' }
+
+    UnlockRequestCreate:
+      type: object
+      required: [user_restricted_app_id, device_id, duration_seconds]
+      properties:
+        user_restricted_app_id: { type: string, format: uuid }
+        device_id: { type: string, format: uuid }
+        duration_seconds: { type: integer, enum: [300, 900, 3600] }
+        funding_source: { type: string, enum: [wallet], default: wallet }
+    UnlockGranted:
+      type: object
+      required: [unlock_request_id, status, authorization_token, expires_at]
+      properties:
+        unlock_request_id: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/UnlockStatus' }
+        user_restricted_app_id: { type: string, format: uuid }
+        duration_seconds: { type: integer }
+        fee:
+          allOf: [ { $ref: '#/components/schemas/MoneyAmount' } ]
+        granted_at: { type: string, format: date-time }
+        expires_at: { type: string, format: date-time }
+        authorization_token: { type: string, description: EdDSA-signed, device+app+exp bound }
+        wallet: { $ref: '#/components/schemas/Wallet' }
+        ledger_journal_id: { type: string, format: uuid }
+    UnlockFundingRequired:
+      type: object
+      properties:
+        unlock_request_id: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/UnlockStatus' }
+        fee: { $ref: '#/components/schemas/MoneyAmount' }
+        funding_required:
+          type: object
+          properties:
+            reason: { type: string, example: insufficient_wallet_balance }
+            available_balance: { $ref: '#/components/schemas/Money' }
+            shortfall: { $ref: '#/components/schemas/Money' }
+            topup_endpoint: { type: string }
+
+    Wallet:
+      type: object
+      properties:
+        available_balance: { $ref: '#/components/schemas/Money' }
+        locked_balance: { $ref: '#/components/schemas/Money' }
+        currency: { $ref: '#/components/schemas/Currency' }
+        status: { type: string, enum: [active, frozen, closed] }
+    TopupCreate:
+      type: object
+      required: [amount, currency, provider]
+      properties:
+        amount: { $ref: '#/components/schemas/Money' }
+        currency: { $ref: '#/components/schemas/Currency' }
+        provider: { $ref: '#/components/schemas/PaymentProvider' }
+        return_url: { type: string }
+    PaymentIntent:
+      type: object
+      properties:
+        payment_id: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/PaymentStatus' }
+        provider: { $ref: '#/components/schemas/PaymentProvider' }
+        amount: { $ref: '#/components/schemas/Money' }
+        currency: { $ref: '#/components/schemas/Currency' }
+        provider_intent_id: { type: string }
+        checkout:
+          type: object
+          properties:
+            type: { type: string, enum: [redirect, sdk, qr] }
+            url: { type: string }
+        expires_at: { type: string, format: date-time }
+
+    DepositCreate:
+      type: object
+      required: [staked_amount, currency]
+      properties:
+        staked_amount: { $ref: '#/components/schemas/Money' }
+        currency: { $ref: '#/components/schemas/Currency' }
+        commitment_end: { type: string, format: date-time }
+    Deposit:
+      type: object
+      properties:
+        deposit_id: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/DepositStatus' }
+        staked_amount: { $ref: '#/components/schemas/Money' }
+        forfeited_amount: { $ref: '#/components/schemas/Money' }
+        returned_amount: { $ref: '#/components/schemas/Money' }
+        currency: { $ref: '#/components/schemas/Currency' }
+        wallet: { $ref: '#/components/schemas/Wallet' }
+        ledger_journal_id: { type: string, format: uuid }
+        commitment_start: { type: string, format: date-time }
+        commitment_end: { type: string, format: date-time, nullable: true }
+
+    ScreenTimeRule:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        user_restricted_app_id: { type: string, format: uuid }
+        daily_limit_seconds: { type: integer }
+        min_committed_seconds: { type: integer }
+        current_usage_seconds: { type: integer }
+        cooldown_state: { $ref: '#/components/schemas/CooldownState' }
+        status: { $ref: '#/components/schemas/RuleStatus' }
+    UserRestrictedAppCreate:
+      type: object
+      properties:
+        app_catalog_id: { type: string, format: uuid }
+        ios_application_token: { type: string }
+        label_override: { type: string }
+      anyOf:
+        - required: [app_catalog_id]
+        - required: [ios_application_token]
+    UserRestrictedApp:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        app_catalog_id: { type: string, format: uuid, nullable: true }
+        ios_application_token: { type: string, nullable: true }
+        label_override: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/RuleStatus' }
+        added_at: { type: string, format: date-time }
+        removed_at: { type: string, format: date-time, nullable: true }

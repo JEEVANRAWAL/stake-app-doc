@@ -1,0 +1,12 @@
+# Python / MkDocs
+.venv/
+__pycache__/
+*.pyc
+/site/
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
