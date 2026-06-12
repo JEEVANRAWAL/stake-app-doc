@@ -1458,7 +1458,7 @@ in the local market — at that moment the user is hostile and won't complete a 
 - <strong>Provider routing:</strong> Nepal → eSewa/Khalti/Fonepay; international cards/Apple/Google Pay → Stripe. One internal <code>payment_provider</code> abstraction; providers interchangeable.
 - <strong>Forfeited money</strong> routes to <strong><code>system_forfeit_revenue</code> (company revenue)</strong> — <em>🔒 locked: revenue, not charity.</em> Conditional on legal sign-off that revenue-forfeit is permissible (commitment-contract, not gambling) in Nepal; <strong><code>system_charity</code> is the fallback</strong> if counsel objects (the ledger already supports both, so the switch is a config change). The penalty-vs-subscription revenue mix is a tracked ethical guardrail (delivery-plan §8).
 - <strong>Minimum funding to create a commitment</strong> <em>(🔒 locked):</em> arming a commitment requires available
-  balance ≥ a minimum backing (default <strong>Rs. 200</strong>, configurable), and <strong>max penalty/forfeit exposure is
+  balance ≥ a minimum backing (default <strong>Rs. 100</strong>, configurable), and <strong>max penalty/forfeit exposure is
   capped to the pre-funded/staked balance at creation</strong> — no money, no commitment. Underfunded →
   <code>402 COMMITMENT_FUNDING_REQUIRED</code> with a top-up prompt. This is what gives "capture money up front" teeth.
 - <strong>Returned (un-forfeited) deposit</strong> goes back to <em>available balance</em>, <strong>not</strong> auto-refunded to card (local-rail refunds are painful/lossy) — offer explicit withdrawal instead.

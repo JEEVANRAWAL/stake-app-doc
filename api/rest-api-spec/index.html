@@ -1742,7 +1742,7 @@ Response <code>201</code>:
 <a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nt">&quot;ledger_journal_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jrn_77c2a1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;commitment_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-07-12T00:00:00Z&quot;</span>
 <a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="p">}</span>
 </code></pre></div>
-Staking posts <code>user_available → user_locked</code>. <strong>Minimum stake Rs. 200</strong> (configurable). Creating a
+Staking posts <code>user_available → user_locked</code>. <strong>Minimum stake Rs. 100</strong> (configurable). Creating a
 commitment (this deposit <strong>or</strong> arming penalty-bearing restrictions) requires available balance ≥ the
 minimum backing; underfunded → <strong><code>402 COMMITMENT_FUNDING_REQUIRED</code></strong> with <code>funding_required</code> (<code>shortfall</code>,
 <code>topup_endpoint</code>). Max penalty exposure is capped to the staked/pre-funded balance at creation (PRD FR-6).</p>
