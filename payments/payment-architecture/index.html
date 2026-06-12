@@ -1774,8 +1774,9 @@ growth lever but not adopted at launch.</p>
   per route at initiation; <code>payments.fee_amount</code> / <code>net_amount</code> already carry it.</li>
 </ul>
 <p><strong>Limits:</strong>
-- <strong>Minimum top-up Rs. 200</strong>, with presets <strong>Rs. 200 / 500 / 1000</strong>. Sub-Rs.200 top-ups are margin-thin and
-  defeat the batching thesis; Rs. 200 also covers several Rs. 50 penalties.
+- <strong>Minimum top-up Rs. 100</strong>, with presets <strong>Rs. 100 / 500 / 1000</strong>. A floor still matters — very small
+  top-ups are margin-thin and defeat the batching thesis — but Rs. 100 keeps onboarding low-friction and
+  <strong>matches the minimum commitment backing</strong>, so a single minimum top-up can arm a commitment.
 - <strong>Maximum / wallet-balance cap by KYC tier</strong> (start conservative, e.g. Rs. 25k unverified) — feeds the
   stored-value/e-money legal blocker; balance caps reduce regulatory burden.</p>
 <p><strong>Anti-cycling (round-trip abuse):</strong> with gross-up the user already pays the inbound fee, but withdrawals
