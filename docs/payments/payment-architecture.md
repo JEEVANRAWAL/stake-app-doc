@@ -104,6 +104,75 @@ sequenceDiagram
     SET-->>App: balance updated (push / next sync)
 ```
 
+## Khalti & Fonepay — deltas from the eSewa baseline
+
+Both ride the **same machinery** as eSewa — the provider abstraction (`initiate()` + `fetchStatus()`), the
+backend-mediated deep-link routing, the dual-channel split, the §6b poller + R4 backstop, and the
+transparent gross-up fees are all **provider-agnostic and reused**. Only *initiation*, the *authoritative
+status lookup*, and (for Fonepay QR) the *user surface* differ. (Endpoint/field names below should be
+confirmed against current merchant docs — gateways version these.)
+
+| Aspect | eSewa | Khalti (KPG) | Fonepay |
+|---|---|---|---|
+| **Initiation** | client form POST, **HMAC-SHA256** signed | **server** `epayment/initiate/` (secret key) → returns `pidx` + `payment_url` | redirect: signed form (**HMAC-SHA512**) · **QR**: dynamic QR |
+| **User surface** | hosted eSewa page (Custom Tab) | hosted Khalti checkout (Custom Tab) | redirect: hosted page · **QR: user's own bank app** |
+| **Intent id** (`provider_intent_id`) | `transaction_uuid` (= payment.id) | **`pidx`** | PRN / merchant txn ref |
+| **Authoritative confirm** | status-check by `transaction_uuid` | **`epayment/lookup/` by `pidx`** | status-check / notification |
+| **Return mechanism** | redirect → backend → deep link | redirect → backend → deep link | redirect mode: same · **QR: no redirect — poll** |
+| **Amount unit** | rupees | **paisa** (×100, integer) | rupees |
+| **Redirect signature** | signed base64 `data` | none — plain params, verified via lookup | HMAC-SHA512 |
+
+### Khalti — server-initiated, lookup-by-`pidx`
+- **Backend initiates** (secret key stays server-side — cleaner than eSewa's client-side signing): `POST
+  epayment/initiate/` with `return_url` (backend), `amount` in **paisa**, `purchase_order_id` = payment.id
+  → Khalti returns `pidx` + `payment_url`. Store `pidx` in `provider_intent_id`.
+- App opens `payment_url` in a Custom Tab. After payment Khalti redirects to the backend `return_url` with
+  **plain** params (`pidx`, `status`, `transaction_id`, `amount`) — **never trusted**; backend calls
+  **`epayment/lookup/` by `pidx`** for the authoritative status (`Completed`/`Pending`/`Refunded`/
+  `Expired`/`User canceled`). That lookup *is* the §6b poll for Khalti. `pidx` expiry (~60 min) → `Expired`
+  maps to `cancelled` + `failure_code='expired_no_return'`.
+
+### Fonepay — redirect mode **or** QR mode
+- **Redirect (RWS) mode:** eSewa-equivalent, only the hash is **HMAC-SHA512**. Signed form → hosted page →
+  signed redirect to backend → verify → status-check. Reuses everything unchanged.
+- **QR mode (the differentiator — inter-bank reach):** the app shows a Fonepay **dynamic QR**; the user
+  pays from **their own bank app** (any Fonepay-member bank). **There is no browser, no redirect, and no
+  deep link.** Confirmation arrives via Fonepay **server notification + status poll**, so here the **§6b
+  poller is the *primary* confirmation path, not a fallback.** The confirm screen polls
+  `GET /payments/{pid}` while the QR (short TTL) is displayed.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant App as Flutter App
+    participant Bank as User's Bank App
+    participant API as NestJS API
+    participant FP as Fonepay
+    participant SET as SettlementWorker
+
+    App->>API: POST /v1/wallet/topup {provider: fonepay_qr}
+    API->>FP: request dynamic QR (PRN = payment.id)
+    FP-->>API: QR payload
+    API-->>App: show QR (short TTL)
+    U->>Bank: scan QR & approve (separate app)
+    Bank->>FP: pay
+    Note over API,FP: no redirect — confirmation is poll/notification
+    par Notification
+        FP-->>API: payment notification
+        API->>SET: enqueue settlement
+    and §6b poller (primary here)
+        API->>FP: status-check by PRN
+        FP-->>API: COMPLETE
+        API->>SET: enqueue settlement
+    end
+    SET->>API: journal gateway_clearing → user_available (net)
+    App->>API: GET /payments/{pid} (polling) → succeeded → show balance
+```
+
+**MVP routing:** eSewa + **Khalti redirect** are the simplest first pair (both hosted-page + lookup).
+**Fonepay QR** is a strong fast-follow for inter-bank reach but needs the QR/poll UX above.
+
 ## Deep-link / `success_url` routing
 
 **Governing principle — two independent channels.** The deep link back into the app is *not* how money

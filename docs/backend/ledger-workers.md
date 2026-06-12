@@ -210,6 +210,11 @@ set `transaction_uuid = payment.id` at initiation, we can always ask eSewa "what
 X?" via the status-check API keyed on `(product_code, total_amount, transaction_uuid)` — **no callback
 required**. Reconciliation = poll until terminal, then converge local state toward eSewa.
 
+> The same `q.esewa-poll` mechanism serves the other redirect/QR gateways via their own
+> `fetchStatus`: **Khalti** = `epayment/lookup/` by `pidx`; **Fonepay** = status-check by PRN (and for
+> Fonepay **QR**, which has no redirect at all, this poller is the *primary* confirmation path, not a
+> fallback). See `payments/payment-architecture.md` → "Khalti & Fonepay — deltas".
+
 **Guiding rule:** eSewa is the source of truth about whether money moved; local state is a cache we
 reconcile toward it. **Never move a payment to a terminal *unpaid* state from silence alone** — only an
 explicit eSewa `CANCELED`/`NOT_FOUND` (after TTL) or the settlement report may declare "not paid." A
