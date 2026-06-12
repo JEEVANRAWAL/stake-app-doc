@@ -14,6 +14,7 @@ bypass on Android or iOS.
 - **Ledger:** Isolated `ledger` schema, append-only double-entry, journal-atomic, role-restricted.
 - **Launch strategy:** **Android-first** MVP (wallet model), iOS fast-follow (entitlement-gated).
 - **Payment return routing:** gateway `success_url` points at the **backend** (not the app); the app return uses **verified App Links / Universal Links — no custom URL scheme**. Deep link is best-effort UX; settlement is server-authoritative. See [payments/payment-architecture.md](payments/payment-architecture.md).
+- **Top-up fees:** **transparent gross-up** — user picks a wallet credit amount; charged amount + disclosed processing fee; wallet credited the round amount; fee-neutral (no silent net shortfall). **Min top-up Rs. 200**; wallet-balance cap by KYC tier; withdrawals bear their own fee + cycle limit. See [payments/payment-architecture.md](payments/payment-architecture.md).
 - **Two launch blockers to start day 1:** Apple Family Controls entitlement; stored-value/e-money legal review.
 
 ## Document map

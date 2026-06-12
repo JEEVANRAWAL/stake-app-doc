@@ -189,6 +189,43 @@ sequenceDiagram
     API-->>App: status: succeeded → show new balance
 ```
 
+## Top-up economics — fees, gross-up, limits
+
+A top-up is the user moving **their own money** into the wallet — we earn nothing on it, so every rupee
+of gateway fee is pure margin drag. Revenue comes from forfeits/penalties (+ possible subscription), not a
+top-up spread.
+
+**🔒 Locked decision — transparent gross-up (fee-neutral).** The user chooses a **wallet credit amount**;
+we charge that amount **plus a disclosed processing fee** at the gateway. The wallet is credited the exact
+round amount the user asked for; we stay fee-neutral. A *silent net shortfall* ("paid 500, got 490") is
+rejected — it erodes trust at the cooperative moment. Absorbing the fee (credit gross) was considered as a
+growth lever but not adopted at launch.
+
+```
+User wants Rs. 500 in wallet
+  eSewa total_amount  = 510   (wallet_credit 500 + processing fee 10)
+  user_available cr.  = 500   (the round amount requested)
+  system_fees         = actual fee from the settlement pull
+```
+
+- **Charge math:** `total_amount = wallet_credit + estimated_fee`. Credit `user_available` with
+  `wallet_credit`; post the **actual** fee (from the authoritative status pull, not the estimate) to
+  `system_fees`; reconcile estimate vs actual. Because the gateway's % applies to the grossed-up total, a
+  few paisa residual remains — **round in the user's favour and absorb it.**
+- **Per-provider fee config:** eSewa ~2%, Khalti/Fonepay (local), Stripe intl ~2.9%+. Gross-up is computed
+  per route at initiation; `payments.fee_amount` / `net_amount` already carry it.
+
+**Limits:**
+- **Minimum top-up Rs. 200**, with presets **Rs. 200 / 500 / 1000**. Sub-Rs.200 top-ups are margin-thin and
+  defeat the batching thesis; Rs. 200 also covers several Rs. 50 penalties.
+- **Maximum / wallet-balance cap by KYC tier** (start conservative, e.g. Rs. 25k unverified) — feeds the
+  stored-value/e-money legal blocker; balance caps reduce regulatory burden.
+
+**Anti-cycling (round-trip abuse):** with gross-up the user already pays the inbound fee, but withdrawals
+must not become a fee-free money mover. Withdrawals bear their **own payout fee** (passed to user) + a
+**minimum withdrawal**, plus a **cooling-off / cycle limit**. (Returned deposits land in *available
+balance*, not auto-refunded — withdrawal is always explicit.)
+
 > **iOS synergy:** an extension cannot present a payment sheet, so on iOS "pay to unlock" is done
 > as **pre-authorized unlocks** — the user buys unlock credit/time *in the app* (cooperative,
 > gateway-friendly) and the `ShieldAction` extension just verifies & consumes a token from the
