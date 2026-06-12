@@ -1344,6 +1344,7 @@
 |---|---|---|---|
 | <code>user_available</code> | liability | credits − debits | spendable wallet |
 | <code>user_locked</code> | liability | credits − debits | staked/locked deposit |
+| <code>user_payout_pending</code> | liability | credits − debits | withdrawal held pending disbursement |
 | <code>system_gateway_clearing</code> | asset | debits − credits | funds in transit at PSP |
 | <code>system_forfeit_revenue</code> | revenue | credits − debits | forfeits/penalties → company |
 | <code>system_charity</code> | liability | credits − debits | forfeits earmarked for charity |
@@ -1358,7 +1359,9 @@
 | Penalty (locked first, then available) | <code>user_locked</code> / <code>user_available</code> | <code>system_forfeit_revenue</code> <em>(or <code>system_charity</code>)</em> |
 | Deposit forfeiture | <code>user_locked</code> | <code>system_forfeit_revenue</code> <em>(or <code>system_charity</code>)</em> |
 | Deposit return | <code>user_locked</code> | <code>user_available</code> |
-| Withdrawal | <code>user_available</code> | <code>system_gateway_clearing</code> |</p>
+| Withdrawal — request hold | <code>user_available</code> | <code>user_payout_pending</code> |
+| Withdrawal — paid (disbursed) | <code>user_payout_pending</code> | <code>system_gateway_clearing</code> |
+| Withdrawal — release (reject/fail/cancel) | <code>user_payout_pending</code> | <code>user_available</code> |</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// The only code allowed to write ledger.*  — runs inside one DB transaction.</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">async</span><span class="w"> </span><span class="nx">postJournal</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">input</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="c1">// 1. Idempotency</span>
@@ -1507,12 +1510,22 @@ Returned money lands in <strong>available balance</strong> (not auto-refunded to
 <td>ops ticket</td>
 </tr>
 <tr>
+<td><strong>R5 — Payout settlement</strong></td>
+<td><code>paid</code> withdrawals vs bank / connectIPS settlement export (both ways)</td>
+<td>page; <strong>freeze payouts</strong></td>
+</tr>
+<tr>
 <td>Plus orphan scans: granted unlocks w/o journal; active deposits past end w/o release; payments stuck pending past TTL → expire.</td>
 <td></td>
 <td></td>
 </tr>
 </tbody>
 </table>
+<p><strong>Payout safety (outbound = unrecoverable real money):</strong> a withdrawal stuck in <code>processing</code> is resolved
+<strong>only</strong> by checking the bank / connectIPS status — <strong>never blind-retried</strong>. Each withdrawal carries an
+idempotent disburse reference (connectIPS merchant txn ref) so a batch re-run cannot double-pay. R5 flags
+any <code>paid</code> withdrawal missing from the bank export (did it actually send?) and any bank debit lacking a
+<code>paid</code> withdrawal. See <code>payments/payment-architecture.md</code> → "Withdrawal / payout flow".</p>
 <h2 id="6b-esewa-top-up-reconciliation-paid-but-didnt-return">6b. eSewa Top-up Reconciliation — "paid but didn't return"<a class="headerlink" href="#6b-esewa-top-up-reconciliation-paid-but-didnt-return" title="Permanent link">&para;</a></h2>
 <p>eSewa ePay v2 has <strong>no async webhook</strong>: confirmation rides the browser redirect to <code>success_url</code>.
 If the user approves payment then closes the browser before the redirect fires, the <code>payments</code> row
