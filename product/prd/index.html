@@ -534,10 +534,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-payment-model-is-a-phase-1-architecture-decision" class="md-nav__link">
+  <a href="#7-payment-model-locked-why-pre-funded-wallet" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. ⚠️ Payment Model is a Phase-1 Architecture Decision
+        7. Payment Model (🔒 locked) — why pre-funded wallet
       
     </span>
   </a>
@@ -567,10 +567,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#10-critical-open-decisions-blockers" class="md-nav__link">
+  <a href="#10-critical-decisions-status" class="md-nav__link">
     <span class="md-ellipsis">
       
-        10. Critical Open Decisions (blockers)
+        10. Critical Decisions — Status
       
     </span>
   </a>
@@ -1380,10 +1380,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-payment-model-is-a-phase-1-architecture-decision" class="md-nav__link">
+  <a href="#7-payment-model-locked-why-pre-funded-wallet" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. ⚠️ Payment Model is a Phase-1 Architecture Decision
+        7. Payment Model (🔒 locked) — why pre-funded wallet
       
     </span>
   </a>
@@ -1413,10 +1413,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#10-critical-open-decisions-blockers" class="md-nav__link">
+  <a href="#10-critical-decisions-status" class="md-nav__link">
     <span class="md-ellipsis">
       
-        10. Critical Open Decisions (blockers)
+        10. Critical Decisions — Status
       
     </span>
   </a>
@@ -1586,7 +1586,7 @@ loss-aversion into the enforcement mechanism.</p>
 </ul>
 <h3 id="fr-6-commitment-integrity">FR-6 — Commitment Integrity<a class="headerlink" href="#fr-6-commitment-integrity" title="Permanent link">&para;</a></h3>
 <p>See <a href="../../architecture/anti-cheating/">architecture/anti-cheating.md</a>.</p>
-<h2 id="7-payment-model-is-a-phase-1-architecture-decision">7. ⚠️ Payment Model is a Phase-1 Architecture Decision<a class="headerlink" href="#7-payment-model-is-a-phase-1-architecture-decision" title="Permanent link">&para;</a></h2>
+<h2 id="7-payment-model-locked-why-pre-funded-wallet">7. Payment Model (🔒 locked) — why pre-funded wallet<a class="headerlink" href="#7-payment-model-locked-why-pre-funded-wallet" title="Permanent link">&para;</a></h2>
 <p><strong>You cannot reliably charge a user <em>after</em> they break a commitment</strong> — especially after uninstall.</p>
 <table>
 <thead>
@@ -1618,8 +1618,11 @@ loss-aversion into the enforcement mechanism.</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Recommendation:</strong> <strong>Model A (pre-funded stake) + optionally C for forfeits.</strong> Decide now whether
-penalty money is <strong>revenue</strong> or <strong>forfeited (charity/locked)</strong> — affects store billing classification, taxes, trust, IAP requirement.</p>
+<p><strong>🔒 Locked:</strong> <strong>Model A — pre-funded wallet/stake</strong> is the payment substrate, and <strong>forfeits → company
+revenue</strong> (<code>system_forfeit_revenue</code>), not charity (legal-gated; charity is the fallback). Store billing
+classification, taxes, trust, and IAP requirement all flow from this. See
+<a href="../../payments/payment-architecture/">../payments/payment-architecture.md</a> and the locked decisions in
+<a href="../../">../README.md</a>.</p>
 <h2 id="8-non-functional-requirements">8. Non-Functional Requirements<a class="headerlink" href="#8-non-functional-requirements" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Block latency:</strong> &lt; ~300 ms after foreground detection (Android), before meaningful interaction.</li>
@@ -1631,13 +1634,13 @@ penalty money is <strong>revenue</strong> or <strong>forfeited (charity/locked)<
 <h2 id="9-success-metrics">9. Success Metrics<a class="headerlink" href="#9-success-metrics" title="Permanent link">&para;</a></h2>
 <p>D7/D30 retention; <strong>avg. days a commitment survives</strong>; bypass-attempt rate; paid-unlock conversion;
 <strong>% of revenue from unlocks vs. subscription</strong> (over-reliance on penalties = product failing its users — watch this).</p>
-<h2 id="10-critical-open-decisions-blockers">10. Critical Open Decisions (blockers)<a class="headerlink" href="#10-critical-open-decisions-blockers" title="Permanent link">&para;</a></h2>
+<h2 id="10-critical-decisions-status">10. Critical Decisions — Status<a class="headerlink" href="#10-critical-decisions-status" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Penalty money flow:</strong> revenue vs. charity-forfeit vs. user-reward. → IAP vs. processor, store policy, legal/tax.</li>
-<li><strong>Stake vs. charge-on-event:</strong> confirm pre-funded stake (Model A).</li>
-<li><strong>iOS entitlement go/no-go:</strong> Apple's Family Controls distribution entitlement is gated and can be denied — submit early.</li>
-<li><strong>Launch platform:</strong> Android-first (richer enforcement + custom pay screen).</li>
-<li>~~"Increase limit takes effect when?"~~ <strong>Resolved (locked):</strong> next logical day (anti-binge); same-day need is served by paid unlocks (FR-2). See FR-4.</li>
+<li>~~<strong>Penalty money flow</strong>~~ <strong>Resolved:</strong> → <strong>company revenue</strong> (<code>system_forfeit_revenue</code>), legal-gated (not gambling); charity is the fallback.</li>
+<li>~~<strong>Stake vs. charge-on-event</strong>~~ <strong>Resolved:</strong> pre-funded <strong>wallet/stake (Model A)</strong>.</li>
+<li><strong>iOS entitlement go/no-go</strong> — <em>still open (external):</em> Apple's Family Controls distribution entitlement is gated and can be denied — submit early. Tracked as launch blocker #1.</li>
+<li>~~<strong>Launch platform</strong>~~ <strong>Resolved:</strong> <strong>Android-first</strong> (richer enforcement + custom pay screen).</li>
+<li>~~"Increase limit takes effect when?"~~ <strong>Resolved:</strong> next logical day (anti-binge); same-day need is served by paid unlocks (FR-2). See FR-4.</li>
 </ol>
 <h2 id="11-phase-1-cutline-mvp">11. Phase 1 Cutline (MVP)<a class="headerlink" href="#11-phase-1-cutline-mvp" title="Permanent link">&para;</a></h2>
 <p>Android-first · FR-1 + FR-3 + FR-2 (5-min unlock) + FR-4 asymmetric edits · pre-funded wallet ·
