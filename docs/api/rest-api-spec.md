@@ -193,11 +193,11 @@ stateDiagram-v2
     requested --> denied: rule no longer active / fraud
 ```
 
-## F. Wallet, Deposit, Rule-Edit & Removal
+## F. Wallet, Deposit, Withdrawal, Rule-Edit & Removal
 
 ### F.1 Top-up — `POST /v1/wallet/topup` (Idempotency-Key)
 ```json
-{ "amount": "500.0000", "currency": "NPR", "provider": "khalti", "return_url": "stakeapp://topup/return" }
+{ "amount": "500.0000", "currency": "NPR", "provider": "khalti", "return_url": "https://link.stakeapp.io/topup/return" }
 ```
 Response `201`:
 ```json
@@ -236,6 +236,54 @@ Staking posts `user_available → user_locked`.
 ### F.4 Remove app — `DELETE /v1/user-restricted-apps/{id}` (Idempotency-Key)
 Body: `{ "break_token": "brk_…" }`. Requires a paid commitment-break; removal effective **after the current
 active window** (`removed_at` set, `status='removed'` deferred).
+
+### F.5 Request withdrawal — `POST /v1/wallet/withdrawals` (Idempotency-Key)
+Money out — **gross-down fee** (user bears it) + **two-phase hold**. Requires **KYC ≥ tier 1** and a
+bank-account name match. Only **settled, un-staked, non-forfeited** available balance is withdrawable.
+```json
+{
+  "amount": "500.0000", "currency": "NPR",
+  "destination": { "bank_code": "NICENPKA", "account_no": "0123010000123", "account_name": "Jeevan Rawal" }
+}
+```
+Response `201` (funds held, pending review):
+```json
+{
+  "withdrawal_id": "wd_3c91aa", "status": "under_review",
+  "amount": "500.0000", "fee_amount": "10.0000", "payout_amount": "490.0000", "currency": "NPR",
+  "wallet": { "available_balance": "0.0000", "locked_balance": "200.0000", "payout_pending_balance": "500.0000", "currency": "NPR" },
+  "ledger_journal_id": "jrn_88d4c2",
+  "estimated_completion": "1–2 business days",
+  "requested_at": "2026-06-12T04:20:00Z"
+}
+```
+At request the server holds funds (`user_available → user_payout_pending`) so they can't be re-spent or
+double-withdrawn; the payout itself (`user_payout_pending → system_gateway_clearing`) posts **only** when
+disbursement is confirmed `paid`. Provider (`manual_bank` now, `connectips` later) is chosen server-side.
+
+Error responses:
+- `403 WITHDRAWAL_KYC_REQUIRED` — identity / bank-name verification needed before first payout (`meta.required_tier`).
+- `409 INSUFFICIENT_AVAILABLE_BALANCE` — exceeds settled, un-staked balance (`meta.available_balance`).
+- `409 WITHDRAWAL_LIMIT_EXCEEDED` — below minimum or over per-tier velocity cap (`meta.minimum`, `meta.limit`).
+
+### F.6 Get withdrawal — `GET /v1/wallet/withdrawals/{id}`
+Response `200`:
+```json
+{
+  "withdrawal_id": "wd_3c91aa", "status": "paid",
+  "amount": "500.0000", "fee_amount": "10.0000", "payout_amount": "490.0000", "currency": "NPR",
+  "provider": "manual_bank", "disburse_reference": "BNK-20260613-0042",
+  "requested_at": "2026-06-12T04:20:00Z", "approved_at": "2026-06-12T05:00:00Z", "paid_at": "2026-06-13T09:10:00Z"
+}
+```
+Statuses: `requested → under_review → approved → processing → paid`; or `rejected` / `failed` / `cancelled`
+(each **releases the hold** back to available). See [payments/payment-architecture.md](../payments/payment-architecture.md) → "Withdrawal / payout flow".
+
+### F.7 Cancel withdrawal — `POST /v1/wallet/withdrawals/{id}/cancel` (Idempotency-Key)
+Allowed **only** while `requested`/`under_review` (never once `processing` — a disbursement may be in
+flight). Releases the hold (`user_payout_pending → user_available`).
+- `200` → new wallet balances.
+- `409 WITHDRAWAL_NOT_CANCELLABLE` — already in/after `processing`.
 
 ## G. Request Signing & Replay Protection
 Per-device HMAC key (issued at registration, stored in Android Keystore / iOS Keychain — hardware-backed):
