@@ -207,6 +207,8 @@ CREATE TABLE core.screen_time_rules (
     current_usage_seconds   INTEGER NOT NULL DEFAULT 0,
     limit_reached_at        TIMESTAMPTZ,
     last_increase_payment_id UUID,
+    pending_limit_seconds   INTEGER CHECK (pending_limit_seconds >= 0),  -- staged increase (next-day, anti-binge)
+    pending_effective_day_key DATE,                                      -- when the staged increase applies
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (user_restricted_app_id),

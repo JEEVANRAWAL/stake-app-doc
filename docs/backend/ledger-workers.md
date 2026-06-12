@@ -295,7 +295,7 @@ flowchart TD
 ```
 
 ## 7. Aggregation, Streaks, Notifications
-- **SnapshotWorker** (per user at their `day_boundary_minutes`): folds `usage_events` into `daily_snapshots` + `daily_app_usage`. Idempotent on `(user_id, snapshot_date)`.
+- **SnapshotWorker** (per user at their `day_boundary_minutes`): folds `usage_events` into `daily_snapshots` + `daily_app_usage`. Idempotent on `(user_id, snapshot_date)`. **Rule rollover:** at the boundary it also resets `current_usage_seconds`/`current_day_key` and **applies any staged increase** (`pending_limit_seconds` → `daily_limit_seconds` when `pending_effective_day_key` ≤ new day), then clears the pending fields — this is where the FR-4 *next-logical-day* increase lands.
 - **StreakWorker**: updates `gamification_state` (streaks, productivity score, money saved). Replayable from snapshots.
 - **NotificationWorker**: the outbox relay; reads pending `engage.notifications`, sends via FCM/APNs, advances status. Idempotent on notification id.
 

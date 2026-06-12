@@ -228,7 +228,10 @@ Staking posts `user_available → user_locked`.
 - Decrease (free, immediate): `{ "daily_limit_seconds": 1200 }` → `200`.
 - Increase (blocked): `{ "daily_limit_seconds": 2700 }` → `409 RULE_INCREASE_FORBIDDEN` with `required_fee`.
   Client first `POST /v1/commitment-breaks` (debits wallet, returns `break_token`), then retries the PATCH
-  with `{ "daily_limit_seconds": 2700, "break_token": "brk_…" }`. Increase takes effect **next logical day**.
+  with `{ "daily_limit_seconds": 2700, "break_token": "brk_…" }`. Increase takes effect **next logical day**:
+  the new value is **staged** in `pending_limit_seconds` / `pending_effective_day_key` and applied at the
+  rule's day-boundary rollover — never same-day (anti-binge). For access **now**, the user buys a paid
+  unlock (FR-2) instead; the increase and the unlock are independent levers.
 
 ### F.4 Remove app — `DELETE /v1/user-restricted-apps/{id}` (Idempotency-Key)
 Body: `{ "break_token": "brk_…" }`. Requires a paid commitment-break; removal effective **after the current

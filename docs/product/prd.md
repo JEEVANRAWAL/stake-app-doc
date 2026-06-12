@@ -66,7 +66,10 @@ loss-aversion into the enforcement mechanism.
 ### FR-4 — Anti-Cheating Edit Rules (asymmetric editing)
 - **Reduce limit:** allowed, free, immediate.
 - **Increase / disable limit:** blocked unless **commitment-break fee** paid.
-- Recommendation: increase takes effect *next* period, not instantly, so paying isn't a same-day binge enabler. *(Open decision.)*
+- **🔒 Locked — an increase takes effect at the *next logical day* (the rule's day-boundary reset), never same-day.** Paying the break fee *stages* the higher limit for the next period; it grants no extra time today. This is the anti-binge guarantee.
+- **Need-it-now is served by a paid unlock (FR-2)** — immediate, temporary, priced per use — so a next-day increase never feels like "paid for nothing." The two levers are deliberately distinct: *paid unlock = time now*; *limit increase = a higher cap from tomorrow*.
+- **UX:** the break-fee confirmation must state plainly "takes effect tomorrow" and offer the paid-unlock path for immediate access.
+- **Disable/remove** follows the same principle (FR-5): effective after the current active window, not mid-restriction.
 
 ### FR-5 — Remove App from Restriction List
 - Requires commitment-break fee (Rs. 50). After payment → removed.
@@ -103,7 +106,7 @@ D7/D30 retention; **avg. days a commitment survives**; bypass-attempt rate; paid
 2. **Stake vs. charge-on-event:** confirm pre-funded stake (Model A).
 3. **iOS entitlement go/no-go:** Apple's Family Controls distribution entitlement is gated and can be denied — submit early.
 4. **Launch platform:** Android-first (richer enforcement + custom pay screen).
-5. **"Increase limit takes effect when?"** — recommend next-period to avoid same-day binge.
+5. ~~"Increase limit takes effect when?"~~ **Resolved (locked):** next logical day (anti-binge); same-day need is served by paid unlocks (FR-2). See FR-4.
 
 ## 11. Phase 1 Cutline (MVP)
 Android-first · FR-1 + FR-3 + FR-2 (5-min unlock) + FR-4 asymmetric edits · pre-funded wallet ·
