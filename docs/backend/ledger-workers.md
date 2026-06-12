@@ -169,7 +169,9 @@ async process({ violationId }) {
 ```
 **Insufficient funds:** post what's available, record a `negative_commitment_balance` flag, block new
 commitments + require top-up. Wallet never goes negative. Mitigated by **capping max penalty exposure to the
-pre-funded balance** at commitment-creation time.
+pre-funded balance** at commitment-creation time — enforced by the **minimum-funding-to-create-a-commitment**
+rule (PRD FR-6 / `payments/payment-architecture.md`): a commitment can't be armed unless available balance ≥
+the minimum backing, so there is always money behind the teeth.
 
 ## 5. Deposit Forfeiture / Return Engine (`q.deposit-engine`)
 ```mermaid

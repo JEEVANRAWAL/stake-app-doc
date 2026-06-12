@@ -76,7 +76,13 @@ loss-aversion into the enforcement mechanism.
 - **Cooling-off:** removal takes effect after the current active window, not mid-restriction.
 
 ### FR-6 — Commitment Integrity
-See [architecture/anti-cheating.md](../architecture/anti-cheating.md).
+- **🔒 Locked — minimum funding to create a commitment.** Arming a commitment (a staked deposit, **or**
+  activating penalty-bearing restrictions) **requires available wallet balance ≥ a minimum backing
+  (default Rs. 200, configurable).** Max penalty/forfeit exposure is **capped to the pre-funded (or
+  staked) balance at creation time** — a commitment is only as strong as the money behind it; an
+  **unfunded commitment has no teeth and is not allowed.** Underfunded → creation blocked with a top-up
+  prompt (`402 COMMITMENT_FUNDING_REQUIRED`).
+- Detection / threat model: see [architecture/anti-cheating.md](../architecture/anti-cheating.md).
 
 ## 7. Payment Model (🔒 locked) — why pre-funded wallet
 **You cannot reliably charge a user *after* they break a commitment** — especially after uninstall.
