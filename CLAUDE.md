@@ -20,14 +20,14 @@ Read **`docs/README.md`** first — it's the index, the locked decisions, and th
 - **Payment return routing:** gateway `success_url` → **backend** (verifies before deep-linking home); app return uses **verified App Links / Universal Links — no custom URL scheme**. Deep link is best-effort UX; settlement stays server-authoritative (poller + R4 backstop). See `docs/payments/payment-architecture.md`.
 - **Top-up fees:** **transparent gross-up** (wallet credit + disclosed processing fee; fee-neutral; no silent net shortfall). Min top-up Rs. 200; wallet cap by KYC tier; withdrawals bear own fee + cycle limit. See `docs/payments/payment-architecture.md`.
 - **Withdrawal/payout:** collection gateways can't pay out → separate rail. **MVP = manual batch bank transfer (KYC-gated); connectIPS/NPI later** via swappable `PayoutProvider`. Two-phase hold (`user_payout_pending`), gross-down fee, never blind-retry a stuck payout, R5 recon. Disbursement onboarding = long-lead item. See `docs/payments/payment-architecture.md`.
+- **Forfeit destination:** forfeits/penalties → **company revenue** (`system_forfeit_revenue`), *not* charity. Conditional on legal sign-off that revenue-forfeit is permissible (commitment-contract, not gambling) in Nepal; charity-forfeit is the fallback if counsel objects. The penalty-vs-subscription revenue mix stays a tracked ethical guardrail. See `docs/payments/payment-architecture.md`.
 - **Launch:** Android-first MVP (wallet model), iOS fast-follow. See `docs/project/delivery-plan.md`.
 
 ## Two launch blockers — start day 1 (long lead times)
 1. **Apple Family Controls distribution entitlement** — gated, can be denied; without it iOS is unshippable.
-2. **Stored-value / e-money legal review** — segregated/escrow accounts, KYC, and deciding forfeit destination (revenue vs charity).
+2. **Stored-value / e-money legal review** — segregated/escrow accounts, KYC, and **confirming revenue-forfeit is legally clean (not gambling)** in Nepal.
 
 ## Open decisions (not yet locked)
-- Forfeit destination: company revenue vs charity.
 - "Increase limit takes effect when?" — recommended next-period (anti-binge), not yet confirmed.
 - iOS entitlement outcome (pending).
 

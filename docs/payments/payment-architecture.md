@@ -52,7 +52,7 @@ flowchart TD
 
 **Concrete rules:**
 - **Provider routing:** Nepal → eSewa/Khalti/Fonepay; international cards/Apple/Google Pay → Stripe. One internal `payment_provider` abstraction; providers interchangeable.
-- **Forfeited money** routes to a **system "forfeit" ledger account** (revenue vs. charity — Phase 1 decision).
+- **Forfeited money** routes to **`system_forfeit_revenue` (company revenue)** — *🔒 locked: revenue, not charity.* Conditional on legal sign-off that revenue-forfeit is permissible (commitment-contract, not gambling) in Nepal; **`system_charity` is the fallback** if counsel objects (the ledger already supports both, so the switch is a config change). The penalty-vs-subscription revenue mix is a tracked ethical guardrail (delivery-plan §8).
 - **Returned (un-forfeited) deposit** goes back to *available balance*, **not** auto-refunded to card (local-rail refunds are painful/lossy) — offer explicit withdrawal instead.
 - **Store policy:** unlocks/penalties are arguably digital goods → check Apple/Google billing rules; top-up provider stays behind the abstraction so it's swappable (may be forced to IAP on iOS).
 

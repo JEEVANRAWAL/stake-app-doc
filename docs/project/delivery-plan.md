@@ -10,7 +10,7 @@ on day one, in parallel with everything else.** Pace Android-first (richer enfor
 | Blocker | Why critical | Week-0 action | Owner |
 |---|---|---|---|
 | **Apple Family Controls entitlement** | Without `com.apple.developer.family-controls`, the **entire iOS module is unshippable**; Apple gates and *can deny* it | Submit with a clear digital-wellbeing justification; fallback parental/self-control framing | PM + iOS lead |
-| **Stored-value / e-money legal review** | Wallet holds user funds → financial regulation, **segregated/escrow account**, KYC, forfeit destination | Engage Nepal fintech counsel + global-payments view; decide forfeit destination; open settlement accounts | Founder/PM + Legal |
+| **Stored-value / e-money legal review** | Wallet holds user funds → financial regulation, **segregated/escrow account**, KYC; **forfeit→revenue decided — counsel must confirm it's not gambling** | Engage Nepal fintech counsel + global-payments view; **validate revenue-forfeit (commitment-contract, not gambling)**; open settlement accounts | Founder/PM + Legal |
 
 **Also Week 0 (lead-time):** payment provider onboarding (eSewa/Khalti/Fonepay KYC + Stripe); **payout/
 disbursement rail onboarding — connectIPS/NPI agreement (NCHL) or a bulk-disbursement deal** (collection
@@ -109,6 +109,8 @@ flowchart LR
 |---|---|---|---|
 | Apple denies entitlement | Med | High | submit Week 0; fallback framing; Android-only viable |
 | E-money regulation heavier than expected | Med | High | legal Week 0; segregated accounts; charity-forfeit fallback |
+| Revenue-forfeit ruled gambling / impermissible | Med | High | legal validates Week 0; **`system_charity` fallback is a config switch** (ledger supports both) |
+| Over-reliance on penalty revenue (profiting from user failure) | Med | Med | track **% revenue from penalties vs subscription** (§8); product-health guardrail, not a growth metric |
 | OEM battery-killers defeat enforcement | High | Med | Sprint-1 spike; watchdog + boot receiver; **silence→forfeit backstop** |
 | Play rejects Accessibility | Med | Med | declared-use justification; UsageStats-only fallback |
 | Small-txn fees crush margin | Med | Med | wallet batches top-ups; min top-up sizing; fee SLI |
@@ -119,7 +121,7 @@ flowchart LR
 | False penalties (our outage) | Med | High | grace windows; `PENALTY_CONVERSION_PAUSED`; never penalize on our own outage |
 
 ## 7. Launch Gates (Ready to Ship Real Money)
-- [ ] Legal sign-off: stored value + e-money + forfeit destination; segregated account live.
+- [ ] Legal sign-off: stored value + e-money + **revenue-forfeit confirmed legally clean (not gambling)**; segregated account live; ledger wired to `system_forfeit_revenue`.
 - [ ] ≥1 local provider + Stripe in **production** with verified webhooks (raw-body sig + server-pull confirm).
 - [ ] Reconciliation R1–R4 green in prod; **auto-freeze** wired + tested.
 - [ ] Withdrawal path live: KYC-gated manual-batch payout, two-phase hold, **R5 payout recon** + double-pay guard tested.
