@@ -289,8 +289,9 @@ User wants Rs. 500 in wallet
   per route at initiation; `payments.fee_amount` / `net_amount` already carry it.
 
 **Limits:**
-- **Minimum top-up Rs. 200**, with presets **Rs. 200 / 500 / 1000**. Sub-Rs.200 top-ups are margin-thin and
-  defeat the batching thesis; Rs. 200 also covers several Rs. 50 penalties.
+- **Minimum top-up Rs. 100**, with presets **Rs. 100 / 500 / 1000**. A floor still matters — very small
+  top-ups are margin-thin and defeat the batching thesis — but Rs. 100 keeps onboarding low-friction and
+  **matches the minimum commitment backing**, so a single minimum top-up can arm a commitment.
 - **Maximum / wallet-balance cap by KYC tier** (start conservative, e.g. Rs. 25k unverified) — feeds the
   stored-value/e-money legal blocker; balance caps reduce regulatory burden.
 
