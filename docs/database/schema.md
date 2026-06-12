@@ -32,13 +32,14 @@ CREATE TYPE core.schedule_type         AS ENUM ('daily','weekdays','weekends','c
 CREATE TYPE core.rule_status           AS ENUM ('active','paused','removed');
 CREATE TYPE core.cooldown_state        AS ENUM ('none','limit_reached','in_paid_unlock','locked_window');
 
-CREATE TYPE billing.payment_provider   AS ENUM ('stripe','esewa','khalti','fonepay','apple_iap','google_iap','wallet_internal');
+CREATE TYPE billing.payment_provider   AS ENUM ('stripe','esewa','khalti','fonepay','apple_iap','google_iap','wallet_internal','connectips','manual_bank');
+CREATE TYPE billing.withdrawal_status   AS ENUM ('requested','under_review','approved','processing','paid','rejected','failed','cancelled');
 CREATE TYPE billing.payment_purpose    AS ENUM ('wallet_topup','unlock_fee','commitment_break_fee','deposit_stake','withdrawal');
 CREATE TYPE billing.payment_status     AS ENUM ('initiated','pending','authorized','succeeded','failed','cancelled','refunded','partially_refunded','disputed');
 CREATE TYPE billing.wallet_status      AS ENUM ('active','frozen','closed');
 CREATE TYPE billing.deposit_status     AS ENUM ('active','completed_returned','forfeited','partially_forfeited','cancelled');
 
-CREATE TYPE ledger.account_type        AS ENUM ('user_available','user_locked','system_forfeit_revenue','system_charity','system_gateway_clearing','system_fees');
+CREATE TYPE ledger.account_type        AS ENUM ('user_available','user_locked','user_payout_pending','system_forfeit_revenue','system_charity','system_gateway_clearing','system_fees');
 CREATE TYPE ledger.entry_direction     AS ENUM ('debit','credit');
 
 CREATE TYPE usage.violation_type       AS ENUM ('schedule_block','time_limit_reached','permission_revoked','force_stop','app_uninstalled','clock_tamper','clone_detected');
@@ -294,6 +295,36 @@ CREATE TABLE billing.payment_webhook_events (
     received_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (provider, provider_event_id)
 );
+
+-- ============ WITHDRAWALS (payout / money-out) ============
+CREATE TABLE billing.withdrawals (
+    id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id                 UUID NOT NULL REFERENCES core.users(id) ON DELETE RESTRICT,
+    wallet_id               UUID NOT NULL REFERENCES billing.wallets(id),
+    status                  billing.withdrawal_status NOT NULL DEFAULT 'requested',
+    amount                  NUMERIC(14,4) NOT NULL CHECK (amount > 0),  -- debited from wallet
+    fee_amount              NUMERIC(14,4) NOT NULL DEFAULT 0,           -- borne by user (gross-down)
+    payout_amount           NUMERIC(14,4),                              -- amount - fee, sent to user
+    currency                CHAR(3) NOT NULL,
+    provider                billing.payment_provider NOT NULL,          -- 'manual_bank' | 'connectips'
+    dest_bank_code          VARCHAR(32),
+    dest_account_no         VARCHAR(64),
+    dest_account_name       VARCHAR(128),
+    kyc_tier_at_request     SMALLINT NOT NULL,
+    reviewed_by             UUID REFERENCES core.users(id),
+    review_note             TEXT,
+    disburse_reference      VARCHAR(191),                               -- idempotent payout ref (no double-pay)
+    batch_id                UUID,
+    failure_code            VARCHAR(64),
+    requested_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+    approved_at             TIMESTAMPTZ,
+    paid_at                 TIMESTAMPTZ,
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (provider, disburse_reference)                              -- guards against duplicate disbursement
+);
+CREATE INDEX idx_withdrawals_user   ON billing.withdrawals(user_id, requested_at DESC);
+CREATE INDEX idx_withdrawals_queue  ON billing.withdrawals(status) WHERE status IN ('requested','under_review','approved','processing');
 
 -- ============ ISOLATED DOUBLE-ENTRY LEDGER ============
 CREATE TABLE ledger.accounts (

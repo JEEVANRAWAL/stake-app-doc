@@ -44,6 +44,7 @@ Account map & balance convention:
 |---|---|---|---|
 | `user_available` | liability | credits − debits | spendable wallet |
 | `user_locked` | liability | credits − debits | staked/locked deposit |
+| `user_payout_pending` | liability | credits − debits | withdrawal held pending disbursement |
 | `system_gateway_clearing` | asset | debits − credits | funds in transit at PSP |
 | `system_forfeit_revenue` | revenue | credits − debits | forfeits/penalties → company |
 | `system_charity` | liability | credits − debits | forfeits earmarked for charity |
@@ -59,7 +60,9 @@ Journal templates (all net to zero):
 | Penalty (locked first, then available) | `user_locked` / `user_available` | `system_forfeit_revenue` *(or `system_charity`)* |
 | Deposit forfeiture | `user_locked` | `system_forfeit_revenue` *(or `system_charity`)* |
 | Deposit return | `user_locked` | `user_available` |
-| Withdrawal | `user_available` | `system_gateway_clearing` |
+| Withdrawal — request hold | `user_available` | `user_payout_pending` |
+| Withdrawal — paid (disbursed) | `user_payout_pending` | `system_gateway_clearing` |
+| Withdrawal — release (reject/fail/cancel) | `user_payout_pending` | `user_available` |
 
 ```ts
 // The only code allowed to write ledger.*  — runs inside one DB transaction.
@@ -199,7 +202,14 @@ Returned money lands in **available balance** (not auto-refunded to card); expli
 | **R2 — Wallet cache vs ledger** | recompute available/locked from entries vs cache | repair from ledger; alert delta |
 | **R3 — Global double-entry** | total debits == credits; assets = liabilities + revenue ± fees | page |
 | **R4 — Provider settlement** | succeeded payments vs provider settlement export | ops ticket |
+| **R5 — Payout settlement** | `paid` withdrawals vs bank / connectIPS settlement export (both ways) | page; **freeze payouts** |
 Plus orphan scans: granted unlocks w/o journal; active deposits past end w/o release; payments stuck pending past TTL → expire.
+
+**Payout safety (outbound = unrecoverable real money):** a withdrawal stuck in `processing` is resolved
+**only** by checking the bank / connectIPS status — **never blind-retried**. Each withdrawal carries an
+idempotent disburse reference (connectIPS merchant txn ref) so a batch re-run cannot double-pay. R5 flags
+any `paid` withdrawal missing from the bank export (did it actually send?) and any bank debit lacking a
+`paid` withdrawal. See `payments/payment-architecture.md` → "Withdrawal / payout flow".
 
 ## 6b. eSewa Top-up Reconciliation — "paid but didn't return"
 

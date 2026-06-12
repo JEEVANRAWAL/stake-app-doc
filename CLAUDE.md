@@ -19,6 +19,7 @@ Read **`docs/README.md`** first — it's the index, the locked decisions, and th
 - **Security:** device is untrusted; server-authoritative time/balances/rules/unlock grants; Ed25519-signed unlock tokens (monotonic-clock-anchored expiry, `kid` rotation); Play Integrity / App Attest verified server-side; per-device HMAC request signing. See `docs/api/security-framework.md`.
 - **Payment return routing:** gateway `success_url` → **backend** (verifies before deep-linking home); app return uses **verified App Links / Universal Links — no custom URL scheme**. Deep link is best-effort UX; settlement stays server-authoritative (poller + R4 backstop). See `docs/payments/payment-architecture.md`.
 - **Top-up fees:** **transparent gross-up** (wallet credit + disclosed processing fee; fee-neutral; no silent net shortfall). Min top-up Rs. 200; wallet cap by KYC tier; withdrawals bear own fee + cycle limit. See `docs/payments/payment-architecture.md`.
+- **Withdrawal/payout:** collection gateways can't pay out → separate rail. **MVP = manual batch bank transfer (KYC-gated); connectIPS/NPI later** via swappable `PayoutProvider`. Two-phase hold (`user_payout_pending`), gross-down fee, never blind-retry a stuck payout, R5 recon. Disbursement onboarding = long-lead item. See `docs/payments/payment-architecture.md`.
 - **Launch:** Android-first MVP (wallet model), iOS fast-follow. See `docs/project/delivery-plan.md`.
 
 ## Two launch blockers — start day 1 (long lead times)

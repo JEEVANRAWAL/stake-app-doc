@@ -295,6 +295,93 @@ must not become a fee-free money mover. Withdrawals bear their **own payout fee*
 **minimum withdrawal**, plus a **cooling-off / cycle limit**. (Returned deposits land in *available
 balance*, not auto-refunded — withdrawal is always explicit.)
 
+## Withdrawal / payout flow (money out)
+
+Withdrawal is the **reverse** of top-up and **asymmetric** to it: the collection gateways (eSewa / Khalti
+/ Fonepay) are *collection-only* — they cannot push money out to a user. Paying out routes through a
+separate **disbursement rail**. Top-up failures merely delay the user; **a withdrawal error or fraud
+loses real money that has already left the building** — so this flow is identity-gated, held, approved,
+idempotent, and tightly reconciled.
+
+**🔒 Locked decision — payout rail strategy.** MVP = **manual batch bank transfer** (ops reviews a queue,
+then bulk-uploads a transfer file via the corporate bank portal), KYC-gated. Automate via **NCHL
+connectIPS / NPI** once the agreement lands. A `PayoutProvider` interface (`disburse()`,
+`fetchPayoutStatus()`) keeps the engine swappable — the user-facing flow and the ledger stay identical;
+only the disburse step changes from "ops uploads a file" to "server calls connectIPS." **Disbursement-
+agreement / NPI onboarding is a long-lead item — start it alongside the two launch blockers.**
+
+**Fee — gross-down (user bears it), symmetric with the top-up gross-up.** Withdraw Rs. 500 → receive
+**Rs. 500 − payout fee**, with the fee disclosed. **Minimum withdrawal Rs. 500** so the fee stays a small
+%. Only **settled, un-staked, non-forfeited** available balance is withdrawable (never `user_locked`
+stakes, never `system_forfeit` money).
+
+**KYC tiers** (feeds the stored-value/e-money legal blocker):
+
+| Tier | Verification | Withdrawal |
+|---|---|---|
+| 0 — unverified | phone only | ❌ none (may still top-up & stake) |
+| 1 — basic | name + govt ID | capped per-day / per-month |
+| 2 — full | ID **+ bank-account name match** | higher limits |
+
+Bank-account **ownership (name match) is mandatory before the first payout** — anti-fraud + AML.
+
+**Anti-cycling:** cooling-off on freshly topped-up funds (no instant top-up→withdraw money-moving),
+per-tier velocity caps, the Rs. 500 minimum, and "withdraw only settled/un-staked/non-forfeit funds."
+
+**Hold invariant (two-phase, never single-step).** At **request** time, funds move `user_available →
+user_payout_pending` (held, unspendable — the user can't double-withdraw or spend it during the
+days-long review/batch window). They only leave to `gateway_clearing` on **confirmed paid**; any
+reject/fail/cancel **releases the hold back to available**. (Ledger journals: see ledger-workers §ledger.)
+
+```mermaid
+stateDiagram-v2
+    [*] --> requested: hold available → payout_pending
+    requested --> under_review: KYC / fraud / limit checks
+    under_review --> approved: cleared (auto for low-risk tier-2, else manual)
+    under_review --> rejected: KYC/fraud/limit fail → release hold
+    approved --> processing: added to batch / disburse call
+    processing --> paid: bank/connectIPS confirms → payout_pending → gateway_clearing
+    processing --> failed: bad account / bank reject → release or requeue
+    requested --> cancelled: user cancels → release hold
+    under_review --> cancelled: user cancels → release hold
+    rejected --> [*]
+    cancelled --> [*]
+    paid --> [*]
+```
+
+**Double-pay safety (the inverse of §6b's "never decide from silence").** A stuck `processing` is
+resolved **only by checking the bank / connectIPS — never blind-retried**, because a duplicate
+disbursement is unrecoverable real money. Each withdrawal carries an **idempotent disburse reference**
+(connectIPS merchant txn ref) so a re-run of a batch cannot double-pay. The **R5 payout reconciliation**
+(ledger-workers §6) matches `paid` withdrawals against the bank / connectIPS settlement export both ways.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant App as Flutter App
+    participant API as NestJS API
+    participant OPS as Ops / Reviewer
+    participant BANK as Corporate Bank Portal
+    participant L as Ledger
+
+    U->>App: Withdraw Rs. 500
+    App->>API: POST /v1/wallet/withdraw {amount:500}
+    API->>L: hold: user_available → user_payout_pending 500
+    API-->>App: status: under_review ("1–2 business days")
+    OPS->>API: review (KYC, fraud, limits) → approve
+    Note over API,BANK: ── daily batch ──
+    API-->>OPS: export approved payouts (bulk file)
+    OPS->>BANK: upload file (Rs. 490 to user, fee Rs. 10)
+    BANK-->>OPS: transfers confirmed
+    OPS->>API: mark paid
+    API->>L: payout: user_payout_pending → gateway_clearing 500
+    API-->>App: push: "Withdrawal complete"
+```
+
+> The connectIPS/NPI swap replaces the Ops + bank-portal steps with a `PayoutProvider.disburse()` API
+> call + `fetchPayoutStatus()` poll — the request, hold, review, ledger, and reconciliation are unchanged.
+
 > **iOS synergy:** an extension cannot present a payment sheet, so on iOS "pay to unlock" is done
 > as **pre-authorized unlocks** — the user buys unlock credit/time *in the app* (cooperative,
 > gateway-friendly) and the `ShieldAction` extension just verifies & consumes a token from the
