@@ -1598,7 +1598,7 @@ expiry), and pages on any local <code>succeeded</code> absent from eSewa's expor
     R4 --&gt; CR</code></pre>
 <h2 id="7-aggregation-streaks-notifications">7. Aggregation, Streaks, Notifications<a class="headerlink" href="#7-aggregation-streaks-notifications" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>SnapshotWorker</strong> (per user at their <code>day_boundary_minutes</code>): folds <code>usage_events</code> into <code>daily_snapshots</code> + <code>daily_app_usage</code>. Idempotent on <code>(user_id, snapshot_date)</code>.</li>
+<li><strong>SnapshotWorker</strong> (per user at their <code>day_boundary_minutes</code>): folds <code>usage_events</code> into <code>daily_snapshots</code> + <code>daily_app_usage</code>. Idempotent on <code>(user_id, snapshot_date)</code>. <strong>Rule rollover:</strong> at the boundary it also resets <code>current_usage_seconds</code>/<code>current_day_key</code> and <strong>applies any staged increase</strong> (<code>pending_limit_seconds</code> → <code>daily_limit_seconds</code> when <code>pending_effective_day_key</code> ≤ new day), then clears the pending fields — this is where the FR-4 <em>next-logical-day</em> increase lands.</li>
 <li><strong>StreakWorker</strong>: updates <code>gamification_state</code> (streaks, productivity score, money saved). Replayable from snapshots.</li>
 <li><strong>NotificationWorker</strong>: the outbox relay; reads pending <code>engage.notifications</code>, sends via FCM/APNs, advances status. Idempotent on notification id.</li>
 </ul>

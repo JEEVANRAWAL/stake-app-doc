@@ -1574,7 +1574,10 @@ loss-aversion into the enforcement mechanism.</p>
 <ul>
 <li><strong>Reduce limit:</strong> allowed, free, immediate.</li>
 <li><strong>Increase / disable limit:</strong> blocked unless <strong>commitment-break fee</strong> paid.</li>
-<li>Recommendation: increase takes effect <em>next</em> period, not instantly, so paying isn't a same-day binge enabler. <em>(Open decision.)</em></li>
+<li><strong>🔒 Locked — an increase takes effect at the <em>next logical day</em> (the rule's day-boundary reset), never same-day.</strong> Paying the break fee <em>stages</em> the higher limit for the next period; it grants no extra time today. This is the anti-binge guarantee.</li>
+<li><strong>Need-it-now is served by a paid unlock (FR-2)</strong> — immediate, temporary, priced per use — so a next-day increase never feels like "paid for nothing." The two levers are deliberately distinct: <em>paid unlock = time now</em>; <em>limit increase = a higher cap from tomorrow</em>.</li>
+<li><strong>UX:</strong> the break-fee confirmation must state plainly "takes effect tomorrow" and offer the paid-unlock path for immediate access.</li>
+<li><strong>Disable/remove</strong> follows the same principle (FR-5): effective after the current active window, not mid-restriction.</li>
 </ul>
 <h3 id="fr-5-remove-app-from-restriction-list">FR-5 — Remove App from Restriction List<a class="headerlink" href="#fr-5-remove-app-from-restriction-list" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1634,7 +1637,7 @@ penalty money is <strong>revenue</strong> or <strong>forfeited (charity/locked)<
 <li><strong>Stake vs. charge-on-event:</strong> confirm pre-funded stake (Model A).</li>
 <li><strong>iOS entitlement go/no-go:</strong> Apple's Family Controls distribution entitlement is gated and can be denied — submit early.</li>
 <li><strong>Launch platform:</strong> Android-first (richer enforcement + custom pay screen).</li>
-<li><strong>"Increase limit takes effect when?"</strong> — recommend next-period to avoid same-day binge.</li>
+<li>~~"Increase limit takes effect when?"~~ <strong>Resolved (locked):</strong> next logical day (anti-binge); same-day need is served by paid unlocks (FR-2). See FR-4.</li>
 </ol>
 <h2 id="11-phase-1-cutline-mvp">11. Phase 1 Cutline (MVP)<a class="headerlink" href="#11-phase-1-cutline-mvp" title="Permanent link">&para;</a></h2>
 <p>Android-first · FR-1 + FR-3 + FR-2 (5-min unlock) + FR-4 asymmetric edits · pre-funded wallet ·

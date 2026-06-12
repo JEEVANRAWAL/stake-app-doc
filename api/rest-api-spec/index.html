@@ -1682,7 +1682,10 @@ Staking posts <code>user_available → user_locked</code>.</p>
 <li>Decrease (free, immediate): <code>{ "daily_limit_seconds": 1200 }</code> → <code>200</code>.</li>
 <li>Increase (blocked): <code>{ "daily_limit_seconds": 2700 }</code> → <code>409 RULE_INCREASE_FORBIDDEN</code> with <code>required_fee</code>.
   Client first <code>POST /v1/commitment-breaks</code> (debits wallet, returns <code>break_token</code>), then retries the PATCH
-  with <code>{ "daily_limit_seconds": 2700, "break_token": "brk_…" }</code>. Increase takes effect <strong>next logical day</strong>.</li>
+  with <code>{ "daily_limit_seconds": 2700, "break_token": "brk_…" }</code>. Increase takes effect <strong>next logical day</strong>:
+  the new value is <strong>staged</strong> in <code>pending_limit_seconds</code> / <code>pending_effective_day_key</code> and applied at the
+  rule's day-boundary rollover — never same-day (anti-binge). For access <strong>now</strong>, the user buys a paid
+  unlock (FR-2) instead; the increase and the unlock are independent levers.</li>
 </ul>
 <h3 id="f4-remove-app-delete-v1user-restricted-appsid-idempotency-key">F.4 Remove app — <code>DELETE /v1/user-restricted-apps/{id}</code> (Idempotency-Key)<a class="headerlink" href="#f4-remove-app-delete-v1user-restricted-appsid-idempotency-key" title="Permanent link">&para;</a></h3>
 <p>Body: <code>{ "break_token": "brk_…" }</code>. Requires a paid commitment-break; removal effective <strong>after the current
