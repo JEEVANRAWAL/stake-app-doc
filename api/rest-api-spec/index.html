@@ -1,0 +1,1760 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Commitment-based digital discipline app — planning & architecture">
+      
+      
+      
+      
+        <link rel="prev" href="../../database/schema/">
+      
+      
+        <link rel="next" href="../security-framework/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>REST API Specification - Stake — Planning Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#phase-3-rest-api-specification" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Stake — Planning Docs" class="md-header__button md-logo" aria-label="Stake — Planning Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Stake — Planning Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              REST API Specification
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Stake — Planning Docs" class="md-nav__button md-logo" aria-label="Stake — Planning Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Stake — Planning Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1 — Product & Feasibility
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 1 — Product & Feasibility
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../product/prd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Product Requirements (PRD)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/platform-feasibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform Feasibility Matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/anti-cheating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Anti-Cheating & Threat Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 — Payments, System & Data
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 2 — Payments, System & Data
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../payments/payment-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Payment Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/system_design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Design & Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Schema (DDL)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 — API & Security
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 3 — API & Security
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    REST API Specification
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    REST API Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#commitment-based-digital-discipline-app-stake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commitment-Based Digital Discipline App ("Stake")
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-api-conventions-apply-to-every-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. API Conventions (apply to every endpoint)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#b-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. Authentication
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#c-device-registration-anti-tamper-heartbeat-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C. Device Registration &amp; Anti-Tamper Heartbeat Sync
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="C. Device Registration &amp; Anti-Tamper Heartbeat Sync">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#c1-register-update-device-post-v1devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C.1 Register / update device — POST /v1/devices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c2-anti-tamper-heartbeat-post-v1devicesdevice_idheartbeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C.2 Anti-tamper heartbeat — POST /v1/devices/{device_id}/heartbeat
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#d-usage-sync-batched-high-write-post-v1usagesync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D. Usage Sync (batched, high-write) — POST /v1/usage/sync
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e-unlock-request-flow-fr-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E. Unlock Request Flow (FR-2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="E. Unlock Request Flow (FR-2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#e1-create-post-v1unlock-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E.1 Create — POST /v1/unlock-requests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e2-native-confirms-applied-post-v1unlock-requestsidapplied" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E.2 Native confirms applied — POST /v1/unlock-requests/{id}/applied
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e3-unlock-state-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E.3 Unlock state machine
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#f-wallet-deposit-rule-edit-removal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F. Wallet, Deposit, Rule-Edit &amp; Removal
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="F. Wallet, Deposit, Rule-Edit &amp; Removal">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#f1-top-up-post-v1wallettopup-idempotency-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F.1 Top-up — POST /v1/wallet/topup (Idempotency-Key)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f2-create-deposit-post-v1commitment-deposits-idempotency-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F.2 Create deposit — POST /v1/commitment-deposits (Idempotency-Key)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f3-asymmetric-rule-edit-patch-v1screen-time-rulesidlimit-idempotency-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F.3 Asymmetric rule edit — PATCH /v1/screen-time-rules/{id}/limit (Idempotency-Key)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f4-remove-app-delete-v1user-restricted-appsid-idempotency-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F.4 Remove app — DELETE /v1/user-restricted-apps/{id} (Idempotency-Key)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#g-request-signing-replay-protection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        G. Request Signing &amp; Replay Protection
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 4 — Contracts & High-Risk Areas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 4 — Contracts & High-Risk Areas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../openapi.yaml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAPI 3.1 Contract
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../native/enforcement-modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Native Enforcement Modules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../backend/ledger-workers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ledger & State-Machine Workers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ops & Delivery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Ops & Delivery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ops/sre-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations & SRE Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../project/delivery-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Plan & Delivery Cutline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#commitment-based-digital-discipline-app-stake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commitment-Based Digital Discipline App ("Stake")
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-api-conventions-apply-to-every-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. API Conventions (apply to every endpoint)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#b-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. Authentication
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#c-device-registration-anti-tamper-heartbeat-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C. Device Registration &amp; Anti-Tamper Heartbeat Sync
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="C. Device Registration &amp; Anti-Tamper Heartbeat Sync">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#c1-register-update-device-post-v1devices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C.1 Register / update device — POST /v1/devices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c2-anti-tamper-heartbeat-post-v1devicesdevice_idheartbeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C.2 Anti-tamper heartbeat — POST /v1/devices/{device_id}/heartbeat
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#d-usage-sync-batched-high-write-post-v1usagesync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D. Usage Sync (batched, high-write) — POST /v1/usage/sync
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e-unlock-request-flow-fr-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E. Unlock Request Flow (FR-2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="E. Unlock Request Flow (FR-2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#e1-create-post-v1unlock-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E.1 Create — POST /v1/unlock-requests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e2-native-confirms-applied-post-v1unlock-requestsidapplied" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E.2 Native confirms applied — POST /v1/unlock-requests/{id}/applied
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e3-unlock-state-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E.3 Unlock state machine
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#f-wallet-deposit-rule-edit-removal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F. Wallet, Deposit, Rule-Edit &amp; Removal
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="F. Wallet, Deposit, Rule-Edit &amp; Removal">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#f1-top-up-post-v1wallettopup-idempotency-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F.1 Top-up — POST /v1/wallet/topup (Idempotency-Key)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f2-create-deposit-post-v1commitment-deposits-idempotency-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F.2 Create deposit — POST /v1/commitment-deposits (Idempotency-Key)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f3-asymmetric-rule-edit-patch-v1screen-time-rulesidlimit-idempotency-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F.3 Asymmetric rule edit — PATCH /v1/screen-time-rules/{id}/limit (Idempotency-Key)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f4-remove-app-delete-v1user-restricted-appsid-idempotency-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F.4 Remove app — DELETE /v1/user-restricted-apps/{id} (Idempotency-Key)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#g-request-signing-replay-protection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        G. Request Signing &amp; Replay Protection
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="phase-3-rest-api-specification">Phase 3 — REST API Specification<a class="headerlink" href="#phase-3-rest-api-specification" title="Permanent link">&para;</a></h1>
+<h3 id="commitment-based-digital-discipline-app-stake">Commitment-Based Digital Discipline App ("Stake")<a class="headerlink" href="#commitment-based-digital-discipline-app-stake" title="Permanent link">&para;</a></h3>
+<p>Consistent with the Phase 2 schema (NestJS + PostgreSQL, wallet-substrate-with-deposit-lock, isolated
+double-entry ledger). See <a href="../openapi.yaml">openapi.yaml</a> for the machine-readable contract and
+<a href="../security-framework/">security-framework.md</a> for clock/root/webhook defenses.</p>
+<h2 id="a-api-conventions-apply-to-every-endpoint">A. API Conventions (apply to every endpoint)<a class="headerlink" href="#a-api-conventions-apply-to-every-endpoint" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Convention</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Base URL / version</td>
+<td><code>https://api.stakeapp.io/v1</code> — version in path</td>
+</tr>
+<tr>
+<td>Transport</td>
+<td>TLS 1.3 only; HSTS; cert pinning (leaf+intermediate, backup pin)</td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>Short-lived <strong>access JWT</strong> (10 min, <code>Authorization: Bearer</code>) + rotating <strong>refresh token</strong> (hashed in <code>core.sessions</code>)</td>
+</tr>
+<tr>
+<td>Device binding</td>
+<td><code>X-Device-Id</code> (UUID) + <code>X-Device-Attestation</code>; tokens bound to a device</td>
+</tr>
+<tr>
+<td>Idempotency</td>
+<td>Money-moving/state-mutating POSTs require <code>Idempotency-Key</code> (UUIDv4), stored (<code>payments.idempotency_key</code>)</td>
+</tr>
+<tr>
+<td>Request signing</td>
+<td>Anti-tamper/sync/unlock endpoints require <code>X-Signature</code> + <code>X-Timestamp</code> + <code>X-Nonce</code> (HMAC, §G)</td>
+</tr>
+<tr>
+<td>Errors</td>
+<td>RFC-9457 Problem Details JSON; stable machine <code>code</code></td>
+</tr>
+<tr>
+<td>Time</td>
+<td>Server is the <strong>only</strong> authority; device time is reported, never trusted</td>
+</tr>
+<tr>
+<td>Rate limits</td>
+<td>Per-user + per-device Redis token buckets; <code>429</code> + <code>Retry-After</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Standard error envelope:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://api.stakeapp.io/errors/limit-increase-requires-payment&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;RULE_INCREASE_FORBIDDEN&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Screen-time limit cannot be increased without a commitment-break fee&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">409</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nt">&quot;detail&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Increasing Instagram from 1800s to 2700s requires a commitment-break fee of NPR 50.00.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="nt">&quot;instance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/v1/screen-time-rules/0c2b…/limit&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="nt">&quot;meta&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;required_fee&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;50.0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NPR&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">}</span>
+</code></pre></div></p>
+<h2 id="b-authentication">B. Authentication<a class="headerlink" href="#b-authentication" title="Permanent link">&para;</a></h2>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>POST /v1/auth/register   → create user, send OTP/verify link
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>POST /v1/auth/login      → access+refresh tokens (device-bound)
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>POST /v1/auth/refresh    → rotate refresh, new access token
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>POST /v1/auth/logout     → revoke session
+</code></pre></div>
+Refresh-token rotation mandatory: each <code>/refresh</code> issues a new refresh token and revokes the prior;
+reuse of a revoked token → revoke the entire session family (theft detection).</p>
+<h2 id="c-device-registration-anti-tamper-heartbeat-sync">C. Device Registration &amp; Anti-Tamper Heartbeat Sync<a class="headerlink" href="#c-device-registration-anti-tamper-heartbeat-sync" title="Permanent link">&para;</a></h2>
+<h3 id="c1-register-update-device-post-v1devices">C.1 Register / update device — <code>POST /v1/devices</code><a class="headerlink" href="#c1-register-update-device-post-v1devices" title="Permanent link">&para;</a></h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;os_platform&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;android&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;os_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;15&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;app_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.4.2&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&quot;device_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Pixel 8&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;hardware_id_hash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;b8e5…f01a&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">&quot;push_token&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fcm:dQw4w9…&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;push_provider&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fcm&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nt">&quot;permissions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="nt">&quot;accessibility_granted&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;usage_access_granted&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="nt">&quot;overlay_granted&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;family_controls_granted&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;battery_optimized&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="nt">&quot;attestation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;play_integrity&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;token&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eyJ…&lt;Play Integrity JWT&gt;…&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">}</span>
+</code></pre></div>
+Response <code>201</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">&quot;device_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5f3a2c10-9b1e-4a77-8d2c-1f0e9a7b6c54&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">&quot;integrity_verified&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;protection_status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;healthy&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">&quot;heartbeat_interval_seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;signing_key_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dk_2026_06_a&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nt">&quot;server_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T04:21:00Z&quot;</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">}</span>
+</code></pre></div></p>
+<h3 id="c2-anti-tamper-heartbeat-post-v1devicesdevice_idheartbeat">C.2 Anti-tamper heartbeat — <code>POST /v1/devices/{device_id}/heartbeat</code><a class="headerlink" href="#c2-anti-tamper-heartbeat-post-v1devicesdevice_idheartbeat" title="Permanent link">&para;</a></h3>
+<p>Headers: <code>X-Signature, X-Timestamp, X-Nonce, X-Device-Attestation</code>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;seq&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">88421</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">&quot;device_local_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T09:53:31+05:45&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">&quot;monotonic_uptime_ms&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">184523910</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">&quot;active_commitments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;c_91a…&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;c_77b…&quot;</span><span class="p">],</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nt">&quot;permissions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;accessibility_granted&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;usage_access_granted&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="nt">&quot;overlay_granted&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;family_controls_granted&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;battery_optimized&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="nt">&quot;enforcement_state&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;shield_active_app_ids&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ura_3f2…&quot;</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;last_block_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T09:40:12Z&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="nt">&quot;integrity&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;root_detected&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;hook_framework_detected&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="nt">&quot;clone_environment&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;developer_mode&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="nt">&quot;attestation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;play_integrity&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;token&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eyJ…&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="p">}</span>
+</code></pre></div>
+Response <code>200</code> (healthy):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;ack_seq&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">88421</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;server_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T04:08:31Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">&quot;clock_skew_ms&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">142</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;clock_verdict&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ok&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">&quot;protection_status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;healthy&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;actions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="nt">&quot;next_heartbeat_seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">}</span>
+</code></pre></div>
+Response <code>200</code> (tamper suspected):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&quot;ack_seq&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">88421</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;server_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T04:08:31Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">&quot;clock_skew_ms&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">921344</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;clock_verdict&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tamper_suspected&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">&quot;protection_status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;degraded&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nt">&quot;actions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;RECORD_VIOLATION&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;violation_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;clock_tamper&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;SHOW_WARNING&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Your device clock looks off. Commitments use server time.&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;REQUIRE_REATTESTATION&quot;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="nt">&quot;grace&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;expires_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T04:38:31Z&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;penalty_on_expiry&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;50.0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NPR&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span><span class="nt">&quot;next_heartbeat_seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="p">}</span>
+</code></pre></div>
+<strong>Server-side processing:</strong> verify signature/timestamp/nonce/attestation → persist <code>clock_skew_ms</code> →
+clock-trust verdict → if permissions dropped / root / clone during an active commitment, enqueue a
+<code>usage.violations</code> row + grace timer → a silence-sweeper flags devices that stop heartbeating during a
+commitment (covers force-stop/uninstall) → same grace→penalty path.</p>
+<h2 id="d-usage-sync-batched-high-write-post-v1usagesync">D. Usage Sync (batched, high-write) — <code>POST /v1/usage/sync</code><a class="headerlink" href="#d-usage-sync-batched-high-write-post-v1usagesync" title="Permanent link">&para;</a></h2>
+<p>Headers: <code>Idempotency-Key, X-Signature, X-Timestamp, X-Nonce</code>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&quot;batch_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;9c1e7f20-3a44-4b91-9c0e-77aa1234bcde&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">&quot;device_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5f3a2c10-9b1e-4a77-8d2c-1f0e9a7b6c54&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">&quot;events&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;user_restricted_app_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ura_3f2c9a&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;event_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;foreground&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">      </span><span class="nt">&quot;duration_seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">312</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;device_local_ts&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T09:30:00+05:45&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;monotonic_elapsed_ms&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">184211900</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;user_restricted_app_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ura_3f2c9a&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;event_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;threshold&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">      </span><span class="nt">&quot;duration_seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;device_local_ts&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T09:35:12+05:45&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;monotonic_elapsed_ms&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">184523000</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="p">]</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">}</span>
+</code></pre></div>
+Response <code>202</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;batch_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;9c1e7f20-3a44-4b91-9c0e-77aa1234bcde&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;accepted_events&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;rejected_events&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;server_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T04:08:40Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;rule_state&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;user_restricted_app_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ura_3f2c9a&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;current_usage_seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1798</span><span class="p">,</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">      </span><span class="nt">&quot;daily_limit_seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1800</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;cooldown_state&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;none&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;limit_reached&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="p">]</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="p">}</span>
+</code></pre></div>
+Raw rows go into partitioned <code>usage.usage_events</code>; async workers fold into counters/snapshots.
+<code>monotonic_elapsed_ms</code> is the tamper-resistant elapsed-time source; <code>device_local_ts</code> is for display/forensics only.</p>
+<h2 id="e-unlock-request-flow-fr-2">E. Unlock Request Flow (FR-2)<a class="headerlink" href="#e-unlock-request-flow-fr-2" title="Permanent link">&para;</a></h2>
+<h3 id="e1-create-post-v1unlock-requests">E.1 Create — <code>POST /v1/unlock-requests</code><a class="headerlink" href="#e1-create-post-v1unlock-requests" title="Permanent link">&para;</a></h3>
+<p>Headers: <code>Idempotency-Key, X-Signature, X-Timestamp, X-Nonce</code>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;user_restricted_app_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ura_3f2c9a&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;device_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5f3a2c10-…&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;duration_seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;funding_source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wallet&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+Response <code>200</code> (wallet funded → granted instantly):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">&quot;unlock_request_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ulr_7b2a91&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;granted&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">&quot;user_restricted_app_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ura_3f2c9a&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;duration_seconds&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nt">&quot;fee&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;50.0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NPR&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wallet&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nt">&quot;granted_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T04:10:02Z&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;expires_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T04:15:02Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="nt">&quot;authorization_token&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eyJhbGciOiJFZERTQSIsImtpZCI6ImRrXzIwMjZfMDZfYSJ9…&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span><span class="nt">&quot;wallet&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;available_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;430.0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;locked_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;200.0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NPR&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="nt">&quot;ledger_journal_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jrn_5c8e12&quot;</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="p">}</span>
+</code></pre></div>
+The client passes <code>authorization_token</code> over the platform channel to the native module, which verifies
+the EdDSA signature locally and lifts the shield until <code>expires_at</code>. Token is bound to
+<code>device_id + user_restricted_app_id + exp</code>. Server work is one DB transaction: <code>SELECT … FOR UPDATE</code>
+wallet → balanced journal (<code>user_available → forfeit_revenue</code>) → insert <code>unlock_requests(granted)</code> →
+insert <code>violations(allowed_paid_unlock)</code>.</p>
+<p>Response <code>402</code> (wallet empty → fund via gateway first):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;unlock_request_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ulr_7b2a91&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;payment_pending&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">&quot;fee&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;50.0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NPR&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">&quot;funding_required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;insufficient_wallet_balance&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;available_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;10.0000&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">    </span><span class="nt">&quot;shortfall&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;40.0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;topup_endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/v1/wallet/topup&quot;</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="p">}</span>
+</code></pre></div></p>
+<h3 id="e2-native-confirms-applied-post-v1unlock-requestsidapplied">E.2 Native confirms applied — <code>POST /v1/unlock-requests/{id}/applied</code><a class="headerlink" href="#e2-native-confirms-applied-post-v1unlock-requestsidapplied" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;applied_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T04:10:03Z&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;shield_lifted&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<h3 id="e3-unlock-state-machine">E.3 Unlock state machine<a class="headerlink" href="#e3-unlock-state-machine" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; requested
+    requested --&gt; granted: wallet funded (debit ok)
+    requested --&gt; payment_pending: insufficient balance
+    payment_pending --&gt; granted: topup succeeded + debit
+    payment_pending --&gt; denied: topup failed / cancelled
+    granted --&gt; expired: now &gt; expires_at (re-shield)
+    requested --&gt; denied: rule no longer active / fraud</code></pre>
+<h2 id="f-wallet-deposit-rule-edit-removal">F. Wallet, Deposit, Rule-Edit &amp; Removal<a class="headerlink" href="#f-wallet-deposit-rule-edit-removal" title="Permanent link">&para;</a></h2>
+<h3 id="f1-top-up-post-v1wallettopup-idempotency-key">F.1 Top-up — <code>POST /v1/wallet/topup</code> (Idempotency-Key)<a class="headerlink" href="#f1-top-up-post-v1wallettopup-idempotency-key" title="Permanent link">&para;</a></h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;500.0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NPR&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;provider&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;khalti&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;return_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stakeapp://topup/return&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+Response <code>201</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="p">{</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">&quot;payment_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pay_a91c33&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pending&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;provider&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;khalti&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;500.0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NPR&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;provider_intent_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;khalti_pidx_9aZ2&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="nt">&quot;checkout&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;redirect&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://pay.khalti.com/?pidx=9aZ2&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span><span class="nt">&quot;expires_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-12T04:40:00Z&quot;</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">}</span>
+</code></pre></div>
+Wallet credited <strong>only</strong> when the verified webhook confirms success — never on client <code>return_url</code>.</p>
+<h3 id="f2-create-deposit-post-v1commitment-deposits-idempotency-key">F.2 Create deposit — <code>POST /v1/commitment-deposits</code> (Idempotency-Key)<a class="headerlink" href="#f2-create-deposit-post-v1commitment-deposits-idempotency-key" title="Permanent link">&para;</a></h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;staked_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1000.0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NPR&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;commitment_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-07-12T00:00:00Z&quot;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+Response <code>201</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="p">{</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nt">&quot;deposit_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dep_4471aa&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;active&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;staked_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1000.0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;currency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NPR&quot;</span><span class="p">,</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nt">&quot;wallet&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;available_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;locked_balance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1200.0000&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nt">&quot;ledger_journal_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jrn_77c2a1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;commitment_end&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-07-12T00:00:00Z&quot;</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="p">}</span>
+</code></pre></div>
+Staking posts <code>user_available → user_locked</code>.</p>
+<h3 id="f3-asymmetric-rule-edit-patch-v1screen-time-rulesidlimit-idempotency-key">F.3 Asymmetric rule edit — <code>PATCH /v1/screen-time-rules/{id}/limit</code> (Idempotency-Key)<a class="headerlink" href="#f3-asymmetric-rule-edit-patch-v1screen-time-rulesidlimit-idempotency-key" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Decrease (free, immediate): <code>{ "daily_limit_seconds": 1200 }</code> → <code>200</code>.</li>
+<li>Increase (blocked): <code>{ "daily_limit_seconds": 2700 }</code> → <code>409 RULE_INCREASE_FORBIDDEN</code> with <code>required_fee</code>.
+  Client first <code>POST /v1/commitment-breaks</code> (debits wallet, returns <code>break_token</code>), then retries the PATCH
+  with <code>{ "daily_limit_seconds": 2700, "break_token": "brk_…" }</code>. Increase takes effect <strong>next logical day</strong>.</li>
+</ul>
+<h3 id="f4-remove-app-delete-v1user-restricted-appsid-idempotency-key">F.4 Remove app — <code>DELETE /v1/user-restricted-apps/{id}</code> (Idempotency-Key)<a class="headerlink" href="#f4-remove-app-delete-v1user-restricted-appsid-idempotency-key" title="Permanent link">&para;</a></h3>
+<p>Body: <code>{ "break_token": "brk_…" }</code>. Requires a paid commitment-break; removal effective <strong>after the current
+active window</strong> (<code>removed_at</code> set, <code>status='removed'</code> deferred).</p>
+<h2 id="g-request-signing-replay-protection">G. Request Signing &amp; Replay Protection<a class="headerlink" href="#g-request-signing-replay-protection" title="Permanent link">&para;</a></h2>
+<p>Per-device HMAC key (issued at registration, stored in Android Keystore / iOS Keychain — hardware-backed):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>X-Timestamp: 2026-06-12T04:10:02Z
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>X-Nonce: 0f9a2c…   (128-bit random)
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>X-Signature: base64( HMAC-SHA256( deviceKey, METHOD + &quot;\n&quot; + PATH + &quot;\n&quot; + X-Timestamp + &quot;\n&quot; + X-Nonce + &quot;\n&quot; + sha256(body) ) )
+</code></pre></div>
+Server rejects if: signature mismatch, <code>|server_now − X-Timestamp| &gt; 120s</code>, or <code>X-Nonce</code> already seen
+(Redis <code>SETNX</code>, TTL 300s). Stops replay of captured calls and binds the body to the signature.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "content.code.copy", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

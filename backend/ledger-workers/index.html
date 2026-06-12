@@ -1,0 +1,1629 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Commitment-based digital discipline app — planning & architecture">
+      
+      
+      
+      
+        <link rel="prev" href="../../native/enforcement-modules/">
+      
+      
+        <link rel="next" href="../../ops/sre-plan/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Ledger & State-Machine Workers - Stake — Planning Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#phase-4c-ledger-state-machine-worker-specifications" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Stake — Planning Docs" class="md-header__button md-logo" aria-label="Stake — Planning Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Stake — Planning Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Ledger & State-Machine Workers
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Stake — Planning Docs" class="md-nav__button md-logo" aria-label="Stake — Planning Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Stake — Planning Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1 — Product & Feasibility
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 1 — Product & Feasibility
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../product/prd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Product Requirements (PRD)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/platform-feasibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform Feasibility Matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/anti-cheating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Anti-Cheating & Threat Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 — Payments, System & Data
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 2 — Payments, System & Data
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../payments/payment-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Payment Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/system_design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Design & Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Schema (DDL)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 — API & Security
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 3 — API & Security
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/rest-api-spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    REST API Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/security-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 4 — Contracts & High-Risk Areas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 4 — Contracts & High-Risk Areas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/openapi.yaml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAPI 3.1 Contract
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../native/enforcement-modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Native Enforcement Modules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ledger & State-Machine Workers
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ledger & State-Machine Workers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#commitment-based-digital-discipline-app-stake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commitment-Based Digital Discipline App ("Stake")
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-worker-topology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Worker Topology
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-posting-primitive-every-worker-calls-this" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The Posting Primitive (every worker calls this)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-settlement-worker-qsettlement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Settlement Worker (q.settlement)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-grace-penalty-engine-qgrace-penalty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Grace → Penalty Engine (q.grace-penalty)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-deposit-forfeiture-return-engine-qdeposit-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Deposit Forfeiture / Return Engine (q.deposit-engine)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-reconciliation-workers-qreconcile-nightly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Reconciliation Workers (q.reconcile, nightly)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-aggregation-streaks-notifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Aggregation, Streaks, Notifications
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-exactly-once-five-stacked-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Exactly-Once — five stacked layers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-failure-retry-ops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Failure / Retry / Ops
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-end-to-end-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. End-to-End Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ops & Delivery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Ops & Delivery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ops/sre-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations & SRE Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../project/delivery-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Plan & Delivery Cutline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#commitment-based-digital-discipline-app-stake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commitment-Based Digital Discipline App ("Stake")
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-worker-topology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Worker Topology
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-posting-primitive-every-worker-calls-this" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The Posting Primitive (every worker calls this)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-settlement-worker-qsettlement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Settlement Worker (q.settlement)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-grace-penalty-engine-qgrace-penalty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Grace → Penalty Engine (q.grace-penalty)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-deposit-forfeiture-return-engine-qdeposit-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Deposit Forfeiture / Return Engine (q.deposit-engine)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-reconciliation-workers-qreconcile-nightly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Reconciliation Workers (q.reconcile, nightly)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-aggregation-streaks-notifications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Aggregation, Streaks, Notifications
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-exactly-once-five-stacked-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Exactly-Once — five stacked layers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-failure-retry-ops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Failure / Retry / Ops
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-end-to-end-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. End-to-End Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="phase-4c-ledger-state-machine-worker-specifications">Phase 4c — Ledger &amp; State-Machine Worker Specifications<a class="headerlink" href="#phase-4c-ledger-state-machine-worker-specifications" title="Permanent link">&para;</a></h1>
+<h3 id="commitment-based-digital-discipline-app-stake">Commitment-Based Digital Discipline App ("Stake")<a class="headerlink" href="#commitment-based-digital-discipline-app-stake" title="Permanent link">&para;</a></h3>
+<p>Server-side engine converting violations, silence, clock tamper, paid unlocks, and top-ups into
+<strong>correct, idempotent, auditable money movements</strong>. NestJS + BullMQ + PostgreSQL against the Phase 2 schema.</p>
+<p><strong>Non-negotiable property:</strong> every money movement is a balanced, append-only double-entry journal posted
+<strong>exactly once</strong>, even under retries, crashes, and duplicate events.</p>
+<h2 id="1-worker-topology">1. Worker Topology<a class="headerlink" href="#1-worker-topology" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+    subgraph Producers
+        API["NestJS API"]; WH["Webhook receivers"]; HB["Heartbeat / silence sweeper"]; CRON["Cron schedulers"]
+    end
+    subgraph Queues["BullMQ (Redis)"]
+        Q1[["q.settlement"]]; Q2[["q.grace-penalty (delayed)"]]; Q3[["q.deposit-engine"]]
+        Q4[["q.snapshots"]]; Q5[["q.streaks"]]; Q6[["q.notifications"]]; Q7[["q.reconcile"]]; DLQ[["q.dead-letter"]]
+    end
+    subgraph Workers
+        WSettle; WGrace; WDep; WSnap; WStreak; WNotif; WRecon
+    end
+    PG[("PostgreSQL")]
+    API --&gt; Q1 &amp; Q2 &amp; Q6
+    WH --&gt; Q1
+    HB --&gt; Q2
+    CRON --&gt; Q3 &amp; Q4 &amp; Q5 &amp; Q7
+    Q1--&gt;WSettle; Q2--&gt;WGrace; Q3--&gt;WDep; Q4--&gt;WSnap; Q5--&gt;WStreak; Q6--&gt;WNotif; Q7--&gt;WRecon
+    WSettle &amp; WGrace &amp; WDep &amp; WSnap &amp; WStreak &amp; WRecon --&gt; PG
+    WSettle &amp; WGrace &amp; WDep -. failure .-&gt; DLQ</code></pre>
+<p><strong>Cross-cutting rules:</strong>
+- <strong>Single writer per wallet</strong> — <code>pg_advisory_xact_lock(hashtext(wallet_id))</code> inside the txn serializes debits/credits.
+- <strong>Idempotent by construction</strong> — stable <code>idempotency_key</code>; the posting primitive refuses a second journal for the same <code>(reference_type, reference_id)</code>.
+- <strong>Transactional outbox</strong> — side effects written in the same DB txn as the ledger post, dispatched by a relay.
+- <strong>Retries → DLQ</strong> — exponential backoff (5 attempts); terminal failures page an operator.</p>
+<h2 id="2-the-posting-primitive-every-worker-calls-this">2. The Posting Primitive (every worker calls this)<a class="headerlink" href="#2-the-posting-primitive-every-worker-calls-this" title="Permanent link">&para;</a></h2>
+<p>Account map &amp; balance convention:
+| Account | Type | Balance = | Role |
+|---|---|---|---|
+| <code>user_available</code> | liability | credits − debits | spendable wallet |
+| <code>user_locked</code> | liability | credits − debits | staked/locked deposit |
+| <code>system_gateway_clearing</code> | asset | debits − credits | funds in transit at PSP |
+| <code>system_forfeit_revenue</code> | revenue | credits − debits | forfeits/penalties → company |
+| <code>system_charity</code> | liability | credits − debits | forfeits earmarked for charity |
+| <code>system_fees</code> | expense | debits − credits | gateway fees |</p>
+<p>Journal templates (all net to zero):
+| Event | Debit | Credit |
+|---|---|---|
+| Top-up (net) | <code>system_gateway_clearing</code> | <code>user_available</code> |
+| Gateway fee | <code>system_fees</code> | <code>system_gateway_clearing</code> |
+| Stake a deposit | <code>user_available</code> | <code>user_locked</code> |
+| Paid unlock (from available) | <code>user_available</code> | <code>system_forfeit_revenue</code> |
+| Penalty (locked first, then available) | <code>user_locked</code> / <code>user_available</code> | <code>system_forfeit_revenue</code> <em>(or <code>system_charity</code>)</em> |
+| Deposit forfeiture | <code>user_locked</code> | <code>system_forfeit_revenue</code> <em>(or <code>system_charity</code>)</em> |
+| Deposit return | <code>user_locked</code> | <code>user_available</code> |
+| Withdrawal | <code>user_available</code> | <code>system_gateway_clearing</code> |</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// The only code allowed to write ledger.*  — runs inside one DB transaction.</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">async</span><span class="w"> </span><span class="nx">postJournal</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">input</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="c1">// 1. Idempotency</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">existing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">tx</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="sb">`SELECT id FROM ledger.journals WHERE reference_type=$1 AND reference_id=$2`</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="p">[</span><span class="nx">input</span><span class="p">.</span><span class="nx">referenceType</span><span class="p">,</span><span class="w"> </span><span class="nx">input</span><span class="p">.</span><span class="nx">referenceId</span><span class="p">]);</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">existing</span><span class="p">.</span><span class="nx">rows</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">journalId</span><span class="o">:</span><span class="w"> </span><span class="kt">existing.rows</span><span class="p">[</span><span class="mf">0</span><span class="p">].</span><span class="nx">id</span><span class="w"> </span><span class="p">};</span><span class="w">   </span><span class="c1">// no-op replay</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="c1">// 2. Balance invariant</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">debit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">sum</span><span class="p">(</span><span class="nx">debits</span><span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">legs</span><span class="p">)),</span><span class="w"> </span><span class="nx">credit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">sum</span><span class="p">(</span><span class="nx">credits</span><span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">legs</span><span class="p">));</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">debit</span><span class="p">.</span><span class="nx">eq</span><span class="p">(</span><span class="nx">credit</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">debit</span><span class="p">.</span><span class="nx">lte</span><span class="p">(</span><span class="mf">0</span><span class="p">))</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">UnbalancedJournalError</span><span class="p">();</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="c1">// 3. Serialize per wallet</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">w</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">affectedWalletIds</span><span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">legs</span><span class="p">))</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">tx</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="sb">`SELECT pg_advisory_xact_lock(hashtext($1))`</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="nx">w</span><span class="p">]);</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="c1">// 4. Sufficiency (no negative wallet)</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">assertNoOverdraw</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">input</span><span class="p">.</span><span class="nx">legs</span><span class="p">);</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">  </span><span class="c1">// 5. Append journal + entries (immutable)</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">journalId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">insertJournal</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">input</span><span class="p">);</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">leg</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">input</span><span class="p">.</span><span class="nx">legs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">balanceAfter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">applyToLedgerAccount</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">leg</span><span class="p">);</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">insertEntry</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">journalId</span><span class="p">,</span><span class="w"> </span><span class="nx">leg</span><span class="p">,</span><span class="w"> </span><span class="nx">balanceAfter</span><span class="p">);</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">  </span><span class="c1">// 6. Refresh wallet cache (ledger remains source of truth)</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">refreshWalletCache</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">input</span><span class="p">.</span><span class="nx">legs</span><span class="p">);</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">journalId</span><span class="w"> </span><span class="p">};</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="p">}</span>
+</code></pre></div>
+<h2 id="3-settlement-worker-qsettlement">3. Settlement Worker (<code>q.settlement</code>)<a class="headerlink" href="#3-settlement-worker-qsettlement" title="Permanent link">&para;</a></h2>
+<p>Turns a verified gateway webhook into wallet credit — exactly once.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">async</span><span class="w"> </span><span class="nx">process</span><span class="p">({</span><span class="w"> </span><span class="nx">paymentId</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nx">tx</span><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">lockPaymentRow</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">paymentId</span><span class="p">);</span><span class="w">             </span><span class="c1">// FOR UPDATE</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">TERMINAL</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">status</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="p">;</span><span class="w">                        </span><span class="c1">// already settled</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">live</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">providers</span><span class="p">[</span><span class="nx">p</span><span class="p">.</span><span class="nx">provider</span><span class="p">].</span><span class="nx">fetchStatus</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">provider_intent_id</span><span class="p">);</span><span class="w"> </span><span class="c1">// server PULL</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="nx">assertMatch</span><span class="p">(</span><span class="nx">live</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="kt">p.amount</span><span class="p">,</span><span class="w"> </span><span class="nx">currency</span><span class="o">:</span><span class="w"> </span><span class="kt">p.currency</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">live</span><span class="p">.</span><span class="nx">status</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="s1">&#39;succeeded&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">markPayment</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">p</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;failed&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">live</span><span class="p">);</span><span class="w"> </span><span class="k">return</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">purpose</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;wallet_topup&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">      </span><span class="k">await</span><span class="w"> </span><span class="nx">ledger</span><span class="p">.</span><span class="nx">postJournal</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">        </span><span class="nx">referenceType</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;payment&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">referenceId</span><span class="o">:</span><span class="w"> </span><span class="kt">p.id</span><span class="p">,</span><span class="w"> </span><span class="nx">currency</span><span class="o">:</span><span class="w"> </span><span class="kt">p.currency</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">        </span><span class="nx">description</span><span class="o">:</span><span class="w"> </span><span class="sb">`Top-up </span><span class="si">${</span><span class="nx">p</span><span class="p">.</span><span class="nx">amount</span><span class="si">}</span><span class="sb"> via </span><span class="si">${</span><span class="nx">p</span><span class="p">.</span><span class="nx">provider</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">        </span><span class="nx">legs</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">          </span><span class="p">{</span><span class="w"> </span><span class="nx">accountId</span><span class="o">:</span><span class="w"> </span><span class="kt">acc.gatewayClearing</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">currency</span><span class="p">),</span><span class="w"> </span><span class="nx">direction</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;debit&#39;</span><span class="p">,</span><span class="w">  </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="kt">p.netAmount</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">          </span><span class="p">{</span><span class="w"> </span><span class="nx">accountId</span><span class="o">:</span><span class="w"> </span><span class="kt">acc.userAvailable</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span><span class="w"> </span><span class="nx">p</span><span class="p">.</span><span class="nx">currency</span><span class="p">),</span><span class="w"> </span><span class="nx">direction</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;credit&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="kt">p.netAmount</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">        </span><span class="p">]</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">fee_amount</span><span class="p">.</span><span class="nx">gt</span><span class="p">(</span><span class="mf">0</span><span class="p">))</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">postFeeJournal</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">p</span><span class="p">);</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">markPayment</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">p</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;succeeded&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">live</span><span class="p">);</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">outbox</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;notification&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;payment_receipt&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">userId</span><span class="o">:</span><span class="w"> </span><span class="kt">p.userId</span><span class="p">,</span><span class="w"> </span><span class="nx">paymentId</span><span class="o">:</span><span class="w"> </span><span class="kt">p.id</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">continuation</span><span class="p">)</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">outbox</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">p</span><span class="p">.</span><span class="nx">continuation</span><span class="p">.</span><span class="nx">queue</span><span class="p">,</span><span class="w"> </span><span class="nx">p</span><span class="p">.</span><span class="nx">continuation</span><span class="p">.</span><span class="nx">payload</span><span class="p">);</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">  </span><span class="p">});</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="p">}</span>
+</code></pre></div>
+<strong>Payment state machine:</strong>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; initiated
+    initiated --&gt; pending
+    pending --&gt; authorized
+    authorized --&gt; succeeded
+    pending --&gt; failed
+    pending --&gt; cancelled
+    succeeded --&gt; refunded
+    succeeded --&gt; partially_refunded
+    succeeded --&gt; disputed</code></pre>
+Illegal transitions (e.g. <code>succeeded → pending</code>) rejected by a guard table; out-of-order webhooks can only advance.</p>
+<h2 id="4-grace-penalty-engine-qgrace-penalty">4. Grace → Penalty Engine (<code>q.grace-penalty</code>)<a class="headerlink" href="#4-grace-penalty-engine-qgrace-penalty" title="Permanent link">&para;</a></h2>
+<p>Detection opens a grace window; the penalty is only posted if the user doesn't cure it (avoids penalizing innocent OEM battery-kills).
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; detected: heartbeat/sweeper inserts violation + grace_expires_at
+    detected --&gt; resolved: cure observed
+    detected --&gt; penalized: grace expired &amp; still uncured</code></pre>
+Scheduling: on violation insert, enqueue a <strong>delayed</strong> job with <code>delay = grace_expires_at − now</code>, <code>jobId = violation:{id}</code>.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">async</span><span class="w"> </span><span class="nx">process</span><span class="p">({</span><span class="w"> </span><span class="nx">violationId</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nx">tx</span><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="nx">tx</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">lockViolation</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">violationId</span><span class="p">);</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">v</span><span class="p">.</span><span class="nx">enforcement_action</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="s1">&#39;grace_period&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">isCured</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">v</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="k">await</span><span class="w"> </span><span class="nx">setViolation</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">v</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">enforcement_action</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;warning&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">resolved_at</span><span class="o">:</span><span class="w"> </span><span class="kt">now</span><span class="p">()</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">      </span><span class="k">await</span><span class="w"> </span><span class="nx">outbox</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;notification&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;protection_down&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">userId</span><span class="o">:</span><span class="w"> </span><span class="kt">v.user_id</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">        </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Protection restored — no penalty applied.&#39;</span><span class="w"> </span><span class="p">});</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">fee</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">penaltyPolicy</span><span class="p">.</span><span class="nx">amountFor</span><span class="p">(</span><span class="nx">v</span><span class="p">.</span><span class="nx">violation_type</span><span class="p">,</span><span class="w"> </span><span class="nx">v</span><span class="p">.</span><span class="nx">user_id</span><span class="p">);</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">dest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">forfeitPolicy</span><span class="p">.</span><span class="nx">destination</span><span class="p">(</span><span class="nx">v</span><span class="p">.</span><span class="nx">user_id</span><span class="p">);</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">legs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">buildDebitLegs</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">v</span><span class="p">.</span><span class="nx">user_id</span><span class="p">,</span><span class="w"> </span><span class="nx">fee</span><span class="p">,</span><span class="w"> </span><span class="nx">dest</span><span class="p">);</span><span class="w">     </span><span class="c1">// locked-first waterfall</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">journalId</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">ledger</span><span class="p">.</span><span class="nx">postJournal</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">      </span><span class="nx">referenceType</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;penalty&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">referenceId</span><span class="o">:</span><span class="w"> </span><span class="kt">v.id</span><span class="p">,</span><span class="w"> </span><span class="nx">currency</span><span class="o">:</span><span class="w"> </span><span class="kt">fee.currency</span><span class="p">,</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">      </span><span class="nx">description</span><span class="o">:</span><span class="w"> </span><span class="sb">`Penalty: </span><span class="si">${</span><span class="nx">v</span><span class="p">.</span><span class="nx">violation_type</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span><span class="w"> </span><span class="nx">legs</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">setViolation</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="nx">v</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">enforcement_action</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;penalty_applied&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">      </span><span class="nx">fee_applied</span><span class="o">:</span><span class="w"> </span><span class="kt">fee.amount</span><span class="p">,</span><span class="w"> </span><span class="nx">related_journal_id</span><span class="o">:</span><span class="w"> </span><span class="kt">journalId</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">outbox</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;deposit-engine&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;penalty_consumed_lock&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">userId</span><span class="o">:</span><span class="w"> </span><span class="kt">v.user_id</span><span class="p">,</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">      </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="kt">fee.amount</span><span class="p">,</span><span class="w"> </span><span class="nx">journalId</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">outbox</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;notification&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;commitment_break&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">userId</span><span class="o">:</span><span class="w"> </span><span class="kt">v.user_id</span><span class="p">,</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">      </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="sb">`Commitment broken — </span><span class="si">${</span><span class="nx">fee</span><span class="p">.</span><span class="nx">amount</span><span class="si">}</span><span class="sb"> </span><span class="si">${</span><span class="nx">fee</span><span class="p">.</span><span class="nx">currency</span><span class="si">}</span><span class="sb"> forfeited.`</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">  </span><span class="p">});</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="p">}</span>
+</code></pre></div>
+<strong>Insufficient funds:</strong> post what's available, record a <code>negative_commitment_balance</code> flag, block new
+commitments + require top-up. Wallet never goes negative. Mitigated by <strong>capping max penalty exposure to the
+pre-funded balance</strong> at commitment-creation time.</p>
+<h2 id="5-deposit-forfeiture-return-engine-qdeposit-engine">5. Deposit Forfeiture / Return Engine (<code>q.deposit-engine</code>)<a class="headerlink" href="#5-deposit-forfeiture-return-engine-qdeposit-engine" title="Permanent link">&para;</a></h2>
+<p><pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; active: stake posted (available -&gt; locked)
+    active --&gt; partially_forfeited: penalty consumed part of lock
+    active --&gt; completed_returned: commitment_end reached, intact
+    partially_forfeited --&gt; completed_returned: end reached, remainder returned
+    active --&gt; forfeited: full stake consumed
+    active --&gt; cancelled: user cancels early (policy)</code></pre>
+- <code>penalty_consumed_lock</code>: decrement effective remaining lock, bump <code>forfeited_amount</code>, set status. No new journal (penalty journal already moved the money).
+- <code>commitment_end</code> reached (cron <code>jobId = deposit:{id}:return</code>): return remaining locked:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">await</span><span class="w"> </span><span class="nx">ledger</span><span class="p">.</span><span class="nx">postJournal</span><span class="p">(</span><span class="nx">tx</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nx">referenceType</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;deposit_release&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">referenceId</span><span class="o">:</span><span class="w"> </span><span class="kt">deposit.id</span><span class="p">,</span><span class="w"> </span><span class="nx">currency</span><span class="o">:</span><span class="w"> </span><span class="kt">deposit.currency</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nx">description</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Commitment kept — return remaining stake&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nx">legs</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">accountId</span><span class="o">:</span><span class="w"> </span><span class="kt">acc.userLocked</span><span class="p">(</span><span class="nx">deposit</span><span class="p">.</span><span class="nx">user_id</span><span class="p">,</span><span class="w"> </span><span class="nx">c</span><span class="p">),</span><span class="w"> </span><span class="nx">direction</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;debit&#39;</span><span class="p">,</span><span class="w">  </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="kt">remaining</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">accountId</span><span class="o">:</span><span class="w"> </span><span class="kt">acc.userAvailable</span><span class="p">(</span><span class="nx">deposit</span><span class="p">.</span><span class="nx">user_id</span><span class="p">,</span><span class="w"> </span><span class="nx">c</span><span class="p">),</span><span class="w"> </span><span class="nx">direction</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;credit&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">amount</span><span class="o">:</span><span class="w"> </span><span class="kt">remaining</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="p">]</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
+<code>CHECK (forfeited_amount + returned_amount &lt;= staked_amount)</code> makes over-return/over-forfeit impossible.
+Returned money lands in <strong>available balance</strong> (not auto-refunded to card); explicit withdrawal separately.</p>
+<h2 id="6-reconciliation-workers-qreconcile-nightly">6. Reconciliation Workers (<code>q.reconcile</code>, nightly)<a class="headerlink" href="#6-reconciliation-workers-qreconcile-nightly" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Verifies</th>
+<th>On mismatch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>R1 — Journal balance</strong></td>
+<td>every journal nets to zero</td>
+<td>page; freeze writes</td>
+</tr>
+<tr>
+<td><strong>R2 — Wallet cache vs ledger</strong></td>
+<td>recompute available/locked from entries vs cache</td>
+<td>repair from ledger; alert delta</td>
+</tr>
+<tr>
+<td><strong>R3 — Global double-entry</strong></td>
+<td>total debits == credits; assets = liabilities + revenue ± fees</td>
+<td>page</td>
+</tr>
+<tr>
+<td><strong>R4 — Provider settlement</strong></td>
+<td>succeeded payments vs provider settlement export</td>
+<td>ops ticket</td>
+</tr>
+<tr>
+<td>Plus orphan scans: granted unlocks w/o journal; active deposits past end w/o release; payments stuck pending past TTL → expire.</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-aggregation-streaks-notifications">7. Aggregation, Streaks, Notifications<a class="headerlink" href="#7-aggregation-streaks-notifications" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>SnapshotWorker</strong> (per user at their <code>day_boundary_minutes</code>): folds <code>usage_events</code> into <code>daily_snapshots</code> + <code>daily_app_usage</code>. Idempotent on <code>(user_id, snapshot_date)</code>.</li>
+<li><strong>StreakWorker</strong>: updates <code>gamification_state</code> (streaks, productivity score, money saved). Replayable from snapshots.</li>
+<li><strong>NotificationWorker</strong>: the outbox relay; reads pending <code>engage.notifications</code>, sends via FCM/APNs, advances status. Idempotent on notification id.</li>
+</ul>
+<h2 id="8-exactly-once-five-stacked-layers">8. Exactly-Once — five stacked layers<a class="headerlink" href="#8-exactly-once-five-stacked-layers" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Inbound dedup:</strong> webhook <code>(provider, provider_event_id)</code> UNIQUE.</li>
+<li><strong>Job dedup:</strong> BullMQ <code>jobId = {type}:{entityId}</code>.</li>
+<li><strong>Journal dedup:</strong> <code>ledger.journals (reference_type, reference_id)</code> lookup → no-op on replay.</li>
+<li><strong>Serialization:</strong> advisory lock + <code>FOR UPDATE</code> per wallet.</li>
+<li><strong>Atomic side effects:</strong> ledger post + state transition + outbox commit in one txn; relay dispatches after commit.</li>
+</ol>
+<h2 id="9-failure-retry-ops">9. Failure / Retry / Ops<a class="headerlink" href="#9-failure-retry-ops" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Failure</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Transient DB/Redis</td>
+<td>retry w/ backoff; idempotent</td>
+</tr>
+<tr>
+<td>Provider fetch timeout</td>
+<td>leave pending; retry; expire after TTL</td>
+</tr>
+<tr>
+<td>Unbalanced journal / overdraw</td>
+<td>throw → rollback → DLQ + page</td>
+</tr>
+<tr>
+<td>Penalty insufficient funds</td>
+<td>partial + <code>negative_commitment_balance</code> flag</td>
+</tr>
+<tr>
+<td>Worker crash mid-job</td>
+<td>txn rolls back; re-deliver; no-op if committed</td>
+</tr>
+<tr>
+<td>Reconciliation drift (R1/R3)</td>
+<td><strong>freeze money writes</strong>, page</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Observability:</strong> queue depth/lag, DLQ size (alert &gt; 0), reconciliation deltas (alert ≠ 0), ledger
+global-balance gauge, time-to-settle histogram. DLQ non-empty and any reconciliation delta are <strong>paging</strong> events.</p>
+<h2 id="10-end-to-end-lifecycle">10. End-to-End Lifecycle<a class="headerlink" href="#10-end-to-end-lifecycle" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>sequenceDiagram
+    participant U as User/Device
+    participant API; participant G as Gateway; participant WH as Webhook
+    participant SET as SettlementWorker; participant DEP as DepositEngine
+    participant HB as Heartbeat/Sweeper; participant GP as GracePenaltyWorker; participant L as Ledger
+    U-&gt;&gt;API: POST /wallet/topup (500)
+    API-&gt;&gt;G: create intent
+    G--&gt;&gt;WH: success (signed)
+    WH-&gt;&gt;SET: enqueue {paymentId}
+    SET-&gt;&gt;L: journal: gateway_clearing -&gt; user_available 500
+    U-&gt;&gt;API: POST /commitment-deposits (stake 1000)
+    API-&gt;&gt;L: journal: user_available -&gt; user_locked 1000
+    alt user breaks commitment
+        HB-&gt;&gt;GP: violation (perm revoked) + grace
+        GP-&gt;&gt;L: penalty: user_locked -&gt; forfeit_revenue 50
+        GP-&gt;&gt;DEP: penalty_consumed_lock
+        DEP-&gt;&gt;DEP: deposit -&gt; partially_forfeited
+    else user keeps it
+        DEP-&gt;&gt;L: deposit_release: user_locked -&gt; user_available (remaining)
+        DEP-&gt;&gt;U: "Commitment kept — stake returned"
+    end</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "content.code.copy", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

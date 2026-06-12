@@ -1,0 +1,1705 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Commitment-based digital discipline app — planning & architecture">
+      
+      
+      
+      
+        <link rel="prev" href="../..">
+      
+      
+        <link rel="next" href="../../architecture/platform-feasibility/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Product Requirements (PRD) - Stake — Planning Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#phase-1-product-requirements-document-prd" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Stake — Planning Docs" class="md-header__button md-logo" aria-label="Stake — Planning Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Stake — Planning Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Product Requirements (PRD)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Stake — Planning Docs" class="md-nav__button md-logo" aria-label="Stake — Planning Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Stake — Planning Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1 — Product & Feasibility
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 1 — Product & Feasibility
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Product Requirements (PRD)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Product Requirements (PRD)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#commitment-based-digital-discipline-app-stake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commitment-Based Digital Discipline App ("Stake")
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-vision-positioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Vision &amp; Positioning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-problem-statement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Problem Statement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-goals-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Goals (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-explicit-non-goals-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Explicit Non-Goals (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-personas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Personas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fr-1-app-restriction-schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-1 — App Restriction Schedule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-2-paid-unlock-during-restriction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-2 — Paid Unlock During Restriction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-3-per-app-daily-screen-time-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-3 — Per-App Daily Screen-Time Limits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-4-anti-cheating-edit-rules-asymmetric-editing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-4 — Anti-Cheating Edit Rules (asymmetric editing)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-5-remove-app-from-restriction-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-5 — Remove App from Restriction List
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-6-commitment-integrity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-6 — Commitment Integrity
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-payment-model-is-a-phase-1-architecture-decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. ⚠️ Payment Model is a Phase-1 Architecture Decision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-non-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Non-Functional Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-success-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Success Metrics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-critical-open-decisions-blockers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Critical Open Decisions (blockers)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-phase-1-cutline-mvp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Phase 1 Cutline (MVP)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/platform-feasibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform Feasibility Matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/anti-cheating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Anti-Cheating & Threat Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 — Payments, System & Data
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 2 — Payments, System & Data
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../payments/payment-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Payment Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/system_design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Design & Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Schema (DDL)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 — API & Security
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 3 — API & Security
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/rest-api-spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    REST API Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/security-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 4 — Contracts & High-Risk Areas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 4 — Contracts & High-Risk Areas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/openapi.yaml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAPI 3.1 Contract
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../native/enforcement-modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Native Enforcement Modules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../backend/ledger-workers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ledger & State-Machine Workers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ops & Delivery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Ops & Delivery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ops/sre-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations & SRE Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../project/delivery-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Plan & Delivery Cutline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#commitment-based-digital-discipline-app-stake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commitment-Based Digital Discipline App ("Stake")
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-vision-positioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Vision &amp; Positioning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-problem-statement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Problem Statement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-goals-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Goals (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-explicit-non-goals-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Explicit Non-Goals (Phase 1)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-personas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Personas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fr-1-app-restriction-schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-1 — App Restriction Schedule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-2-paid-unlock-during-restriction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-2 — Paid Unlock During Restriction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-3-per-app-daily-screen-time-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-3 — Per-App Daily Screen-Time Limits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-4-anti-cheating-edit-rules-asymmetric-editing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-4 — Anti-Cheating Edit Rules (asymmetric editing)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-5-remove-app-from-restriction-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-5 — Remove App from Restriction List
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr-6-commitment-integrity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR-6 — Commitment Integrity
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-payment-model-is-a-phase-1-architecture-decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. ⚠️ Payment Model is a Phase-1 Architecture Decision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-non-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Non-Functional Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-success-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Success Metrics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-critical-open-decisions-blockers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Critical Open Decisions (blockers)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-phase-1-cutline-mvp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Phase 1 Cutline (MVP)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="phase-1-product-requirements-document-prd">Phase 1 — Product Requirements Document (PRD)<a class="headerlink" href="#phase-1-product-requirements-document-prd" title="Permanent link">&para;</a></h1>
+<h3 id="commitment-based-digital-discipline-app-stake">Commitment-Based Digital Discipline App ("Stake")<a class="headerlink" href="#commitment-based-digital-discipline-app-stake" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>The single most important framing: <strong>on consumer mobile devices you cannot technically
+<em>force</em> a determined user to stay blocked.</strong> Both Apple and Google deliberately make that
+impossible outside enterprise/MDM-managed devices. The product is re-framed around a model
+that <em>works with</em> that reality: a financial commitment with teeth.</p>
+</blockquote>
+<h2 id="1-vision-positioning">1. Vision &amp; Positioning<a class="headerlink" href="#1-vision-positioning" title="Permanent link">&para;</a></h2>
+<p>A behavior-change app that converts a user's <em>stated intention</em> to use distracting apps less
+into a <strong>financial commitment with teeth</strong>. Screen-time apps fail because their barriers are
+free to bypass (one tap to dismiss/extend). Stake makes bypassing <strong>cost real money</strong>, turning
+loss-aversion into the enforcement mechanism.</p>
+<p><strong>Positioning:</strong> <em>"Not a screen-time tracker. A commitment device. You set the rules; breaking them costs you."</em></p>
+<h2 id="2-problem-statement">2. Problem Statement<a class="headerlink" href="#2-problem-statement" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Existing tools (Apple Screen Time, Digital Wellbeing, Freedom) have <strong>zero switching cost to bypass</strong> → habituation within days.</li>
+<li>Users <em>want</em> friction but also want a release valve for genuine need (emergencies, work).</li>
+<li>A penalty/stake model provides both: high friction + a paid escape hatch that funds the user's own accountability.</li>
+</ul>
+<h2 id="3-goals-phase-1">3. Goals (Phase 1)<a class="headerlink" href="#3-goals-phase-1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Goal</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G1</td>
+<td>Block selected apps on a schedule</td>
+<td>Core utility</td>
+</tr>
+<tr>
+<td>G2</td>
+<td>Per-app daily time limits with asymmetric editing (tighten free, loosen costs money)</td>
+<td>The commitment hook</td>
+</tr>
+<tr>
+<td>G3</td>
+<td>Paid temporary unlock during restriction</td>
+<td>Monetized release valve</td>
+</tr>
+<tr>
+<td>G4</td>
+<td>Paid commitment-break for loosening/removing rules</td>
+<td>Monetized integrity</td>
+</tr>
+<tr>
+<td>G5</td>
+<td>Make bypass <em>detectable and costly</em>, not impossible</td>
+<td>Honest about platform limits</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-explicit-non-goals-phase-1">4. Explicit Non-Goals (Phase 1)<a class="headerlink" href="#4-explicit-non-goals-phase-1" title="Permanent link">&para;</a></h2>
+<ul>
+<li>❌ Kiosk/MDM-level hard lock (enterprise-only).</li>
+<li>❌ Blocking <em>system</em> settings, browser content, or web versions of apps (Phase 2+).</li>
+<li>❌ Social/accountability-partner features.</li>
+<li>❌ Cross-device sync of restrictions (single device per account in P1).</li>
+</ul>
+<h2 id="5-personas">5. Personas<a class="headerlink" href="#5-personas" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>The Self-Aware Procrastinator</strong> — knows they doom-scroll, wants something they <em>can't</em> casually dismiss.</li>
+<li><strong>The Focus Worker</strong> — wants apps gone 9–5, but needs a guaranteed paid escape for the occasional real need.</li>
+<li><strong>The Gamer-Parent (self-managed)</strong> — wants games off during evenings/family time.</li>
+</ul>
+<h2 id="6-functional-requirements">6. Functional Requirements<a class="headerlink" href="#6-functional-requirements" title="Permanent link">&para;</a></h2>
+<h3 id="fr-1-app-restriction-schedule">FR-1 — App Restriction Schedule<a class="headerlink" href="#fr-1-app-restriction-schedule" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Multi-select restricted apps (via OS-provided picker; on iOS you get opaque <em>tokens</em>, not names).</li>
+<li>Recurring schedules: Daily / Weekday / Custom-days, with one or more time windows per day.</li>
+<li>During an active window: app launch → <strong>blocking screen</strong>; restriction settings are <strong>read-only (locked)</strong> until the window ends.</li>
+<li>Edge cases to specify: overlapping windows, windows crossing midnight, DST, edits scheduled to take effect <em>after</em> the active window (allowed) vs. immediate (blocked).</li>
+</ul>
+<h3 id="fr-2-paid-unlock-during-restriction">FR-2 — Paid Unlock During Restriction<a class="headerlink" href="#fr-2-paid-unlock-during-restriction" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Block screen offers: <strong>Cancel</strong> | <strong>Unlock by paying Rs. 50</strong>.</li>
+<li><strong>Unlock duration — recommendation:</strong> tiered set, default to shortest, price by friction:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Duration</th>
+<th>Price</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Quick peek</strong> (default)</td>
+<td>5 min</td>
+<td>Rs. 50</td>
+<td>"Check one DM." Auto re-locks.</td>
+</tr>
+<tr>
+<td>Short</td>
+<td>15 min</td>
+<td>Rs. 120</td>
+<td>Still painful.</td>
+</tr>
+<tr>
+<td>Session</td>
+<td>60 min</td>
+<td>Rs. 400</td>
+<td>Deliberately expensive.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>UX principles:</strong> shortest/cheapest pre-selected &amp; prominent; <strong>no "rest of day"/unlimited</strong> option; mandatory <strong>10-second cooldown + confirmation</strong> before pay activates; show running <strong>"broken commitments this month"</strong> counter; on expiry re-lock immediately.</p>
+<h3 id="fr-3-per-app-daily-screen-time-limits">FR-3 — Per-App Daily Screen-Time Limits<a class="headerlink" href="#fr-3-per-app-daily-screen-time-limits" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Configure minutes/day per app (e.g., IG 30, TikTok 15).</li>
+<li>On reaching limit → block screen; counter resets at user-defined day boundary (default local midnight; configurable e.g. 4 AM).</li>
+</ul>
+<h3 id="fr-4-anti-cheating-edit-rules-asymmetric-editing">FR-4 — Anti-Cheating Edit Rules (asymmetric editing)<a class="headerlink" href="#fr-4-anti-cheating-edit-rules-asymmetric-editing" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Reduce limit:</strong> allowed, free, immediate.</li>
+<li><strong>Increase / disable limit:</strong> blocked unless <strong>commitment-break fee</strong> paid.</li>
+<li>Recommendation: increase takes effect <em>next</em> period, not instantly, so paying isn't a same-day binge enabler. <em>(Open decision.)</em></li>
+</ul>
+<h3 id="fr-5-remove-app-from-restriction-list">FR-5 — Remove App from Restriction List<a class="headerlink" href="#fr-5-remove-app-from-restriction-list" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Requires commitment-break fee (Rs. 50). After payment → removed.</li>
+<li><strong>Cooling-off:</strong> removal takes effect after the current active window, not mid-restriction.</li>
+</ul>
+<h3 id="fr-6-commitment-integrity">FR-6 — Commitment Integrity<a class="headerlink" href="#fr-6-commitment-integrity" title="Permanent link">&para;</a></h3>
+<p>See <a href="../../architecture/anti-cheating/">architecture/anti-cheating.md</a>.</p>
+<h2 id="7-payment-model-is-a-phase-1-architecture-decision">7. ⚠️ Payment Model is a Phase-1 Architecture Decision<a class="headerlink" href="#7-payment-model-is-a-phase-1-architecture-decision" title="Permanent link">&para;</a></h2>
+<p><strong>You cannot reliably charge a user <em>after</em> they break a commitment</strong> — especially after uninstall.</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>How</th>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Pre-funded wallet / stake (recommended)</strong></td>
+<td>Load balance up front; penalties/unlocks debit it.</td>
+<td>Money already captured → integrity holds even after uninstall.</td>
+<td>Top-up UX; stored-value regulation.</td>
+</tr>
+<tr>
+<td><strong>B. Charge-on-event</strong></td>
+<td>Card on file, charge per event.</td>
+<td>No pre-funding friction.</td>
+<td>Fails on uninstall/revoke; chargebacks; high fees on Rs.50.</td>
+</tr>
+<tr>
+<td><strong>C. Charity-forfeit / anti-charity</strong></td>
+<td>Penalty → charity, not you.</td>
+<td>Strong motivator; cleaner store-policy optics.</td>
+<td>Payout complexity.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Recommendation:</strong> <strong>Model A (pre-funded stake) + optionally C for forfeits.</strong> Decide now whether
+penalty money is <strong>revenue</strong> or <strong>forfeited (charity/locked)</strong> — affects store billing classification, taxes, trust, IAP requirement.</p>
+<h2 id="8-non-functional-requirements">8. Non-Functional Requirements<a class="headerlink" href="#8-non-functional-requirements" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Block latency:</strong> &lt; ~300 ms after foreground detection (Android), before meaningful interaction.</li>
+<li><strong>Battery:</strong> survive OEM battery optimizers (Xiaomi/Oppo/Samsung); onboarding guides whitelisting.</li>
+<li><strong>Privacy:</strong> usage data on-device where possible; on iOS <em>enforced</em> (you never see app identities). Clear privacy policy.</li>
+<li><strong>Security:</strong> rules, limits, wallet balance are server-authoritative.</li>
+<li><strong>Accessibility:</strong> the block screen itself must be screen-reader usable.</li>
+</ul>
+<h2 id="9-success-metrics">9. Success Metrics<a class="headerlink" href="#9-success-metrics" title="Permanent link">&para;</a></h2>
+<p>D7/D30 retention; <strong>avg. days a commitment survives</strong>; bypass-attempt rate; paid-unlock conversion;
+<strong>% of revenue from unlocks vs. subscription</strong> (over-reliance on penalties = product failing its users — watch this).</p>
+<h2 id="10-critical-open-decisions-blockers">10. Critical Open Decisions (blockers)<a class="headerlink" href="#10-critical-open-decisions-blockers" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Penalty money flow:</strong> revenue vs. charity-forfeit vs. user-reward. → IAP vs. processor, store policy, legal/tax.</li>
+<li><strong>Stake vs. charge-on-event:</strong> confirm pre-funded stake (Model A).</li>
+<li><strong>iOS entitlement go/no-go:</strong> Apple's Family Controls distribution entitlement is gated and can be denied — submit early.</li>
+<li><strong>Launch platform:</strong> Android-first (richer enforcement + custom pay screen).</li>
+<li><strong>"Increase limit takes effect when?"</strong> — recommend next-period to avoid same-day binge.</li>
+</ol>
+<h2 id="11-phase-1-cutline-mvp">11. Phase 1 Cutline (MVP)<a class="headerlink" href="#11-phase-1-cutline-mvp" title="Permanent link">&para;</a></h2>
+<p>Android-first · FR-1 + FR-3 + FR-2 (5-min unlock) + FR-4 asymmetric edits · pre-funded wallet ·
+server-authoritative rules + heartbeat + Play Integrity · honest "we detect &amp; charge, we don't physically prevent" framing.
+Defer iOS, clone-detection, charity-forfeit, multi-device to Phase 2.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "content.code.copy", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

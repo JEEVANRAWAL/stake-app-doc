@@ -1,0 +1,1654 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Commitment-based digital discipline app — planning & architecture">
+      
+      
+      
+      
+        <link rel="prev" href="../../backend/ledger-workers/">
+      
+      
+        <link rel="next" href="../../project/delivery-plan/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Operations & SRE Plan - Stake — Planning Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#operations-sre-plan" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Stake — Planning Docs" class="md-header__button md-logo" aria-label="Stake — Planning Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Stake — Planning Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Operations & SRE Plan
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Stake — Planning Docs" class="md-nav__button md-logo" aria-label="Stake — Planning Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Stake — Planning Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1 — Product & Feasibility
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 1 — Product & Feasibility
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../product/prd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Product Requirements (PRD)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/platform-feasibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform Feasibility Matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/anti-cheating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Anti-Cheating & Threat Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 — Payments, System & Data
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 2 — Payments, System & Data
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../payments/payment-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Payment Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/system_design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Design & Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../database/schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Schema (DDL)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 — API & Security
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 3 — API & Security
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/rest-api-spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    REST API Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/security-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Framework
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 4 — Contracts & High-Risk Areas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 4 — Contracts & High-Risk Areas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/openapi.yaml" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenAPI 3.1 Contract
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../native/enforcement-modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Native Enforcement Modules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../backend/ledger-workers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ledger & State-Machine Workers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ops & Delivery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Ops & Delivery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations & SRE Plan
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations & SRE Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#commitment-based-digital-discipline-app-stake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commitment-Based Digital Discipline App ("Stake")
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-environment-deployment-topology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Environment &amp; Deployment Topology
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-scaling-the-high-write-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Scaling the High-Write Path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-database-ha-backup-pitr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Database HA, Backup &amp; PITR
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-redis-queue-ops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Redis &amp; Queue Ops
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-cryptographic-key-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Cryptographic Key Management
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Observability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-slos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. SLOs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-incident-runbooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Incident Runbooks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-cicd-migrations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. CI/CD &amp; Migrations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-security-compliance-data-governance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Security, Compliance &amp; Data Governance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-capacity-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Capacity &amp; Cost
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-dr-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. DR Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../project/delivery-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Plan & Delivery Cutline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#commitment-based-digital-discipline-app-stake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commitment-Based Digital Discipline App ("Stake")
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-environment-deployment-topology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Environment &amp; Deployment Topology
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-scaling-the-high-write-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Scaling the High-Write Path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-database-ha-backup-pitr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Database HA, Backup &amp; PITR
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-redis-queue-ops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Redis &amp; Queue Ops
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-cryptographic-key-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Cryptographic Key Management
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Observability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-slos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. SLOs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-incident-runbooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Incident Runbooks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-cicd-migrations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. CI/CD &amp; Migrations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-security-compliance-data-governance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Security, Compliance &amp; Data Governance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-capacity-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Capacity &amp; Cost
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-dr-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. DR Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="operations-sre-plan">Operations &amp; SRE Plan<a class="headerlink" href="#operations-sre-plan" title="Permanent link">&para;</a></h1>
+<h3 id="commitment-based-digital-discipline-app-stake">Commitment-Based Digital Discipline App ("Stake")<a class="headerlink" href="#commitment-based-digital-discipline-app-stake" title="Permanent link">&para;</a></h3>
+<p>Theme: <strong>the ledger is sacred</strong> (any imbalance freezes writes and pages a human) and <strong>the device is
+untrusted</strong> (server-held funds are the backstop).</p>
+<h2 id="1-environment-deployment-topology">1. Environment &amp; Deployment Topology<a class="headerlink" href="#1-environment-deployment-topology" title="Permanent link">&para;</a></h2>
+<p><pre class="mermaid"><code>flowchart TB
+    subgraph Edge
+        CF["CDN + WAF + DDoS"]; LB["Load Balancer"]
+    end
+    subgraph K8s["Kubernetes (regional)"]
+        API["api (NestJS, HPA 3–N)"]; WH["webhook (isolated, raw-body)"]
+        WK["workers (BullMQ, KEDA)"]; WS["realtime (WS/SSE)"]
+    end
+    subgraph Data
+        PGP[("PG primary")]; PGR1[("PG sync replica (HA)")]; PGR2[("PG async replica")]
+        RED[("Redis HA, AOF")]; OBJ[("Object storage / WAL archive")]
+    end
+    CF--&gt;LB--&gt;API &amp; WH &amp; WS
+    API &amp; WK &amp; WS--&gt;PGP; WK &amp; WS--&gt;RED; API--&gt;RED
+    PGP==&gt;PGR1; PGP--&gt;PGR2; PGP--&gt;OBJ</code></pre>
+- <strong>Environments:</strong> <code>dev</code> → <code>sandbox</code> → <code>prod</code>, fully isolated (DB, Redis, secrets). No shared state.
+- <strong>Webhooks separate</strong> — raw-body parsing, distinct rate-limit/IP-allowlist, stays available during API rollouts (a dropped payment webhook is money).
+- <strong>Region:</strong> primary near the user base; DB/ledger single-writer in one region; multi-region <strong>active-passive</strong>. Never shard/multi-master the ledger.</p>
+<h2 id="2-scaling-the-high-write-path">2. Scaling the High-Write Path<a class="headerlink" href="#2-scaling-the-high-write-path" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Partition automation (pg_partman/cron):</strong> pre-create next month ~7 days ahead (alert if missing); detach + archive partitions &gt; ~90 days to object storage.</li>
+<li><strong>Index discipline on hot partitions:</strong> only the two Phase 2 indexes; route dashboards to the async replica.</li>
+<li><strong>Tactics:</strong> batch + async ingestion (<code>202</code>, aggregation in BullMQ); PgBouncer transaction-mode pools (separate API vs worker pools); <strong>KEDA scales workers on queue depth</strong> with money lanes (<code>q.settlement</code>, <code>q.grace-penalty</code>) prioritized.</li>
+</ul>
+<h2 id="3-database-ha-backup-pitr">3. Database HA, Backup &amp; PITR<a class="headerlink" href="#3-database-ha-backup-pitr" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Spec</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HA</td>
+<td>sync replica in 2nd AZ; auto failover (Patroni/managed); <code>synchronous_commit=on</code> for ledger/billing txns</td>
+</tr>
+<tr>
+<td>WAL archiving</td>
+<td>continuous → object storage; <strong>PITR to any second</strong>; RPO ≤ 5 s money data</td>
+</tr>
+<tr>
+<td>Base backups</td>
+<td>daily full + WAL; 35 days hot; ledger retained per tax law (5–7 yr)</td>
+</tr>
+<tr>
+<td>Restore drills</td>
+<td><strong>quarterly</strong> PITR into isolated env + run R1–R4 reconciliation</td>
+</tr>
+<tr>
+<td>Ledger immutability</td>
+<td>append-only trigger + role grants; app role <code>INSERT</code>-only; break-glass DBA role MFA+audited</td>
+</tr>
+<tr>
+<td>RTO</td>
+<td>≤ 15 min DB failover; ≤ 2 h regional DR rebuild</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-redis-queue-ops">4. Redis &amp; Queue Ops<a class="headerlink" href="#4-redis-queue-ops" title="Permanent link">&para;</a></h2>
+<ul>
+<li>AOF (<code>appendfsync everysec</code>) + HA so queued money jobs survive node loss (at-least-once safe via idempotency).</li>
+<li>Separate instances/DBs for queues vs idempotency/nonce vs cache.</li>
+<li>Nonce TTL = signature window (300 s).</li>
+<li><strong>DLQ depth &gt; 0 = page.</strong> SLIs: depth, oldest-job age, processing rate. Alert <code>q.settlement</code> oldest-job age &gt; 60 s.</li>
+</ul>
+<h2 id="5-cryptographic-key-management">5. Cryptographic Key Management<a class="headerlink" href="#5-cryptographic-key-management" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Ed25519 unlock-signing keys</strong> (<code>kid = dk_YYYY_MM_x</code>): private key in KMS/HSM; public keys pinned in native clients; <strong>monthly rotation</strong> with current+next overlap; tokens carry <code>kid</code>. Compromise runbook: revoke kid, force client update, shorten TTLs; tokens also device+monotonic bound → contained, Sev-1.</li>
+<li><strong>Per-device HMAC keys + attestation:</strong> hardware-backed storage; attestation roots in KMS; verification server-side.</li>
+<li><strong>Secrets:</strong> in a secrets manager (Vault/KMS), runtime-injected, never in git; provider webhook secrets rotated with overlap.</li>
+<li><strong>TLS cert pinning:</strong> leaf + backup pin; rotate backup pin one release <em>before</em> the cert.</li>
+</ul>
+<h2 id="6-observability">6. Observability<a class="headerlink" href="#6-observability" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Tooling</th>
+<th>Money specifics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Metrics</td>
+<td>Prometheus + Grafana</td>
+<td>ledger global-balance gauge; queue depth/lag; settlement time-to-credit; reconciliation deltas; payment success per provider; heartbeat-silence count</td>
+</tr>
+<tr>
+<td>Logs</td>
+<td>Structured JSON</td>
+<td>never log PANs/full tokens/secrets; log <code>payment_id</code>, <code>journal_id</code>, <code>idempotency_key</code></td>
+</tr>
+<tr>
+<td>Traces</td>
+<td>OpenTelemetry</td>
+<td>trace unlock path + settlement path end-to-end</td>
+</tr>
+<tr>
+<td>Audit</td>
+<td>Append-only audit log</td>
+<td>every money transition, break-glass access, key rotation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Paging alerts:</strong> reconciliation drift (auto-freezes writes); DLQ &gt; 0; settlement error rate / oldest-job age; provider success-rate drop; attestation failure spike; heartbeat-silence spike.</p>
+<h2 id="7-slos">7. SLOs<a class="headerlink" href="#7-slos" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>SLI</th>
+<th>SLO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Auth/API availability</td>
+<td>success rate</td>
+<td>99.9% / 30 d</td>
+</tr>
+<tr>
+<td>Unlock grant latency</td>
+<td>p99 (wallet path)</td>
+<td>&lt; 800 ms</td>
+</tr>
+<tr>
+<td>Block enforcement (client)</td>
+<td>block shown after detect</td>
+<td>p95 &lt; 300 ms</td>
+</tr>
+<tr>
+<td>Webhook ingestion</td>
+<td>2xx ack rate</td>
+<td>99.95%</td>
+</tr>
+<tr>
+<td>Settlement freshness</td>
+<td>verified webhook → credit</td>
+<td>p95 &lt; 30 s</td>
+</tr>
+<tr>
+<td><strong>Ledger correctness</strong></td>
+<td>reconciliation drift events</td>
+<td><strong>0 (no error budget)</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-incident-runbooks">8. Incident Runbooks<a class="headerlink" href="#8-incident-runbooks" title="Permanent link">&para;</a></h2>
+<p><strong>8.1 Reconciliation Freeze (most important):</strong> auto <code>MONEY_WRITES_FROZEN=true</code> (money workers pause; API
+rejects money mutations with <code>503</code>; enforcement/read paths stay up) → page on-call + finance → diagnose from
+the immutable ledger (R2 recompute) → <strong>never edit <code>ledger.entries</code>; correct via a compensating journal
+(<code>reference_type='correction'</code>), two-engineer review</strong> → re-run R1–R3 clean → unfreeze → drain → post-mortem.</p>
+<p><strong>8.2 Payment Provider Outage:</strong> mark provider <code>degraded</code>; route new top-ups to a healthy provider; queue
+reconciliation for the down provider; pending payments auto-expire. Already-funded users keep unlocking (wallet path unaffected).</p>
+<p><strong>8.3 Mass Enforcement Outage (bad release):</strong> heartbeat-silence spike after a release → <strong>pause grace→penalty
+conversions</strong> (<code>PENALTY_CONVERSION_PAUSED</code>); roll back; resume only after devices re-arm. <strong>Never penalize on our own outage.</strong></p>
+<p><strong>8.4 Signing-Key Compromise:</strong> revoke kid, force client update, shorten TTLs, rotate. Sev-1.</p>
+<p><strong>8.5 Data-Subject Request:</strong> export from replica; deletion anonymizes PII but <strong>retains financial ledger records</strong> (legal), de-linking PII while preserving the immutable money trail.</p>
+<h2 id="9-cicd-migrations">9. CI/CD &amp; Migrations<a class="headerlink" href="#9-cicd-migrations" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Pipeline: lint (incl. Spectral on OpenAPI) → tests → <strong>contract diff (OpenAPI vs DTOs)</strong> → ephemeral-env e2e incl. <strong>ledger reconciliation test</strong> → security scan → deploy.</li>
+<li><strong>Zero-downtime migrations:</strong> expand → backfill → contract across releases. <strong>Forbidden:</strong> <code>DROP</code>/<code>ALTER</code> on <code>ledger.entries</code>/<code>journals</code> (guard blocks anyway). New money columns additive; throttled backfills.</li>
+<li><strong>Release strategy:</strong> API rolling; <strong>canary staged rollout for the mobile client</strong> with auto-halt on heartbeat-silence spike.</li>
+<li><strong>Feature flags as ops levers:</strong> <code>MONEY_WRITES_FROZEN</code>, <code>PENALTY_CONVERSION_PAUSED</code>, per-provider <code>enabled</code>, attestation strictness.</li>
+</ul>
+<h2 id="10-security-compliance-data-governance">10. Security, Compliance &amp; Data Governance<a class="headerlink" href="#10-security-compliance-data-governance" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Posture</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PCI scope</td>
+<td>card data never touches servers (Stripe Elements/SDK + redirects) → <strong>SAQ-A</strong>; store only references/tokens</td>
+</tr>
+<tr>
+<td>PII</td>
+<td>encrypt at rest + backups; TLS 1.3; field-level encryption for contacts; minimize (iOS opaque tokens)</td>
+</tr>
+<tr>
+<td>Data residency</td>
+<td>confirm Nepali residency; pin primary region + in-region WAL</td>
+</tr>
+<tr>
+<td>Stored value / e-money</td>
+<td>wallet holds user funds → financial regulation, escrow/segregated accounts, KYC; <strong>legal review is a launch blocker</strong></td>
+</tr>
+<tr>
+<td>Retention</td>
+<td>ledger 5–7 yr; telemetry short hot window + aggregate-then-purge</td>
+</tr>
+<tr>
+<td>Access control</td>
+<td>least privilege; break-glass MFA + audited; app role can't mutate ledger</td>
+</tr>
+<tr>
+<td>Edge</td>
+<td>WAF (OWASP), per-user/device rate limits, DDoS, webhook IP-allowlist</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-capacity-cost">11. Capacity &amp; Cost<a class="headerlink" href="#11-capacity-cost" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Dominant write cost: <code>usage_events</code> → batch size, partition granularity, archival.</li>
+<li>Dominant compute: workers under load (KEDA on queue depth, money lanes prioritized).</li>
+<li><strong>Fee guardrail:</strong> Nepali per-txn fees on Rs.50 are brutal → wallet batches top-ups; monitor fee-as-%-of-volume; nudge minimum top-up sizes.</li>
+</ul>
+<h2 id="12-dr-summary">12. DR Summary<a class="headerlink" href="#12-dr-summary" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>RTO</th>
+<th>RPO</th>
+<th>Mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AZ loss</td>
+<td>&lt; 15 min</td>
+<td>~0</td>
+<td>sync replica failover</td>
+</tr>
+<tr>
+<td>Primary DB corruption</td>
+<td>&lt; 2 h</td>
+<td>≤ 5 s</td>
+<td>PITR + reconciliation before reopening writes</td>
+</tr>
+<tr>
+<td>Region loss</td>
+<td>&lt; 4 h</td>
+<td>≤ 1 min</td>
+<td>WAL/backups in 2nd region; active-passive rebuild</td>
+</tr>
+<tr>
+<td>Redis loss</td>
+<td>&lt; 5 min</td>
+<td>≤ 1 s</td>
+<td>HA failover; idempotent replay</td>
+</tr>
+<tr>
+<td>Provider outage</td>
+<td>0 (degraded)</td>
+<td>n/a</td>
+<td>provider re-routing; wallet path unaffected</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Golden rule:</strong> after any restore/failover, <strong>run R1–R3 reconciliation before re-enabling money writes.</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "content.code.copy", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
