@@ -629,6 +629,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#deep-link-success_url-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deep-link / success_url routing
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1214,6 +1225,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#deep-link-success_url-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deep-link / success_url routing
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1359,6 +1381,141 @@ untrusted</strong>. The authoritative confirmation is always a <strong>server-si
     ES--&gt;&gt;SET: status = COMPLETE, amount = 500
     SET-&gt;&gt;L: journal: gateway_clearing → user_available (net of fee)
     SET--&gt;&gt;App: balance updated (push / next sync)</code></pre>
+<h2 id="deep-link-success_url-routing">Deep-link / <code>success_url</code> routing<a class="headerlink" href="#deep-link-success_url-routing" title="Permanent link">&para;</a></h2>
+<p><strong>Governing principle — two independent channels.</strong> The deep link back into the app is <em>not</em> how money
+is credited; it is purely UX. These never depend on each other:</p>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Path</th>
+<th>Trust</th>
+<th>If it fails</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Money</strong> (authoritative)</td>
+<td>eSewa → backend callback → SettlementWorker pull → ledger</td>
+<td>server-authoritative</td>
+<td>poller + R4 settle it anyway (see ledger-workers §6b)</td>
+</tr>
+<tr>
+<td><strong>UX</strong> (best-effort)</td>
+<td>backend → deep link → app "confirming…" screen</td>
+<td>untrusted, cosmetic</td>
+<td>app re-fetches <code>GET /payments/{id}</code>; user still gets the push receipt</td>
+</tr>
+</tbody>
+</table>
+<p>So <code>success_url</code> <strong>must</strong> be a backend URL, never the app directly — that guarantees the signed eSewa
+callback is received and verified server-side even if the app-return never fires. The app <strong>never</strong> reads
+money state from deep-link params; it always re-fetches from the server (device is untrusted).</p>
+<p><strong>Routing chain:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>1. App   → POST /v1/wallet/topup            backend creates payment (transaction_uuid = payment.id),
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                                             returns eSewa form params + BACKEND success/failure URLs
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>2. App   opens eSewa form (Custom Tab / ASWebAuthenticationSession)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>3. User  approves at eSewa
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>4. eSewa → 302  https://api.stake.app/v1/payments/esewa/return?data=&lt;b64&gt;
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>           backend: verify signature → record callback (idempotent inbox)
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                    → enqueue q.settlement{paymentId}   (PULL is authoritative — NOT this payload)
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                    → 302 to the app deep link
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>5. link  https://link.stake.app/topup?pid=&lt;id&gt;&amp;r=ok    OS routes to app (verified link); tab closes
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>6. App   &quot;Confirming your top-up…&quot; → GET /payments/{pid} until succeeded (also receives push receipt)
+</code></pre></div></p>
+<table>
+<thead>
+<tr>
+<th>Backend endpoint</th>
+<th>eSewa appends</th>
+<th>Then</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /v1/payments/esewa/return</code></td>
+<td><code>?data=&lt;b64&gt;</code></td>
+<td>verify sig → enqueue settlement → 302 <code>…/topup?pid=&amp;r=ok</code></td>
+</tr>
+<tr>
+<td><code>GET /v1/payments/esewa/cancel</code></td>
+<td>—</td>
+<td>mark intent abandoned → 302 <code>…/topup?pid=&amp;r=cancel</code></td>
+</tr>
+</tbody>
+</table>
+<p>The return handler <strong>does not credit</strong> from the redirect payload — crediting is the SettlementWorker's
+authoritative status pull. A forged or replayed <code>data</code> therefore cannot move money.</p>
+<p><strong>🔒 Locked decision — verified App Links / Universal Links, no custom URL scheme.</strong> The return uses an
+<code>https://</code> link on an owned domain (<code>link.stake.app</code>), proven via <code>assetlinks.json</code> (Android) /
+<code>apple-app-site-association</code> (iOS), so the OS cryptographically confirms app ownership and <strong>no other app
+can intercept the redirect</strong>. Custom schemes (<code>stakeapp://</code>) are rejected: any app can register the same
+scheme and hijack the callback. Defense-in-depth: the app treats link params as routing hints only.</p>
+<ul>
+<li><strong>Android (MVP):</strong> Chrome <strong>Custom Tabs</strong> opens eSewa; the backend 302 to the verified <strong>App Link</strong>
+  launches the app and dismisses the tab. Flutter: <code>flutter_custom_tabs</code>/<code>url_launcher</code> to open,
+  <code>app_links</code> to receive (warm-resume <strong>and</strong> cold-start).</li>
+<li><strong>iOS (fast-follow):</strong> <strong><code>ASWebAuthenticationSession</code></strong> — purpose-built for "open web flow, return via
+  callback"; auto-dismisses the sheet and hands the callback URL to the completion handler (https callback
+  on iOS 17.4+).</li>
+</ul>
+<p><strong>Edge cases — all degrade to reconciliation:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Handling</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>User closes the tab (no redirect)</td>
+<td>App <strong>must not assume cancelled</strong> → <code>GET /payments/{pid}</code>; may be the "paid-but-didn't-return" case → §6b poller settles</td>
+</tr>
+<tr>
+<td>App killed during payment</td>
+<td>Deep link <strong>cold-starts</strong> app; <code>app_links</code> initial-link handler routes to the confirm screen by <code>pid</code></td>
+</tr>
+<tr>
+<td>Deep link fails entirely</td>
+<td>Backend already has the callback; poller/R4 settle; user sees balance + push next open</td>
+</tr>
+<tr>
+<td>Lands in browser, not app</td>
+<td>Backend return page renders an HTML "Open the Stake app" fallback, not a dead link</td>
+</tr>
+<tr>
+<td>Duplicate / replayed return URL</td>
+<td>Callback inbox is idempotent; settlement no-ops if already terminal</td>
+</tr>
+<tr>
+<td>Concurrent top-ups</td>
+<td><code>pid</code> disambiguates; each tab session is bound to one <code>pid</code></td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>sequenceDiagram
+    autonumber
+    actor U as User
+    participant App as Flutter App
+    participant BR as Custom Tab / ASWebAuth
+    participant API as NestJS API
+    participant ES as eSewa
+    participant SET as SettlementWorker
+
+    App-&gt;&gt;API: POST /v1/wallet/topup
+    API--&gt;&gt;App: eSewa form params + BACKEND success/failure URLs
+    App-&gt;&gt;BR: open eSewa form
+    BR-&gt;&gt;ES: user approves
+    Note over ES,API: ── Money channel (authoritative) ──
+    ES-&gt;&gt;API: 302 /payments/esewa/return?data=… [untrusted]
+    API-&gt;&gt;API: verify signature · record callback (idempotent)
+    API-&gt;&gt;SET: enqueue settlement (PULL authoritative)
+    Note over API,App: ── UX channel (best-effort) ──
+    API--&gt;&gt;BR: 302 https://link.stake.app/topup?pid&amp;r=ok
+    BR--&gt;&gt;App: verified App/Universal Link → app opens, tab closes
+    App-&gt;&gt;API: GET /payments/{pid} (truth from server)
+    API--&gt;&gt;App: status: succeeded → show new balance</code></pre>
 <blockquote>
 <p><strong>iOS synergy:</strong> an extension cannot present a payment sheet, so on iOS "pay to unlock" is done
 as <strong>pre-authorized unlocks</strong> — the user buys unlock credit/time <em>in the app</em> (cooperative,

@@ -1119,6 +1119,7 @@ bypass on Android or iOS.</p>
 <li><strong>Database:</strong> <strong>PostgreSQL 15+</strong> (+ Redis for cache/locks/queues; TimescaleDB/ClickHouse for analytics later).</li>
 <li><strong>Ledger:</strong> Isolated <code>ledger</code> schema, append-only double-entry, journal-atomic, role-restricted.</li>
 <li><strong>Launch strategy:</strong> <strong>Android-first</strong> MVP (wallet model), iOS fast-follow (entitlement-gated).</li>
+<li><strong>Payment return routing:</strong> gateway <code>success_url</code> points at the <strong>backend</strong> (not the app); the app return uses <strong>verified App Links / Universal Links — no custom URL scheme</strong>. Deep link is best-effort UX; settlement is server-authoritative. See <a href="payments/payment-architecture/">payments/payment-architecture.md</a>.</li>
 <li><strong>Two launch blockers to start day 1:</strong> Apple Family Controls entitlement; stored-value/e-money legal review.</li>
 </ul>
 <h2 id="document-map">Document map<a class="headerlink" href="#document-map" title="Permanent link">&para;</a></h2>
