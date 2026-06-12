@@ -60,6 +60,53 @@ flowchart TD
 - **Returned (un-forfeited) deposit** goes back to *available balance*, **not** auto-refunded to card (local-rail refunds are painful/lossy) — offer explicit withdrawal instead.
 - **Store policy:** unlocks/penalties are arguably digital goods → check Apple/Google billing rules; top-up provider stays behind the abstraction so it's swappable (may be forced to IAP on iOS).
 
+## Available vs staked balance — and how much to stake
+
+Money lives in **two buckets** in the ledger: **`user_available`** (spendable — usable for unlocks,
+withdrawable) and **`user_locked`** (staked behind a commitment — frozen until it resolves). The **stake
+amount** is simply how much moves `available → locked` when a commitment is armed.
+
+**Lifecycle of a stake:**
+- Top-up → `available`
+- Arm commitment → move the stake `available → locked`
+- **Keep it** → `locked → available` (stake returned in full)
+- **Break it** → penalty debits `locked` first (then `available`) → forfeited to `system_forfeit_revenue`;
+  any remainder released back to `available`
+
+Worked example — Rs. 1000 top-up, stake Rs. 600, one Rs. 50 penalty:
+
+| Step | Available | Locked | Forfeited |
+|---|---|---|---|
+| Top up 1000 | 1000 | 0 | 0 |
+| Stake 600 | 400 | 600 | 0 |
+| Rs. 50 penalty (locked first) | 400 | 550 | 50 |
+| Commitment kept | 950 | 0 | 50 |
+
+`available + locked + forfeited` is conserved at every step (double-entry); the wallet never goes negative,
+and max penalty exposure is capped to the staked/pre-funded balance at creation.
+
+**How much to stake — two intensities of the same plumbing:**
+- **Wallet-only (small balance):** keep just enough to *cover* penalties (≥ the Rs. 100 minimum). One
+  violation debits Rs. 50; no large lock needed. **This is the MVP default.**
+- **Commitment deposit (large stake):** lock a deliberately large amount as a **behavioral device** — its
+  value is psychological, not arithmetic. (Option C above; a fast-follow.)
+
+**Why stake more than a single penalty** (the common confusion — "if a slip is only Rs. 50, why lock Rs. 600?"):
+1. **A commitment spans many possible violations, not one.** Rs. 50 is one slip; a 30-day commitment can be
+   tempted dozens of times. Stake only Rs. 50 and the teeth vanish after the first slip — the stake must
+   cover *cumulative* exposure over the whole period.
+2. **Loss aversion scales with what's at risk.** Rs. 50 is shruggable; Rs. 600 locked up and eroding with
+   every slip is a far stronger deterrent. This is the product's behavioral engine.
+3. **"Win your money back" is the reward.** A bigger stake returned on success = bigger motivation + a
+   retention hook.
+4. **User-chosen — "stake more = commit harder" is a feature.** Gentle nudge → Rs. 100; serious quit
+   attempt → Rs. 5,000.
+
+**The reframe:** a stake that only matches one penalty looks pointless *in hindsight* (you slip once, lose
+Rs. 50, get the rest back) — but the amount *at risk* is what deterred the *other* slips you never made. The
+stake's job is deterrence across the whole period, not to price a single violation. **Stake small = "cover
+my penalties"; stake big = "make failure genuinely painful so I follow through."**
+
 ## eSewa top-up flow (redirect + status-pull)
 
 eSewa is touched **only** during a cooperative wallet top-up — never at enforcement time.
