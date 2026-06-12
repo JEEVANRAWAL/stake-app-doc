@@ -630,6 +630,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#khalti-fonepay-deltas-from-the-esewa-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Khalti &amp; Fonepay — deltas from the eSewa baseline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Khalti &amp; Fonepay — deltas from the eSewa baseline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#khalti-server-initiated-lookup-by-pidx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Khalti — server-initiated, lookup-by-pidx
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fonepay-redirect-mode-or-qr-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fonepay — redirect mode or QR mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#deep-link-success_url-routing" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1237,6 +1276,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#khalti-fonepay-deltas-from-the-esewa-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Khalti &amp; Fonepay — deltas from the eSewa baseline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Khalti &amp; Fonepay — deltas from the eSewa baseline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#khalti-server-initiated-lookup-by-pidx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Khalti — server-initiated, lookup-by-pidx
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fonepay-redirect-mode-or-qr-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fonepay — redirect mode or QR mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#deep-link-success_url-routing" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1403,6 +1481,115 @@ untrusted</strong>. The authoritative confirmation is always a <strong>server-si
     ES--&gt;&gt;SET: status = COMPLETE, amount = 500
     SET-&gt;&gt;L: journal: gateway_clearing → user_available (net of fee)
     SET--&gt;&gt;App: balance updated (push / next sync)</code></pre>
+<h2 id="khalti-fonepay-deltas-from-the-esewa-baseline">Khalti &amp; Fonepay — deltas from the eSewa baseline<a class="headerlink" href="#khalti-fonepay-deltas-from-the-esewa-baseline" title="Permanent link">&para;</a></h2>
+<p>Both ride the <strong>same machinery</strong> as eSewa — the provider abstraction (<code>initiate()</code> + <code>fetchStatus()</code>), the
+backend-mediated deep-link routing, the dual-channel split, the §6b poller + R4 backstop, and the
+transparent gross-up fees are all <strong>provider-agnostic and reused</strong>. Only <em>initiation</em>, the <em>authoritative
+status lookup</em>, and (for Fonepay QR) the <em>user surface</em> differ. (Endpoint/field names below should be
+confirmed against current merchant docs — gateways version these.)</p>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>eSewa</th>
+<th>Khalti (KPG)</th>
+<th>Fonepay</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Initiation</strong></td>
+<td>client form POST, <strong>HMAC-SHA256</strong> signed</td>
+<td><strong>server</strong> <code>epayment/initiate/</code> (secret key) → returns <code>pidx</code> + <code>payment_url</code></td>
+<td>redirect: signed form (<strong>HMAC-SHA512</strong>) · <strong>QR</strong>: dynamic QR</td>
+</tr>
+<tr>
+<td><strong>User surface</strong></td>
+<td>hosted eSewa page (Custom Tab)</td>
+<td>hosted Khalti checkout (Custom Tab)</td>
+<td>redirect: hosted page · <strong>QR: user's own bank app</strong></td>
+</tr>
+<tr>
+<td><strong>Intent id</strong> (<code>provider_intent_id</code>)</td>
+<td><code>transaction_uuid</code> (= payment.id)</td>
+<td><strong><code>pidx</code></strong></td>
+<td>PRN / merchant txn ref</td>
+</tr>
+<tr>
+<td><strong>Authoritative confirm</strong></td>
+<td>status-check by <code>transaction_uuid</code></td>
+<td><strong><code>epayment/lookup/</code> by <code>pidx</code></strong></td>
+<td>status-check / notification</td>
+</tr>
+<tr>
+<td><strong>Return mechanism</strong></td>
+<td>redirect → backend → deep link</td>
+<td>redirect → backend → deep link</td>
+<td>redirect mode: same · <strong>QR: no redirect — poll</strong></td>
+</tr>
+<tr>
+<td><strong>Amount unit</strong></td>
+<td>rupees</td>
+<td><strong>paisa</strong> (×100, integer)</td>
+<td>rupees</td>
+</tr>
+<tr>
+<td><strong>Redirect signature</strong></td>
+<td>signed base64 <code>data</code></td>
+<td>none — plain params, verified via lookup</td>
+<td>HMAC-SHA512</td>
+</tr>
+</tbody>
+</table>
+<h3 id="khalti-server-initiated-lookup-by-pidx">Khalti — server-initiated, lookup-by-<code>pidx</code><a class="headerlink" href="#khalti-server-initiated-lookup-by-pidx" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Backend initiates</strong> (secret key stays server-side — cleaner than eSewa's client-side signing): <code>POST
+  epayment/initiate/</code> with <code>return_url</code> (backend), <code>amount</code> in <strong>paisa</strong>, <code>purchase_order_id</code> = payment.id
+  → Khalti returns <code>pidx</code> + <code>payment_url</code>. Store <code>pidx</code> in <code>provider_intent_id</code>.</li>
+<li>App opens <code>payment_url</code> in a Custom Tab. After payment Khalti redirects to the backend <code>return_url</code> with
+  <strong>plain</strong> params (<code>pidx</code>, <code>status</code>, <code>transaction_id</code>, <code>amount</code>) — <strong>never trusted</strong>; backend calls
+  <strong><code>epayment/lookup/</code> by <code>pidx</code></strong> for the authoritative status (<code>Completed</code>/<code>Pending</code>/<code>Refunded</code>/
+  <code>Expired</code>/<code>User canceled</code>). That lookup <em>is</em> the §6b poll for Khalti. <code>pidx</code> expiry (~60 min) → <code>Expired</code>
+  maps to <code>cancelled</code> + <code>failure_code='expired_no_return'</code>.</li>
+</ul>
+<h3 id="fonepay-redirect-mode-or-qr-mode">Fonepay — redirect mode <strong>or</strong> QR mode<a class="headerlink" href="#fonepay-redirect-mode-or-qr-mode" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Redirect (RWS) mode:</strong> eSewa-equivalent, only the hash is <strong>HMAC-SHA512</strong>. Signed form → hosted page →
+  signed redirect to backend → verify → status-check. Reuses everything unchanged.</li>
+<li><strong>QR mode (the differentiator — inter-bank reach):</strong> the app shows a Fonepay <strong>dynamic QR</strong>; the user
+  pays from <strong>their own bank app</strong> (any Fonepay-member bank). <strong>There is no browser, no redirect, and no
+  deep link.</strong> Confirmation arrives via Fonepay <strong>server notification + status poll</strong>, so here the <strong>§6b
+  poller is the <em>primary</em> confirmation path, not a fallback.</strong> The confirm screen polls
+  <code>GET /payments/{pid}</code> while the QR (short TTL) is displayed.</li>
+</ul>
+<pre class="mermaid"><code>sequenceDiagram
+    autonumber
+    actor U as User
+    participant App as Flutter App
+    participant Bank as User's Bank App
+    participant API as NestJS API
+    participant FP as Fonepay
+    participant SET as SettlementWorker
+
+    App-&gt;&gt;API: POST /v1/wallet/topup {provider: fonepay_qr}
+    API-&gt;&gt;FP: request dynamic QR (PRN = payment.id)
+    FP--&gt;&gt;API: QR payload
+    API--&gt;&gt;App: show QR (short TTL)
+    U-&gt;&gt;Bank: scan QR &amp; approve (separate app)
+    Bank-&gt;&gt;FP: pay
+    Note over API,FP: no redirect — confirmation is poll/notification
+    par Notification
+        FP--&gt;&gt;API: payment notification
+        API-&gt;&gt;SET: enqueue settlement
+    and §6b poller (primary here)
+        API-&gt;&gt;FP: status-check by PRN
+        FP--&gt;&gt;API: COMPLETE
+        API-&gt;&gt;SET: enqueue settlement
+    end
+    SET-&gt;&gt;API: journal gateway_clearing → user_available (net)
+    App-&gt;&gt;API: GET /payments/{pid} (polling) → succeeded → show balance</code></pre>
+<p><strong>MVP routing:</strong> eSewa + <strong>Khalti redirect</strong> are the simplest first pair (both hosted-page + lookup).
+<strong>Fonepay QR</strong> is a strong fast-follow for inter-bank reach but needs the QR/poll UX above.</p>
 <h2 id="deep-link-success_url-routing">Deep-link / <code>success_url</code> routing<a class="headerlink" href="#deep-link-success_url-routing" title="Permanent link">&para;</a></h2>
 <p><strong>Governing principle — two independent channels.</strong> The deep link back into the app is <em>not</em> how money
 is credited; it is purely UX. These never depend on each other:</p>

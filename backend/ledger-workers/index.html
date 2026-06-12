@@ -1520,6 +1520,12 @@ is stranded at <code>initiated</code>/<code>pending</code> while the money has a
 set <code>transaction_uuid = payment.id</code> at initiation, we can always ask eSewa "what happened to attempt
 X?" via the status-check API keyed on <code>(product_code, total_amount, transaction_uuid)</code> — <strong>no callback
 required</strong>. Reconciliation = poll until terminal, then converge local state toward eSewa.</p>
+<blockquote>
+<p>The same <code>q.esewa-poll</code> mechanism serves the other redirect/QR gateways via their own
+<code>fetchStatus</code>: <strong>Khalti</strong> = <code>epayment/lookup/</code> by <code>pidx</code>; <strong>Fonepay</strong> = status-check by PRN (and for
+Fonepay <strong>QR</strong>, which has no redirect at all, this poller is the <em>primary</em> confirmation path, not a
+fallback). See <code>payments/payment-architecture.md</code> → "Khalti &amp; Fonepay — deltas".</p>
+</blockquote>
 <p><strong>Guiding rule:</strong> eSewa is the source of truth about whether money moved; local state is a cache we
 reconcile toward it. <strong>Never move a payment to a terminal <em>unpaid</em> state from silence alone</strong> — only an
 explicit eSewa <code>CANCELED</code>/<code>NOT_FOUND</code> (after TTL) or the settlement report may declare "not paid." A
