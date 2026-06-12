@@ -13,6 +13,7 @@ bypass on Android or iOS.
 - **Database:** **PostgreSQL 15+** (+ Redis for cache/locks/queues; TimescaleDB/ClickHouse for analytics later).
 - **Ledger:** Isolated `ledger` schema, append-only double-entry, journal-atomic, role-restricted.
 - **Launch strategy:** **Android-first** MVP (wallet model), iOS fast-follow (entitlement-gated).
+- **Payment return routing:** gateway `success_url` points at the **backend** (not the app); the app return uses **verified App Links / Universal Links — no custom URL scheme**. Deep link is best-effort UX; settlement is server-authoritative. See [payments/payment-architecture.md](payments/payment-architecture.md).
 - **Two launch blockers to start day 1:** Apple Family Controls entitlement; stored-value/e-money legal review.
 
 ## Document map

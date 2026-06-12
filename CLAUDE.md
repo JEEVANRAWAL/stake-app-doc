@@ -17,6 +17,7 @@ Read **`docs/README.md`** first — it's the index, the locked decisions, and th
 - **Backend:** NestJS (TypeScript) + BullMQ workers.
 - **Database:** PostgreSQL 15+ (+ Redis for cache/locks/queues). Isolated `ledger` schema, append-only double-entry, journal-atomic, role-restricted. See `docs/database/schema.md`, `docs/backend/ledger-workers.md`.
 - **Security:** device is untrusted; server-authoritative time/balances/rules/unlock grants; Ed25519-signed unlock tokens (monotonic-clock-anchored expiry, `kid` rotation); Play Integrity / App Attest verified server-side; per-device HMAC request signing. See `docs/api/security-framework.md`.
+- **Payment return routing:** gateway `success_url` → **backend** (verifies before deep-linking home); app return uses **verified App Links / Universal Links — no custom URL scheme**. Deep link is best-effort UX; settlement stays server-authoritative (poller + R4 backstop). See `docs/payments/payment-architecture.md`.
 - **Launch:** Android-first MVP (wallet model), iOS fast-follow. See `docs/project/delivery-plan.md`.
 
 ## Two launch blockers — start day 1 (long lead times)

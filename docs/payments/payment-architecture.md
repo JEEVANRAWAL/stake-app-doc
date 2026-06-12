@@ -104,6 +104,91 @@ sequenceDiagram
     SET-->>App: balance updated (push / next sync)
 ```
 
+## Deep-link / `success_url` routing
+
+**Governing principle — two independent channels.** The deep link back into the app is *not* how money
+is credited; it is purely UX. These never depend on each other:
+
+| Channel | Path | Trust | If it fails |
+|---|---|---|---|
+| **Money** (authoritative) | eSewa → backend callback → SettlementWorker pull → ledger | server-authoritative | poller + R4 settle it anyway (see ledger-workers §6b) |
+| **UX** (best-effort) | backend → deep link → app "confirming…" screen | untrusted, cosmetic | app re-fetches `GET /payments/{id}`; user still gets the push receipt |
+
+So `success_url` **must** be a backend URL, never the app directly — that guarantees the signed eSewa
+callback is received and verified server-side even if the app-return never fires. The app **never** reads
+money state from deep-link params; it always re-fetches from the server (device is untrusted).
+
+**Routing chain:**
+```
+1. App   → POST /v1/wallet/topup            backend creates payment (transaction_uuid = payment.id),
+                                             returns eSewa form params + BACKEND success/failure URLs
+2. App   opens eSewa form (Custom Tab / ASWebAuthenticationSession)
+3. User  approves at eSewa
+4. eSewa → 302  https://api.stake.app/v1/payments/esewa/return?data=<b64>
+           backend: verify signature → record callback (idempotent inbox)
+                    → enqueue q.settlement{paymentId}   (PULL is authoritative — NOT this payload)
+                    → 302 to the app deep link
+5. link  https://link.stake.app/topup?pid=<id>&r=ok    OS routes to app (verified link); tab closes
+6. App   "Confirming your top-up…" → GET /payments/{pid} until succeeded (also receives push receipt)
+```
+
+| Backend endpoint | eSewa appends | Then |
+|---|---|---|
+| `GET /v1/payments/esewa/return` | `?data=<b64>` | verify sig → enqueue settlement → 302 `…/topup?pid=&r=ok` |
+| `GET /v1/payments/esewa/cancel` | — | mark intent abandoned → 302 `…/topup?pid=&r=cancel` |
+
+The return handler **does not credit** from the redirect payload — crediting is the SettlementWorker's
+authoritative status pull. A forged or replayed `data` therefore cannot move money.
+
+**🔒 Locked decision — verified App Links / Universal Links, no custom URL scheme.** The return uses an
+`https://` link on an owned domain (`link.stake.app`), proven via `assetlinks.json` (Android) /
+`apple-app-site-association` (iOS), so the OS cryptographically confirms app ownership and **no other app
+can intercept the redirect**. Custom schemes (`stakeapp://`) are rejected: any app can register the same
+scheme and hijack the callback. Defense-in-depth: the app treats link params as routing hints only.
+
+- **Android (MVP):** Chrome **Custom Tabs** opens eSewa; the backend 302 to the verified **App Link**
+  launches the app and dismisses the tab. Flutter: `flutter_custom_tabs`/`url_launcher` to open,
+  `app_links` to receive (warm-resume **and** cold-start).
+- **iOS (fast-follow):** **`ASWebAuthenticationSession`** — purpose-built for "open web flow, return via
+  callback"; auto-dismisses the sheet and hands the callback URL to the completion handler (https callback
+  on iOS 17.4+).
+
+**Edge cases — all degrade to reconciliation:**
+
+| Case | Handling |
+|---|---|
+| User closes the tab (no redirect) | App **must not assume cancelled** → `GET /payments/{pid}`; may be the "paid-but-didn't-return" case → §6b poller settles |
+| App killed during payment | Deep link **cold-starts** app; `app_links` initial-link handler routes to the confirm screen by `pid` |
+| Deep link fails entirely | Backend already has the callback; poller/R4 settle; user sees balance + push next open |
+| Lands in browser, not app | Backend return page renders an HTML "Open the Stake app" fallback, not a dead link |
+| Duplicate / replayed return URL | Callback inbox is idempotent; settlement no-ops if already terminal |
+| Concurrent top-ups | `pid` disambiguates; each tab session is bound to one `pid` |
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant App as Flutter App
+    participant BR as Custom Tab / ASWebAuth
+    participant API as NestJS API
+    participant ES as eSewa
+    participant SET as SettlementWorker
+
+    App->>API: POST /v1/wallet/topup
+    API-->>App: eSewa form params + BACKEND success/failure URLs
+    App->>BR: open eSewa form
+    BR->>ES: user approves
+    Note over ES,API: ── Money channel (authoritative) ──
+    ES->>API: 302 /payments/esewa/return?data=… [untrusted]
+    API->>API: verify signature · record callback (idempotent)
+    API->>SET: enqueue settlement (PULL authoritative)
+    Note over API,App: ── UX channel (best-effort) ──
+    API-->>BR: 302 https://link.stake.app/topup?pid&r=ok
+    BR-->>App: verified App/Universal Link → app opens, tab closes
+    App->>API: GET /payments/{pid} (truth from server)
+    API-->>App: status: succeeded → show new balance
+```
+
 > **iOS synergy:** an extension cannot present a payment sheet, so on iOS "pay to unlock" is done
 > as **pre-authorized unlocks** — the user buys unlock credit/time *in the app* (cooperative,
 > gateway-friendly) and the `ShieldAction` extension just verifies & consumes a token from the
