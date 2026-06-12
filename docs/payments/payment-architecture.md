@@ -54,7 +54,7 @@ flowchart TD
 - **Provider routing:** Nepal → eSewa/Khalti/Fonepay; international cards/Apple/Google Pay → Stripe. One internal `payment_provider` abstraction; providers interchangeable.
 - **Forfeited money** routes to **`system_forfeit_revenue` (company revenue)** — *🔒 locked: revenue, not charity.* Conditional on legal sign-off that revenue-forfeit is permissible (commitment-contract, not gambling) in Nepal; **`system_charity` is the fallback** if counsel objects (the ledger already supports both, so the switch is a config change). The penalty-vs-subscription revenue mix is a tracked ethical guardrail (delivery-plan §8).
 - **Minimum funding to create a commitment** *(🔒 locked):* arming a commitment requires available
-  balance ≥ a minimum backing (default **Rs. 200**, configurable), and **max penalty/forfeit exposure is
+  balance ≥ a minimum backing (default **Rs. 100**, configurable), and **max penalty/forfeit exposure is
   capped to the pre-funded/staked balance at creation** — no money, no commitment. Underfunded →
   `402 COMMITMENT_FUNDING_REQUIRED` with a top-up prompt. This is what gives "capture money up front" teeth.
 - **Returned (un-forfeited) deposit** goes back to *available balance*, **not** auto-refunded to card (local-rail refunds are painful/lossy) — offer explicit withdrawal instead.

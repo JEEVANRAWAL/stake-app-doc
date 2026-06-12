@@ -222,7 +222,7 @@ Response `201`:
   "ledger_journal_id": "jrn_77c2a1", "commitment_end": "2026-07-12T00:00:00Z"
 }
 ```
-Staking posts `user_available → user_locked`. **Minimum stake Rs. 200** (configurable). Creating a
+Staking posts `user_available → user_locked`. **Minimum stake Rs. 100** (configurable). Creating a
 commitment (this deposit **or** arming penalty-bearing restrictions) requires available balance ≥ the
 minimum backing; underfunded → **`402 COMMITMENT_FUNDING_REQUIRED`** with `funding_required` (`shortfall`,
 `topup_endpoint`). Max penalty exposure is capped to the staked/pre-funded balance at creation (PRD FR-6).

@@ -78,7 +78,7 @@ loss-aversion into the enforcement mechanism.
 ### FR-6 — Commitment Integrity
 - **🔒 Locked — minimum funding to create a commitment.** Arming a commitment (a staked deposit, **or**
   activating penalty-bearing restrictions) **requires available wallet balance ≥ a minimum backing
-  (default Rs. 200, configurable).** Max penalty/forfeit exposure is **capped to the pre-funded (or
+  (default Rs. 100, configurable).** Max penalty/forfeit exposure is **capped to the pre-funded (or
   staked) balance at creation time** — a commitment is only as strong as the money behind it; an
   **unfunded commitment has no teeth and is not allowed.** Underfunded → creation blocked with a top-up
   prompt (`402 COMMITMENT_FUNDING_REQUIRED`).
