@@ -630,6 +630,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#funds-exhausted-during-a-commitment-stake-fully-forfeited" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Funds exhausted during a commitment (stake fully forfeited)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#esewa-top-up-flow-redirect-status-pull" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1298,6 +1309,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#funds-exhausted-during-a-commitment-stake-fully-forfeited" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Funds exhausted during a commitment (stake fully forfeited)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#esewa-top-up-flow-redirect-status-pull" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1553,6 +1575,24 @@ and max penalty exposure is capped to the staked/pre-funded balance at creation.
 Rs. 50, get the rest back) — but the amount <em>at risk</em> is what deterred the <em>other</em> slips you never made. The
 stake's job is deterrence across the whole period, not to price a single violation. <strong>Stake small = "cover
 my penalties"; stake big = "make failure genuinely painful so I follow through."</strong></p>
+<h2 id="funds-exhausted-during-a-commitment-stake-fully-forfeited">Funds exhausted during a commitment (stake fully forfeited)<a class="headerlink" href="#funds-exhausted-during-a-commitment-stake-fully-forfeited" title="Permanent link">&para;</a></h2>
+<p>When a commitment's stake is fully consumed by penalties — <code>available</code> <strong>and</strong> <code>locked</code> both reach 0 — the
+deposit closes as <strong><code>forfeited</code></strong>, a <strong><code>negative_commitment_balance</code></strong> flag is set, and the <strong>wallet never
+goes negative</strong> (a user can never <em>owe</em> Stake money; max loss is capped at what was staked).</p>
+<p><strong>🔒 Locked — enforcement continues for free.</strong> Blocking and limits <strong>keep enforcing until the commitment
+period ends</strong>; enforcement is <em>not</em> gated on a balance (blocking costs nothing). Only the <strong>money layer goes
+dormant</strong>:</p>
+<ul>
+<li>further violations are still <em>recorded</em> but post Rs. 0 (the <code>negative_commitment_balance</code> flag stays raised);</li>
+<li><strong>paid unlocks</strong> return <code>402</code> and <strong>rule-loosening break fees</strong> can't be debited → restrictions hold;</li>
+<li><strong>new commitments are blocked until the user tops up</strong> (the minimum-funding rule).</li>
+</ul>
+<p><strong>Why free continuation (not "blocks drop when the stake is spent"):</strong> a commitment is a behavioral promise,
+not a pay-per-block meter. If enforcement stopped the instant the stake ran out, a user could <strong>"burn the
+stake to escape"</strong> — deliberately trigger penalties until the money's gone, then roam free. Free continued
+enforcement keeps the promise intact; the financial teeth simply can't escalate past what was staked.</p>
+<p>To restore financial stakes the user tops up and <strong>arms a new commitment</strong> (fresh <code>available → locked</code>); the
+exhausted one stays closed as <code>forfeited</code>. The app notifies the user that funds are exhausted and prompts a top-up.</p>
 <h2 id="esewa-top-up-flow-redirect-status-pull">eSewa top-up flow (redirect + status-pull)<a class="headerlink" href="#esewa-top-up-flow-redirect-status-pull" title="Permanent link">&para;</a></h2>
 <p>eSewa is touched <strong>only</strong> during a cooperative wallet top-up — never at enforcement time.
 Unlike Stripe, <strong>eSewa ePay v2 has no asynchronous server-to-server webhook</strong>: confirmation

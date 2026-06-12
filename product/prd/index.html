@@ -1592,6 +1592,11 @@ loss-aversion into the enforcement mechanism.</p>
   staked) balance at creation time</strong> — a commitment is only as strong as the money behind it; an
   <strong>unfunded commitment has no teeth and is not allowed.</strong> Underfunded → creation blocked with a top-up
   prompt (<code>402 COMMITMENT_FUNDING_REQUIRED</code>).</li>
+<li><strong>🔒 Locked — enforcement continues for free if the stake is exhausted.</strong> If a commitment's stake is
+  fully forfeited mid-period, <strong>blocking/limits keep enforcing until the period ends</strong> (enforcement isn't
+  gated on balance); the money layer goes dormant — no further penalties, paid unlocks/break-fees
+  unavailable, <strong>new commitments blocked until top-up.</strong> Prevents "burn the stake to escape"; the wallet
+  never goes negative. See <a href="../../payments/payment-architecture/">payments/payment-architecture.md</a>.</li>
 <li>Detection / threat model: see <a href="../../architecture/anti-cheating/">architecture/anti-cheating.md</a>.</li>
 </ul>
 <h2 id="7-payment-model-locked-why-pre-funded-wallet">7. Payment Model (🔒 locked) — why pre-funded wallet<a class="headerlink" href="#7-payment-model-locked-why-pre-funded-wallet" title="Permanent link">&para;</a></h2>

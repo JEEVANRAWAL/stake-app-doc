@@ -1460,7 +1460,10 @@ Scheduling: on violation insert, enqueue a <strong>delayed</strong> job with <co
 commitments + require top-up. Wallet never goes negative. Mitigated by <strong>capping max penalty exposure to the
 pre-funded balance</strong> at commitment-creation time — enforced by the <strong>minimum-funding-to-create-a-commitment</strong>
 rule (PRD FR-6 / <code>payments/payment-architecture.md</code>): a commitment can't be armed unless available balance ≥
-the minimum backing, so there is always money behind the teeth.</p>
+the minimum backing, so there is always money behind the teeth. When a commitment's stake is <strong>fully</strong>
+forfeited, the deposit closes as <code>forfeited</code> and — <strong>🔒 locked — enforcement (blocking/limits) continues
+for free</strong> until the period ends; only the money layer goes dormant (further violations post Rs. 0, paid
+unlocks/break-fees unavailable, new commitments blocked until top-up). Prevents "burn the stake to escape."</p>
 <h2 id="5-deposit-forfeiture-return-engine-qdeposit-engine">5. Deposit Forfeiture / Return Engine (<code>q.deposit-engine</code>)<a class="headerlink" href="#5-deposit-forfeiture-return-engine-qdeposit-engine" title="Permanent link">&para;</a></h2>
 <p><pre class="mermaid"><code>stateDiagram-v2
     [*] --&gt; active: stake posted (available -&gt; locked)
