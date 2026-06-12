@@ -1585,7 +1585,15 @@ loss-aversion into the enforcement mechanism.</p>
 <li><strong>Cooling-off:</strong> removal takes effect after the current active window, not mid-restriction.</li>
 </ul>
 <h3 id="fr-6-commitment-integrity">FR-6 — Commitment Integrity<a class="headerlink" href="#fr-6-commitment-integrity" title="Permanent link">&para;</a></h3>
-<p>See <a href="../../architecture/anti-cheating/">architecture/anti-cheating.md</a>.</p>
+<ul>
+<li><strong>🔒 Locked — minimum funding to create a commitment.</strong> Arming a commitment (a staked deposit, <strong>or</strong>
+  activating penalty-bearing restrictions) <strong>requires available wallet balance ≥ a minimum backing
+  (default Rs. 200, configurable).</strong> Max penalty/forfeit exposure is <strong>capped to the pre-funded (or
+  staked) balance at creation time</strong> — a commitment is only as strong as the money behind it; an
+  <strong>unfunded commitment has no teeth and is not allowed.</strong> Underfunded → creation blocked with a top-up
+  prompt (<code>402 COMMITMENT_FUNDING_REQUIRED</code>).</li>
+<li>Detection / threat model: see <a href="../../architecture/anti-cheating/">architecture/anti-cheating.md</a>.</li>
+</ul>
 <h2 id="7-payment-model-locked-why-pre-funded-wallet">7. Payment Model (🔒 locked) — why pre-funded wallet<a class="headerlink" href="#7-payment-model-locked-why-pre-funded-wallet" title="Permanent link">&para;</a></h2>
 <p><strong>You cannot reliably charge a user <em>after</em> they break a commitment</strong> — especially after uninstall.</p>
 <table>

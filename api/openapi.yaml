@@ -362,7 +362,23 @@ paths:
         '201':
           content: { application/json: { schema: { $ref: '#/components/schemas/Deposit' } } }
           description: Staked
-        '402': { $ref: '#/components/responses/Problem' }
+        '402':
+          description: Below minimum stake or insufficient funds to back the commitment
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example:
+                type: https://api.stakeapp.io/errors/commitment-funding-required
+                code: COMMITMENT_FUNDING_REQUIRED
+                title: Minimum funding required to create a commitment
+                status: 402
+                detail: A commitment must be backed by at least NPR 200.00 of available balance.
+                instance: /v1/commitment-deposits
+                meta:
+                  minimum: "200.0000"
+                  available_balance: "0.0000"
+                  shortfall: "200.0000"
+                  topup_endpoint: /v1/wallet/topup
     get:
       tags: [Deposits]
       summary: List the caller's deposits
@@ -446,7 +462,7 @@ paths:
           description: List
     post:
       tags: [RestrictedApps]
-      summary: Add an app to the restriction list
+      summary: Add an app to the restriction list (arms a penalty-bearing commitment)
       requestBody:
         required: true
         content:
@@ -456,6 +472,19 @@ paths:
         '201':
           content: { application/json: { schema: { $ref: '#/components/schemas/UserRestrictedApp' } } }
           description: Added
+        '402':
+          description: Wallet not funded to the minimum commitment backing
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example:
+                type: https://api.stakeapp.io/errors/commitment-funding-required
+                code: COMMITMENT_FUNDING_REQUIRED
+                title: Minimum funding required to create a commitment
+                status: 402
+                detail: Fund at least NPR 200.00 of available balance before arming a commitment.
+                instance: /v1/user-restricted-apps
+                meta: { minimum: "200.0000", available_balance: "0.0000", topup_endpoint: /v1/wallet/topup }
 
   /user-restricted-apps/{id}:
     delete:

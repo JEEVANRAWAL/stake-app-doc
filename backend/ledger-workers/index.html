@@ -1458,7 +1458,9 @@ Scheduling: on violation insert, enqueue a <strong>delayed</strong> job with <co
 </code></pre></div>
 <strong>Insufficient funds:</strong> post what's available, record a <code>negative_commitment_balance</code> flag, block new
 commitments + require top-up. Wallet never goes negative. Mitigated by <strong>capping max penalty exposure to the
-pre-funded balance</strong> at commitment-creation time.</p>
+pre-funded balance</strong> at commitment-creation time — enforced by the <strong>minimum-funding-to-create-a-commitment</strong>
+rule (PRD FR-6 / <code>payments/payment-architecture.md</code>): a commitment can't be armed unless available balance ≥
+the minimum backing, so there is always money behind the teeth.</p>
 <h2 id="5-deposit-forfeiture-return-engine-qdeposit-engine">5. Deposit Forfeiture / Return Engine (<code>q.deposit-engine</code>)<a class="headerlink" href="#5-deposit-forfeiture-return-engine-qdeposit-engine" title="Permanent link">&para;</a></h2>
 <p><pre class="mermaid"><code>stateDiagram-v2
     [*] --&gt; active: stake posted (available -&gt; locked)
