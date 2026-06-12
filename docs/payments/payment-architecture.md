@@ -56,6 +56,54 @@ flowchart TD
 - **Returned (un-forfeited) deposit** goes back to *available balance*, **not** auto-refunded to card (local-rail refunds are painful/lossy) — offer explicit withdrawal instead.
 - **Store policy:** unlocks/penalties are arguably digital goods → check Apple/Google billing rules; top-up provider stays behind the abstraction so it's swappable (may be forced to IAP on iOS).
 
+## eSewa top-up flow (redirect + status-pull)
+
+eSewa is touched **only** during a cooperative wallet top-up — never at enforcement time.
+Unlike Stripe, **eSewa ePay v2 has no asynchronous server-to-server webhook**: confirmation
+arrives via a browser **redirect** to `success_url`, which is **user-controllable and therefore
+untrusted**. The authoritative confirmation is always a **server-side status-check API pull**
+(the `fetchStatus` step in the Settlement Worker). Two rules fall out of this:
+
+- **`success_url` points at the backend, not the app** — the server verifies before deep-linking
+  the user home, so a hostile user never controls the confirmation path.
+- **A status poller is mandatory** — if the user pays then closes the browser before the redirect
+  fires, the redirect path never runs. A cron sweep over `payments WHERE status IN
+  ('initiated','pending')` (backed by `idx_payments_status`) pulls eSewa status and settles late.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant App as Flutter App
+    participant API as NestJS API
+    participant ES as eSewa
+    participant SET as SettlementWorker
+    participant POLL as Status Poller (cron)
+    participant L as Ledger
+
+    U->>App: Tap "Add Rs. 500"
+    App->>API: POST /wallet/topup {amount:500, provider:esewa}
+    API->>API: Create payment (initiated)<br/>transaction_uuid = payment.id
+    API->>API: HMAC-SHA256 sign<br/>(total_amount, transaction_uuid, product_code)
+    API-->>App: eSewa form params + signature
+    App->>ES: Open Custom Tab (form POST)
+    U->>ES: Login + approve Rs. 500 (cooperative)
+
+    alt Happy path — redirect returns
+        ES-->>API: GET success_url (base64 resp + signature)<br/>[untrusted]
+        API->>API: Verify redirect signature
+        API->>SET: enqueue {paymentId}
+    else User closed browser after paying
+        POLL->>API: sweep status IN (initiated, pending)
+        API->>SET: enqueue {paymentId}
+    end
+
+    SET->>ES: Status-check API (server PULL)<br/>[authoritative]
+    ES-->>SET: status = COMPLETE, amount = 500
+    SET->>L: journal: gateway_clearing → user_available (net of fee)
+    SET-->>App: balance updated (push / next sync)
+```
+
 > **iOS synergy:** an extension cannot present a payment sheet, so on iOS "pay to unlock" is done
 > as **pre-authorized unlocks** — the user buys unlock credit/time *in the app* (cooperative,
 > gateway-friendly) and the `ShieldAction` extension just verifies & consumes a token from the
