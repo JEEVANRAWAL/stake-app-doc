@@ -201,6 +201,84 @@ Returned money lands in **available balance** (not auto-refunded to card); expli
 | **R4 — Provider settlement** | succeeded payments vs provider settlement export | ops ticket |
 Plus orphan scans: granted unlocks w/o journal; active deposits past end w/o release; payments stuck pending past TTL → expire.
 
+## 6b. eSewa Top-up Reconciliation — "paid but didn't return"
+
+eSewa ePay v2 has **no async webhook**: confirmation rides the browser redirect to `success_url`.
+If the user approves payment then closes the browser before the redirect fires, the `payments` row
+is stranded at `initiated`/`pending` while the money has already left their eSewa account. Because we
+set `transaction_uuid = payment.id` at initiation, we can always ask eSewa "what happened to attempt
+X?" via the status-check API keyed on `(product_code, total_amount, transaction_uuid)` — **no callback
+required**. Reconciliation = poll until terminal, then converge local state toward eSewa.
+
+**Guiding rule:** eSewa is the source of truth about whether money moved; local state is a cache we
+reconcile toward it. **Never move a payment to a terminal *unpaid* state from silence alone** — only an
+explicit eSewa `CANCELED`/`NOT_FOUND` (after TTL) or the settlement report may declare "not paid." A
+stranded `pending` with no eSewa answer stays `pending` and escalates to a human; it is never auto-failed.
+
+**Status poller (`q.esewa-poll`, repeatable ~60s)** sweeps non-terminal eSewa payments and hands each
+to the existing **SettlementWorker** (reuse `fetchStatus` + journal posting — no parallel credit path):
+```sql
+SELECT p.id FROM billing.payments p
+JOIN billing.payment_poll_state s ON s.payment_id = p.id
+WHERE p.status IN ('initiated','pending','authorized')
+  AND p.provider = 'esewa' AND s.next_poll_at <= now()
+ORDER BY s.next_poll_at LIMIT 200;        -- bounded batch; cap concurrency to stay polite
+```
+
+**Sidecar poll state** (keeps the hot `payments` row out of poll-churn / lock contention with settlement):
+```sql
+CREATE TABLE billing.payment_poll_state (
+  payment_id     UUID PRIMARY KEY REFERENCES billing.payments(id),
+  attempts       INT NOT NULL DEFAULT 0,
+  last_polled_at TIMESTAMPTZ,
+  next_poll_at   TIMESTAMPTZ NOT NULL,   -- seeded to initiated_at + 30s
+  last_status    VARCHAR(32)
+);
+```
+**Backoff schedule:** `+30s, +1m, +2m, +5m, +10m, +20m, +30m`, then stop live polling and hand to R4.
+The +30s head start lets the happy-path redirect win, so most top-ups are never polled at all.
+
+**eSewa `status` → action:**
+| `status` | Action |
+|---|---|
+| `COMPLETE` | **Settle:** journal `gateway_clearing → user_available` (net); mark `succeeded` |
+| `PENDING` / `AMBIGUOUS` | keep polling (backoff); alert if `AMBIGUOUS` persists past max attempts |
+| `NOT_FOUND` | keep polling until TTL → then `cancelled` + `failure_code='expired_no_return'` |
+| `CANCELED` | `cancelled` (terminal, no credit) |
+| `FULL_REFUND` / `PARTIAL_REFUND` | `refunded` / `partially_refunded`; reverse-journal if already credited |
+
+`assertMatch(live, {amount,currency})` stays — an amount mismatch is tamper/fraud → `failed` + page, never credit.
+
+**The redirect-vs-poller race is already safe** via the §8 exactly-once layers: `jobId=settle:{paymentId}`
+dedups enqueues, the `FOR UPDATE` + `TERMINAL.has(status)` guard no-ops the loser, and journal dedup on
+`(reference_type='payment', reference_id)` makes a double-credit impossible. A late redirect after the
+poller settled is a non-event.
+
+**R4 is the financial backstop:** the daily settlement-report reconcile (§6) **force-settles** any
+eSewa-settled `transaction_uuid` lacking a `succeeded` payment locally (the ultimate fix for premature
+expiry), and pages on any local `succeeded` absent from eSewa's export. Layers above are just for fast UX.
+
+```mermaid
+flowchart TD
+    POLL["q.esewa-poll<br/>(repeatable ~60s)"] --> SEL{"non-terminal eSewa payment<br/>& next_poll_at ≤ now?"}
+    SEL -- no --> SKIP["skip"]
+    SEL -- yes --> SET["SettlementWorker: status-check pull"]
+    SET --> ST{"eSewa status"}
+    ST -- COMPLETE --> CR["journal gateway_clearing → user_available (net)<br/>mark succeeded · receipt outbox"]
+    ST -- "PENDING / AMBIGUOUS" --> BK{"attempts < max?"}
+    BK -- yes --> SCHED["bump attempts · set next_poll_at (backoff)"]
+    BK -- no --> PAGE["leave pending · alert human (never auto-fail)"]
+    ST -- NOT_FOUND --> TTL{"past TTL?"}
+    TTL -- no --> SCHED
+    TTL -- yes --> EXP["cancelled · failure_code='expired_no_return'"]
+    ST -- CANCELED --> CN["cancelled (no credit)"]
+    ST -- "FULL/PARTIAL_REFUND" --> RF["refunded / partially_refunded<br/>reverse-journal if already credited"]
+    SCHED --> POLL
+    PAGE -.escalates.-> R4
+    EXP -.recoverable via.-> R4["R4 daily settlement reconcile<br/>force-settle missed top-ups"]
+    R4 --> CR
+```
+
 ## 7. Aggregation, Streaks, Notifications
 - **SnapshotWorker** (per user at their `day_boundary_minutes`): folds `usage_events` into `daily_snapshots` + `daily_app_usage`. Idempotent on `(user_id, snapshot_date)`.
 - **StreakWorker**: updates `gamification_state` (streaks, productivity score, money saved). Replayable from snapshots.
