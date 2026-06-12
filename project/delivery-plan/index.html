@@ -1287,8 +1287,8 @@ on day one, in parallel with everything else.</strong> Pace Android-first (riche
 </tr>
 <tr>
 <td><strong>Stored-value / e-money legal review</strong></td>
-<td>Wallet holds user funds → financial regulation, <strong>segregated/escrow account</strong>, KYC, forfeit destination</td>
-<td>Engage Nepal fintech counsel + global-payments view; decide forfeit destination; open settlement accounts</td>
+<td>Wallet holds user funds → financial regulation, <strong>segregated/escrow account</strong>, KYC; <strong>forfeit→revenue decided — counsel must confirm it's not gambling</strong></td>
+<td>Engage Nepal fintech counsel + global-payments view; <strong>validate revenue-forfeit (commitment-contract, not gambling)</strong>; open settlement accounts</td>
 <td>Founder/PM + Legal</td>
 </tr>
 </tbody>
@@ -1437,6 +1437,18 @@ multi-device · rich analytics, social features.</p>
 <td>legal Week 0; segregated accounts; charity-forfeit fallback</td>
 </tr>
 <tr>
+<td>Revenue-forfeit ruled gambling / impermissible</td>
+<td>Med</td>
+<td>High</td>
+<td>legal validates Week 0; <strong><code>system_charity</code> fallback is a config switch</strong> (ledger supports both)</td>
+</tr>
+<tr>
+<td>Over-reliance on penalty revenue (profiting from user failure)</td>
+<td>Med</td>
+<td>Med</td>
+<td>track <strong>% revenue from penalties vs subscription</strong> (§8); product-health guardrail, not a growth metric</td>
+</tr>
+<tr>
 <td>OEM battery-killers defeat enforcement</td>
 <td>High</td>
 <td>Med</td>
@@ -1488,7 +1500,7 @@ multi-device · rich analytics, social features.</p>
 </table>
 <h2 id="7-launch-gates-ready-to-ship-real-money">7. Launch Gates (Ready to Ship Real Money)<a class="headerlink" href="#7-launch-gates-ready-to-ship-real-money" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[ ] Legal sign-off: stored value + e-money + forfeit destination; segregated account live.</li>
+<li>[ ] Legal sign-off: stored value + e-money + <strong>revenue-forfeit confirmed legally clean (not gambling)</strong>; segregated account live; ledger wired to <code>system_forfeit_revenue</code>.</li>
 <li>[ ] ≥1 local provider + Stripe in <strong>production</strong> with verified webhooks (raw-body sig + server-pull confirm).</li>
 <li>[ ] Reconciliation R1–R4 green in prod; <strong>auto-freeze</strong> wired + tested.</li>
 <li>[ ] Withdrawal path live: KYC-gated manual-batch payout, two-phase hold, <strong>R5 payout recon</strong> + double-pay guard tested.</li>
