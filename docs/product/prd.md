@@ -78,7 +78,7 @@ loss-aversion into the enforcement mechanism.
 ### FR-6 — Commitment Integrity
 See [architecture/anti-cheating.md](../architecture/anti-cheating.md).
 
-## 7. ⚠️ Payment Model is a Phase-1 Architecture Decision
+## 7. Payment Model (🔒 locked) — why pre-funded wallet
 **You cannot reliably charge a user *after* they break a commitment** — especially after uninstall.
 
 | Model | How | Pros | Cons |
@@ -87,8 +87,11 @@ See [architecture/anti-cheating.md](../architecture/anti-cheating.md).
 | **B. Charge-on-event** | Card on file, charge per event. | No pre-funding friction. | Fails on uninstall/revoke; chargebacks; high fees on Rs.50. |
 | **C. Charity-forfeit / anti-charity** | Penalty → charity, not you. | Strong motivator; cleaner store-policy optics. | Payout complexity. |
 
-**Recommendation:** **Model A (pre-funded stake) + optionally C for forfeits.** Decide now whether
-penalty money is **revenue** or **forfeited (charity/locked)** — affects store billing classification, taxes, trust, IAP requirement.
+**🔒 Locked:** **Model A — pre-funded wallet/stake** is the payment substrate, and **forfeits → company
+revenue** (`system_forfeit_revenue`), not charity (legal-gated; charity is the fallback). Store billing
+classification, taxes, trust, and IAP requirement all flow from this. See
+[../payments/payment-architecture.md](../payments/payment-architecture.md) and the locked decisions in
+[../README.md](../README.md).
 
 ## 8. Non-Functional Requirements
 - **Block latency:** < ~300 ms after foreground detection (Android), before meaningful interaction.
@@ -101,12 +104,12 @@ penalty money is **revenue** or **forfeited (charity/locked)** — affects store
 D7/D30 retention; **avg. days a commitment survives**; bypass-attempt rate; paid-unlock conversion;
 **% of revenue from unlocks vs. subscription** (over-reliance on penalties = product failing its users — watch this).
 
-## 10. Critical Open Decisions (blockers)
-1. **Penalty money flow:** revenue vs. charity-forfeit vs. user-reward. → IAP vs. processor, store policy, legal/tax.
-2. **Stake vs. charge-on-event:** confirm pre-funded stake (Model A).
-3. **iOS entitlement go/no-go:** Apple's Family Controls distribution entitlement is gated and can be denied — submit early.
-4. **Launch platform:** Android-first (richer enforcement + custom pay screen).
-5. ~~"Increase limit takes effect when?"~~ **Resolved (locked):** next logical day (anti-binge); same-day need is served by paid unlocks (FR-2). See FR-4.
+## 10. Critical Decisions — Status
+1. ~~**Penalty money flow**~~ **Resolved:** → **company revenue** (`system_forfeit_revenue`), legal-gated (not gambling); charity is the fallback.
+2. ~~**Stake vs. charge-on-event**~~ **Resolved:** pre-funded **wallet/stake (Model A)**.
+3. **iOS entitlement go/no-go** — *still open (external):* Apple's Family Controls distribution entitlement is gated and can be denied — submit early. Tracked as launch blocker #1.
+4. ~~**Launch platform**~~ **Resolved:** **Android-first** (richer enforcement + custom pay screen).
+5. ~~"Increase limit takes effect when?"~~ **Resolved:** next logical day (anti-binge); same-day need is served by paid unlocks (FR-2). See FR-4.
 
 ## 11. Phase 1 Cutline (MVP)
 Android-first · FR-1 + FR-3 + FR-2 (5-min unlock) + FR-4 asymmetric edits · pre-funded wallet ·
