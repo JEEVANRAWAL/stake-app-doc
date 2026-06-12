@@ -107,6 +107,28 @@ Rs. 50, get the rest back) — but the amount *at risk* is what deterred the *ot
 stake's job is deterrence across the whole period, not to price a single violation. **Stake small = "cover
 my penalties"; stake big = "make failure genuinely painful so I follow through."**
 
+## Funds exhausted during a commitment (stake fully forfeited)
+
+When a commitment's stake is fully consumed by penalties — `available` **and** `locked` both reach 0 — the
+deposit closes as **`forfeited`**, a **`negative_commitment_balance`** flag is set, and the **wallet never
+goes negative** (a user can never *owe* Stake money; max loss is capped at what was staked).
+
+**🔒 Locked — enforcement continues for free.** Blocking and limits **keep enforcing until the commitment
+period ends**; enforcement is *not* gated on a balance (blocking costs nothing). Only the **money layer goes
+dormant**:
+
+- further violations are still *recorded* but post Rs. 0 (the `negative_commitment_balance` flag stays raised);
+- **paid unlocks** return `402` and **rule-loosening break fees** can't be debited → restrictions hold;
+- **new commitments are blocked until the user tops up** (the minimum-funding rule).
+
+**Why free continuation (not "blocks drop when the stake is spent"):** a commitment is a behavioral promise,
+not a pay-per-block meter. If enforcement stopped the instant the stake ran out, a user could **"burn the
+stake to escape"** — deliberately trigger penalties until the money's gone, then roam free. Free continued
+enforcement keeps the promise intact; the financial teeth simply can't escalate past what was staked.
+
+To restore financial stakes the user tops up and **arms a new commitment** (fresh `available → locked`); the
+exhausted one stays closed as `forfeited`. The app notifies the user that funds are exhausted and prompts a top-up.
+
 ## eSewa top-up flow (redirect + status-pull)
 
 eSewa is touched **only** during a cooperative wallet top-up — never at enforcement time.

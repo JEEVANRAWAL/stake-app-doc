@@ -3,7 +3,9 @@
     "allow": [
       "WebSearch",
       "Bash(grep -viE '```')",
-      "Bash(./deploy.sh \"Re-scope docs to Android-only; defer iOS \\(banners + blockers/roadmap/team/milestones/risks/open-decisions\\)\")"
+      "Bash(./deploy.sh \"Re-scope docs to Android-only; defer iOS \\(banners + blockers/roadmap/team/milestones/risks/open-decisions\\)\")",
+      "Bash(./.venv/bin/mkdocs build *)",
+      "Bash(./deploy.sh \"Document funds-exhausted-mid-commitment lifecycle; lock enforcement-continues-for-free\")"
     ]
   }
 }

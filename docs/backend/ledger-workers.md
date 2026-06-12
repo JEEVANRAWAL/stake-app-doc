@@ -171,7 +171,10 @@ async process({ violationId }) {
 commitments + require top-up. Wallet never goes negative. Mitigated by **capping max penalty exposure to the
 pre-funded balance** at commitment-creation time — enforced by the **minimum-funding-to-create-a-commitment**
 rule (PRD FR-6 / `payments/payment-architecture.md`): a commitment can't be armed unless available balance ≥
-the minimum backing, so there is always money behind the teeth.
+the minimum backing, so there is always money behind the teeth. When a commitment's stake is **fully**
+forfeited, the deposit closes as `forfeited` and — **🔒 locked — enforcement (blocking/limits) continues
+for free** until the period ends; only the money layer goes dormant (further violations post Rs. 0, paid
+unlocks/break-fees unavailable, new commitments blocked until top-up). Prevents "burn the stake to escape."
 
 ## 5. Deposit Forfeiture / Return Engine (`q.deposit-engine`)
 ```mermaid
