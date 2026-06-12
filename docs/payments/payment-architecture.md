@@ -387,7 +387,7 @@ sequenceDiagram
 > The connectIPS/NPI swap replaces the Ops + bank-portal steps with a `PayoutProvider.disburse()` API
 > call + `fetchPayoutStatus()` poll — the request, hold, review, ledger, and reconciliation are unchanged.
 
-> **iOS synergy:** an extension cannot present a payment sheet, so on iOS "pay to unlock" is done
-> as **pre-authorized unlocks** — the user buys unlock credit/time *in the app* (cooperative,
-> gateway-friendly) and the `ShieldAction` extension just verifies & consumes a token from the
-> App Group. The wallet model maps cleanly onto this constraint.
+> **iOS synergy** *(deferred — iOS fast-follow, not active scope):* an extension cannot present a payment
+> sheet, so on iOS "pay to unlock" is done as **pre-authorized unlocks** — the user buys unlock credit/time
+> *in the app* (cooperative, gateway-friendly) and the `ShieldAction` extension just verifies & consumes a
+> token from the App Group. The wallet model maps cleanly onto this constraint.

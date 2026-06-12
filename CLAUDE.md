@@ -7,13 +7,19 @@ apps and pay a monetary penalty (from a pre-funded/staked balance) if they break
 product makes bypassing *deliberate, visible, and financially costly* — money is captured up front and
 the server forfeits it on detected tamper/silence.
 
+## 🎯 Current scope: Android-only (iOS deferred)
+Active development targets **Android only**. **iOS is deferred** — revisit as a fast-follow after the
+Android launch. All iOS/Apple content in the docs (DeviceActivity/ManagedSettings/ShieldAction, App
+Attest, Family Controls entitlement, App Group, pre-auth unlocks) is **retained as future reference, not
+active scope** — don't action it now.
+
 ## 👉 Start here
 Read **`docs/README.md`** first — it's the index, the locked decisions, and the reading order for the
 14 planning docs. The docs in `docs/` are the authoritative source of truth.
 
 ## Locked decisions (as of 2026-06)
 - **Payment model:** wallet substrate + commitment-deposit as a wallet *lock* (preload while cooperative; enforce via instant ledger debits). See `docs/payments/payment-architecture.md`.
-- **Mobile:** Flutter shell + **two native enforcement modules** (Android Kotlin: AccessibilityService/ForegroundService/overlay; iOS Swift: DeviceActivity/ManagedSettings/ShieldAction extensions + App Group). ~60–70% of risk is native. See `docs/native/enforcement-modules.md`.
+- **Mobile:** Flutter shell + native enforcement module — **Android Kotlin (active): AccessibilityService/ForegroundService/overlay**. *(iOS Swift module: DeviceActivity/ManagedSettings/ShieldAction + App Group — **deferred**.)* ~60–70% of risk is native. See `docs/native/enforcement-modules.md`.
 - **Backend:** NestJS (TypeScript) + BullMQ workers.
 - **Database:** PostgreSQL 15+ (+ Redis for cache/locks/queues). Isolated `ledger` schema, append-only double-entry, journal-atomic, role-restricted. See `docs/database/schema.md`, `docs/backend/ledger-workers.md`.
 - **Security:** device is untrusted; server-authoritative time/balances/rules/unlock grants; Ed25519-signed unlock tokens (monotonic-clock-anchored expiry, `kid` rotation); Play Integrity / App Attest verified server-side; per-device HMAC request signing. See `docs/api/security-framework.md`.
@@ -23,14 +29,15 @@ Read **`docs/README.md`** first — it's the index, the locked decisions, and th
 - **Forfeit destination:** forfeits/penalties → **company revenue** (`system_forfeit_revenue`), *not* charity. Conditional on legal sign-off that revenue-forfeit is permissible (commitment-contract, not gambling) in Nepal; charity-forfeit is the fallback if counsel objects. The penalty-vs-subscription revenue mix stays a tracked ethical guardrail. See `docs/payments/payment-architecture.md`.
 - **Rule edits (asymmetric):** reduce = free/immediate; **increase/disable requires a paid commitment-break fee and takes effect *next logical day*** (staged via `pending_limit_seconds`, applied at day-boundary rollover) — anti-binge. Immediate need is served by paid unlocks (FR-2), a separate lever. See `docs/product/prd.md` FR-4.
 - **Minimum funding to create a commitment:** arming a commitment (staked deposit **or** penalty-bearing restrictions) requires available balance ≥ **Rs. 100** (configurable); **max penalty/forfeit exposure capped to the pre-funded/staked balance at creation** — no money, no commitment. Underfunded → `402 COMMITMENT_FUNDING_REQUIRED`. See `docs/product/prd.md` FR-6.
-- **Launch:** Android-first MVP (wallet model), iOS fast-follow. See `docs/project/delivery-plan.md`.
+- **Launch:** **Android-only** MVP (wallet model). iOS deferred (fast-follow, revisit post-launch). See `docs/project/delivery-plan.md`.
 
-## Two launch blockers — start day 1 (long lead times)
-1. **Apple Family Controls distribution entitlement** — gated, can be denied; without it iOS is unshippable.
-2. **Stored-value / e-money legal review** — segregated/escrow accounts, KYC, and **confirming revenue-forfeit is legally clean (not gambling)** in Nepal.
+## Launch blocker — start day 1 (long lead time)
+1. **Stored-value / e-money legal review** — segregated/escrow accounts, KYC, and **confirming revenue-forfeit is legally clean (not gambling)** in Nepal.
+
+*(Deferred with iOS: Apple Family Controls distribution entitlement — re-activate when iOS work resumes; it's gated and can be denied, so submit early once iOS is back in scope.)*
 
 ## Open decisions (not yet locked)
-- iOS entitlement outcome (pending).
+- None for the Android-only scope. *(Deferred: iOS Family Controls entitlement outcome — only relevant once iOS resumes.)*
 
 ## Docs map
 | Topic | File |

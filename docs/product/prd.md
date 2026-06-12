@@ -113,11 +113,11 @@ D7/D30 retention; **avg. days a commitment survives**; bypass-attempt rate; paid
 ## 10. Critical Decisions — Status
 1. ~~**Penalty money flow**~~ **Resolved:** → **company revenue** (`system_forfeit_revenue`), legal-gated (not gambling); charity is the fallback.
 2. ~~**Stake vs. charge-on-event**~~ **Resolved:** pre-funded **wallet/stake (Model A)**.
-3. **iOS entitlement go/no-go** — *still open (external):* Apple's Family Controls distribution entitlement is gated and can be denied — submit early. Tracked as launch blocker #1.
-4. ~~**Launch platform**~~ **Resolved:** **Android-first** (richer enforcement + custom pay screen).
+3. **iOS entitlement go/no-go** — *deferred with iOS:* Apple's Family Controls entitlement (gated, can be denied) is only relevant once iOS resumes; not in the active Android-only scope.
+4. ~~**Launch platform**~~ **Resolved:** **Android-only** for now (richer enforcement + custom pay screen); iOS deferred (fast-follow).
 5. ~~"Increase limit takes effect when?"~~ **Resolved:** next logical day (anti-binge); same-day need is served by paid unlocks (FR-2). See FR-4.
 
 ## 11. Phase 1 Cutline (MVP)
-Android-first · FR-1 + FR-3 + FR-2 (5-min unlock) + FR-4 asymmetric edits · pre-funded wallet ·
+**Android-only** · FR-1 + FR-3 + FR-2 (5-min unlock) + FR-4 asymmetric edits · pre-funded wallet ·
 server-authoritative rules + heartbeat + Play Integrity · honest "we detect & charge, we don't physically prevent" framing.
 Defer iOS, clone-detection, charity-forfeit, multi-device to Phase 2.

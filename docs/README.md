@@ -6,6 +6,10 @@ break their commitment. The product makes bypassing restrictions *deliberate, vi
 and financially costly* — because no consumer app can technically *prevent* a determined
 bypass on Android or iOS.
 
+> 🎯 **Current scope: Android-only.** iOS is **deferred** (fast-follow after the Android launch). All
+> iOS/Apple content in these docs is retained as future reference, **not active scope** — see the
+> [delivery plan](project/delivery-plan.md) for what's in/out now.
+
 ## Core locked decisions
 - **Payment model:** Hybrid — **wallet substrate + commitment-deposit as a wallet lock** (preload while cooperative; enforce via instant ledger debits).
 - **Mobile framework:** **Flutter** (native enforcement modules in Kotlin/Swift behind a Dart facade).
@@ -15,7 +19,7 @@ bypass on Android or iOS.
 - **Forfeit destination:** forfeits/penalties → **company revenue** (`system_forfeit_revenue`), not charity — conditional on legal sign-off that revenue-forfeit is permissible (not gambling) in Nepal; charity is the fallback. See [payments/payment-architecture.md](payments/payment-architecture.md).
 - **Asymmetric rule edits:** reduce limit free/immediate; **increase/disable costs a commitment-break fee and takes effect *next logical day*** (anti-binge); immediate need uses paid unlocks (FR-2). See [product/prd.md](product/prd.md).
 - **Minimum funding to create a commitment:** arming a commitment requires available balance ≥ **Rs. 100** (configurable); **max penalty/forfeit exposure capped to the pre-funded/staked balance at creation** — no money, no commitment. Underfunded → `402 COMMITMENT_FUNDING_REQUIRED`. See [product/prd.md](product/prd.md) FR-6.
-- **Launch strategy:** **Android-first** MVP (wallet model), iOS fast-follow (entitlement-gated).
+- **Launch strategy:** **Android-only** MVP (wallet model). iOS deferred — fast-follow, revisit post-launch (entitlement-gated when it resumes).
 - **Payment return routing:** gateway `success_url` points at the **backend** (not the app); the app return uses **verified App Links / Universal Links — no custom URL scheme**. Deep link is best-effort UX; settlement is server-authoritative. See [payments/payment-architecture.md](payments/payment-architecture.md).
 - **Top-up fees:** **transparent gross-up** — user picks a wallet credit amount; charged amount + disclosed processing fee; wallet credited the round amount; fee-neutral (no silent net shortfall). **Min top-up Rs. 100**; wallet-balance cap by KYC tier; withdrawals bear their own fee + cycle limit. See [payments/payment-architecture.md](payments/payment-architecture.md).
 - **Withdrawal/payout:** collection gateways can't pay out → separate rail. **MVP = manual batch bank transfer (KYC-gated); automate via connectIPS/NPI later** (swappable `PayoutProvider`). Two-phase hold (`user_payout_pending`), gross-down fee, never blind-retry a stuck payout, R5 reconciliation. Disbursement-agreement onboarding is a **long-lead item**. See [payments/payment-architecture.md](payments/payment-architecture.md).

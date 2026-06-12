@@ -1,6 +1,10 @@
 # Phase 4b — Native Enforcement Module Design
 ### Commitment-Based Digital Discipline App ("Stake")
 
+> 🎯 **Scope: Android-only.** Only the **Android (Kotlin)** module is in active scope. All **iOS** content
+> here (DeviceActivity / ManagedSettings / ShieldAction extensions, App Group, App Attest, pre-auth
+> unlocks) is **deferred reference** for the future fast-follow — do not build it now.
+
 **Design invariant:** the device is hostile and untrusted. The native module is an *executor of
 server-authorized decisions*, never an authority. It can verify a server signature and enforce an expiry
 against a monotonic clock — it cannot mint a grant, set a balance, or be trusted to "self-report healthy."

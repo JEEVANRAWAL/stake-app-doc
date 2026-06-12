@@ -1,16 +1,21 @@
 # Phase 5 — Project Plan & Delivery Cutline
 ### Commitment-Based Digital Discipline App ("Stake")
 
-Organizing principle: **two external dependencies have long lead times and can kill the launch — start them
-on day one, in parallel with everything else.** Pace Android-first (richer enforcement + custom pay screen).
+> 🎯 **Scope: Android-only.** iOS is **deferred** (fast-follow after the Android launch). iOS rows below are
+> retained as deferred reference and struck from the active plan, team, and timeline.
+
+Organizing principle: **the e-money legal review has a long lead time and can kill the launch — start it on
+day one, in parallel with everything else.** The product is **Android-only** for now (richest enforcement +
+custom pay screen).
 
 > Dates are illustrative, anchored to a ~mid-2026 start; treat the **sequence and durations** as the commitment.
 
-## 1. The Two Launch Blockers — Start Now (Week 0)
+## 1. The Launch Blocker — Start Now (Week 0)
 | Blocker | Why critical | Week-0 action | Owner |
 |---|---|---|---|
-| **Apple Family Controls entitlement** | Without `com.apple.developer.family-controls`, the **entire iOS module is unshippable**; Apple gates and *can deny* it | Submit with a clear digital-wellbeing justification; fallback parental/self-control framing | PM + iOS lead |
 | **Stored-value / e-money legal review** | Wallet holds user funds → financial regulation, **segregated/escrow account**, KYC; **forfeit→revenue decided — counsel must confirm it's not gambling** | Engage Nepal fintech counsel + global-payments view; **validate revenue-forfeit (commitment-contract, not gambling)**; open settlement accounts | Founder/PM + Legal |
+
+*(Deferred with iOS — **Apple Family Controls entitlement**: without `com.apple.developer.family-controls` the iOS module is unshippable, and Apple gates & can deny it. Re-activate and submit early the moment iOS resumes.)*
 
 **Also Week 0 (lead-time):** payment provider onboarding (eSewa/Khalti/Fonepay KYC + Stripe); **payout/
 disbursement rail onboarding — connectIPS/NPI agreement (NCHL) or a bulk-disbursement deal** (collection
@@ -18,14 +23,14 @@ gateways can't pay users out; contracts + NRB-regulated onboarding are slow — 
 MVP withdrawals run on manual batch bank transfer*); Play Console + App Store accounts; Google's
 Accessibility/`PACKAGE_USAGE_STATS` declared-use review prep.
 
-If either blocker slips, ship the **Android-only, wallet-funded MVP**; iOS + staked-deposit are fast-follows.
+If the blocker slips, narrow further (defer the staked-deposit lock, ship the simplest wallet-funded MVP). iOS + staked-deposit are already fast-follows.
 
 ## 2. Team Shape
 | Role | Count | Focus |
 |---|---|---|
 | Product/PM | 1 | Scope, blockers, provider/legal coordination, metrics |
 | **Android engineer (native-strong)** | 1–2 | Accessibility/FGS/overlay, OEM-killer survival — *highest-risk seat* |
-| iOS engineer (native-strong) | 1 | DeviceActivity/ManagedSettings/extensions (starts when entitlement lands) |
+| ~~iOS engineer (native-strong)~~ | — | *Deferred with iOS — not staffed for the Android-only scope; add when iOS resumes.* |
 | Flutter engineer | 1 | Shell UI, facade, account/wallet/schedule screens |
 | Backend engineer | 1–2 | NestJS API, **ledger/workers** — *second-highest-risk seat* |
 | DevOps/SRE (fractional early) | 0.5–1 | K8s, DB/PITR, observability, key mgmt |
@@ -39,7 +44,6 @@ gantt
     dateFormat  YYYY-MM-DD
     axisFormat  %b
     section Blockers (parallel, day 1)
-    Apple entitlement request        :crit, b1, 2026-06-15, 70d
     E-money legal + escrow accounts  :crit, b2, 2026-06-15, 84d
     Provider/Play onboarding         :b3, 2026-06-15, 56d
     Payout rail (connectIPS/NPI)     :b4, 2026-06-15, 90d
@@ -59,9 +63,7 @@ gantt
     Anti-cheat (clock/integrity)     :h1, after a3, 21d
     E2E + device matrix + recon test :h2, after m3, 21d
     Closed beta (Android)            :milestone, beta, after h2, 0d
-    section iOS (after entitlement)
-    iOS enforcement module           :i1, after b1, 42d
-    iOS unlock (pre-auth model)      :i2, after i1, 21d
+    %% iOS section deferred (fast-follow) — re-add the iOS enforcement module + pre-auth unlock when iOS resumes
 ```
 
 **Milestones / gates:**
@@ -71,9 +73,9 @@ gantt
 - **M4 Anti-cheat in:** clock-tamper + attestation + grace→penalty end-to-end. *Gate: forfeit lands on simulated uninstall/silence.*
 - **M5 Android closed beta:** real users, real small money. *Gate: legal sign-off on stored value live.*
 - **M6 Android public launch.**
-- **M7 iOS beta** (entitlement-gated). **M8 iOS launch + scale.**
+- *(Deferred) **M7 iOS beta** (entitlement-gated) · **M8 iOS launch + scale** — fast-follow after M6.*
 
-## 4. MVP Cutline (Android-first)
+## 4. MVP Cutline (Android-only)
 **IN:** Android only · restricted apps + recurring schedules (FR-1) · per-app daily limits + asymmetric edits
 (FR-3/4) · block screen + paid **5-min unlock** from wallet (FR-2) · commitment-break fee (FR-4/5) · **wallet
 (preload + auto-deduct)** + one local provider + Stripe · anti-cheat (clock-monotonic, Play Integrity,
@@ -81,7 +83,7 @@ heartbeat + silence-sweeper, grace→penalty) · double-entry ledger + nightly r
 
 **IN (withdrawals):** KYC-gated **manual-batch** payout (two-phase hold, gross-down fee, double-pay guard, R5 recon).
 
-**OUT (fast-follows):** iOS (until entitlement) · **staked commitment-deposit lock** (ship wallet first, add
+**OUT (fast-follows):** **iOS (deferred — fast-follow after Android launch)** · **staked commitment-deposit lock** (ship wallet first, add
 the lock once proven — it's incremental on the same ledger) · **automated payout rail (connectIPS/NPI)** +
 multiple unlock tiers, charity-forfeit, withdrawals polish · clone detection, Device Admin anti-uninstall,
 multi-device · rich analytics, social features.
@@ -97,9 +99,8 @@ flowchart LR
     AC --> BETA[Android closed beta]
     LEGAL[E-money legal + escrow] --> BETA
     PROV[Provider live keys] --> M1
-    APPLE[Apple entitlement] --> IOS[iOS module]
     BETA --> LAUNCH[Android launch]
-    LAUNCH --> IOS_FF[iOS fast-follow]
+    %% iOS deferred — Apple entitlement + iOS module are a fast-follow, out of the active critical path
 ```
 **Most likely to set the date:** (1) the Android enforcement spike (prototype OEM-killer survival in Sprint 1);
 (2) legal/e-money sign-off (gates beta-with-real-money regardless of code).
@@ -107,7 +108,7 @@ flowchart LR
 ## 6. Risk Register
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
-| Apple denies entitlement | Med | High | submit Week 0; fallback framing; Android-only viable |
+| *(Deferred w/ iOS) Apple denies entitlement* | — | — | only relevant when iOS resumes; Android-only is the current scope |
 | E-money regulation heavier than expected | Med | High | legal Week 0; segregated accounts; charity-forfeit fallback |
 | Revenue-forfeit ruled gambling / impermissible | Med | High | legal validates Week 0; **`system_charity` fallback is a config switch** (ledger supports both) |
 | Over-reliance on penalty revenue (profiting from user failure) | Med | Med | track **% revenue from penalties vs subscription** (§8); product-health guardrail, not a growth metric |
@@ -141,9 +142,9 @@ flowchart LR
 Green → fund iOS + staked deposits + growth. Red → fix the model before scaling cost.
 
 ## 9. Sequencing Summary
-1. **Week 0:** fire both blockers + provider/Play onboarding + **payout-rail (connectIPS/NPI) onboarding** (long poles).
+1. **Week 0:** fire the e-money legal blocker + provider/Play onboarding + **payout-rail (connectIPS/NPI) onboarding** (long poles).
 2. **Sprints 0–2:** foundation (CI, schema, ledger primitive, auth) **and** Android enforcement spike in parallel.
 3. **Sprints 3–6:** money vertical slice + Android schedules/limits + OEM survival.
 4. **Sprints 7–8:** anti-cheat integration, E2E + device matrix, **Android closed beta** (gated on legal).
 5. **Android public launch**, measure the thesis.
-6. **iOS fast-follow** (entitlement-gated, pre-auth-unlock model); add **staked deposits**; then scale.
+6. *(Deferred) **iOS fast-follow*** (entitlement-gated, pre-auth-unlock model) — revisit post-launch; meanwhile add **staked deposits**, then scale.

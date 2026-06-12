@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "Bash(grep -viE '```')"
+      "Bash(grep -viE '```')",
+      "Bash(./deploy.sh \"Re-scope docs to Android-only; defer iOS \\(banners + blockers/roadmap/team/milestones/risks/open-decisions\\)\")"
     ]
   }
 }
