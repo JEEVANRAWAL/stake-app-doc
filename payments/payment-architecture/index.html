@@ -618,6 +618,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#esewa-top-up-flow-redirect-status-pull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        eSewa top-up flow (redirect + status-pull)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1192,6 +1203,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#esewa-top-up-flow-redirect-status-pull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        eSewa top-up flow (redirect + status-pull)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1293,6 +1315,50 @@ in the local market — at that moment the user is hostile and won't complete a 
 - <strong>Forfeited money</strong> routes to a <strong>system "forfeit" ledger account</strong> (revenue vs. charity — Phase 1 decision).
 - <strong>Returned (un-forfeited) deposit</strong> goes back to <em>available balance</em>, <strong>not</strong> auto-refunded to card (local-rail refunds are painful/lossy) — offer explicit withdrawal instead.
 - <strong>Store policy:</strong> unlocks/penalties are arguably digital goods → check Apple/Google billing rules; top-up provider stays behind the abstraction so it's swappable (may be forced to IAP on iOS).</p>
+<h2 id="esewa-top-up-flow-redirect-status-pull">eSewa top-up flow (redirect + status-pull)<a class="headerlink" href="#esewa-top-up-flow-redirect-status-pull" title="Permanent link">&para;</a></h2>
+<p>eSewa is touched <strong>only</strong> during a cooperative wallet top-up — never at enforcement time.
+Unlike Stripe, <strong>eSewa ePay v2 has no asynchronous server-to-server webhook</strong>: confirmation
+arrives via a browser <strong>redirect</strong> to <code>success_url</code>, which is <strong>user-controllable and therefore
+untrusted</strong>. The authoritative confirmation is always a <strong>server-side status-check API pull</strong>
+(the <code>fetchStatus</code> step in the Settlement Worker). Two rules fall out of this:</p>
+<ul>
+<li><strong><code>success_url</code> points at the backend, not the app</strong> — the server verifies before deep-linking
+  the user home, so a hostile user never controls the confirmation path.</li>
+<li><strong>A status poller is mandatory</strong> — if the user pays then closes the browser before the redirect
+  fires, the redirect path never runs. A cron sweep over <code>payments WHERE status IN
+  ('initiated','pending')</code> (backed by <code>idx_payments_status</code>) pulls eSewa status and settles late.</li>
+</ul>
+<pre class="mermaid"><code>sequenceDiagram
+    autonumber
+    actor U as User
+    participant App as Flutter App
+    participant API as NestJS API
+    participant ES as eSewa
+    participant SET as SettlementWorker
+    participant POLL as Status Poller (cron)
+    participant L as Ledger
+
+    U-&gt;&gt;App: Tap "Add Rs. 500"
+    App-&gt;&gt;API: POST /wallet/topup {amount:500, provider:esewa}
+    API-&gt;&gt;API: Create payment (initiated)&lt;br/&gt;transaction_uuid = payment.id
+    API-&gt;&gt;API: HMAC-SHA256 sign&lt;br/&gt;(total_amount, transaction_uuid, product_code)
+    API--&gt;&gt;App: eSewa form params + signature
+    App-&gt;&gt;ES: Open Custom Tab (form POST)
+    U-&gt;&gt;ES: Login + approve Rs. 500 (cooperative)
+
+    alt Happy path — redirect returns
+        ES--&gt;&gt;API: GET success_url (base64 resp + signature)&lt;br/&gt;[untrusted]
+        API-&gt;&gt;API: Verify redirect signature
+        API-&gt;&gt;SET: enqueue {paymentId}
+    else User closed browser after paying
+        POLL-&gt;&gt;API: sweep status IN (initiated, pending)
+        API-&gt;&gt;SET: enqueue {paymentId}
+    end
+
+    SET-&gt;&gt;ES: Status-check API (server PULL)&lt;br/&gt;[authoritative]
+    ES--&gt;&gt;SET: status = COMPLETE, amount = 500
+    SET-&gt;&gt;L: journal: gateway_clearing → user_available (net of fee)
+    SET--&gt;&gt;App: balance updated (push / next sync)</code></pre>
 <blockquote>
 <p><strong>iOS synergy:</strong> an extension cannot present a payment sheet, so on iOS "pay to unlock" is done
 as <strong>pre-authorized unlocks</strong> — the user buys unlock credit/time <em>in the app</em> (cooperative,
