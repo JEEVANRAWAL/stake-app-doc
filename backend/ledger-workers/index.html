@@ -941,6 +941,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#6b-esewa-top-up-reconciliation-paid-but-didnt-return" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6b. eSewa Top-up Reconciliation — "paid but didn't return"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#7-aggregation-streaks-notifications" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1225,6 +1236,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#6b-esewa-top-up-reconciliation-paid-but-didnt-return" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6b. eSewa Top-up Reconciliation — "paid but didn't return"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#7-aggregation-streaks-notifications" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1491,6 +1513,70 @@ Returned money lands in <strong>available balance</strong> (not auto-refunded to
 </tr>
 </tbody>
 </table>
+<h2 id="6b-esewa-top-up-reconciliation-paid-but-didnt-return">6b. eSewa Top-up Reconciliation — "paid but didn't return"<a class="headerlink" href="#6b-esewa-top-up-reconciliation-paid-but-didnt-return" title="Permanent link">&para;</a></h2>
+<p>eSewa ePay v2 has <strong>no async webhook</strong>: confirmation rides the browser redirect to <code>success_url</code>.
+If the user approves payment then closes the browser before the redirect fires, the <code>payments</code> row
+is stranded at <code>initiated</code>/<code>pending</code> while the money has already left their eSewa account. Because we
+set <code>transaction_uuid = payment.id</code> at initiation, we can always ask eSewa "what happened to attempt
+X?" via the status-check API keyed on <code>(product_code, total_amount, transaction_uuid)</code> — <strong>no callback
+required</strong>. Reconciliation = poll until terminal, then converge local state toward eSewa.</p>
+<p><strong>Guiding rule:</strong> eSewa is the source of truth about whether money moved; local state is a cache we
+reconcile toward it. <strong>Never move a payment to a terminal <em>unpaid</em> state from silence alone</strong> — only an
+explicit eSewa <code>CANCELED</code>/<code>NOT_FOUND</code> (after TTL) or the settlement report may declare "not paid." A
+stranded <code>pending</code> with no eSewa answer stays <code>pending</code> and escalates to a human; it is never auto-failed.</p>
+<p><strong>Status poller (<code>q.esewa-poll</code>, repeatable ~60s)</strong> sweeps non-terminal eSewa payments and hands each
+to the existing <strong>SettlementWorker</strong> (reuse <code>fetchStatus</code> + journal posting — no parallel credit path):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">billing</span><span class="p">.</span><span class="n">payments</span><span class="w"> </span><span class="n">p</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">JOIN</span><span class="w"> </span><span class="n">billing</span><span class="p">.</span><span class="n">payment_poll_state</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">payment_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">id</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;initiated&#39;</span><span class="p">,</span><span class="s1">&#39;pending&#39;</span><span class="p">,</span><span class="s1">&#39;authorized&#39;</span><span class="p">)</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">provider</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;esewa&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">next_poll_at</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">now</span><span class="p">()</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">next_poll_at</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">200</span><span class="p">;</span><span class="w">        </span><span class="c1">-- bounded batch; cap concurrency to stay polite</span>
+</code></pre></div></p>
+<p><strong>Sidecar poll state</strong> (keeps the hot <code>payments</code> row out of poll-churn / lock contention with settlement):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">billing</span><span class="p">.</span><span class="n">payment_poll_state</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="n">payment_id</span><span class="w">     </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">billing</span><span class="p">.</span><span class="n">payments</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="n">attempts</span><span class="w">       </span><span class="nb">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="n">last_polled_at</span><span class="w"> </span><span class="n">TIMESTAMPTZ</span><span class="p">,</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="n">next_poll_at</span><span class="w">   </span><span class="n">TIMESTAMPTZ</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">   </span><span class="c1">-- seeded to initiated_at + 30s</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="n">last_status</span><span class="w">    </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">);</span>
+</code></pre></div>
+<strong>Backoff schedule:</strong> <code>+30s, +1m, +2m, +5m, +10m, +20m, +30m</code>, then stop live polling and hand to R4.
+The +30s head start lets the happy-path redirect win, so most top-ups are never polled at all.</p>
+<p><strong>eSewa <code>status</code> → action:</strong>
+| <code>status</code> | Action |
+|---|---|
+| <code>COMPLETE</code> | <strong>Settle:</strong> journal <code>gateway_clearing → user_available</code> (net); mark <code>succeeded</code> |
+| <code>PENDING</code> / <code>AMBIGUOUS</code> | keep polling (backoff); alert if <code>AMBIGUOUS</code> persists past max attempts |
+| <code>NOT_FOUND</code> | keep polling until TTL → then <code>cancelled</code> + <code>failure_code='expired_no_return'</code> |
+| <code>CANCELED</code> | <code>cancelled</code> (terminal, no credit) |
+| <code>FULL_REFUND</code> / <code>PARTIAL_REFUND</code> | <code>refunded</code> / <code>partially_refunded</code>; reverse-journal if already credited |</p>
+<p><code>assertMatch(live, {amount,currency})</code> stays — an amount mismatch is tamper/fraud → <code>failed</code> + page, never credit.</p>
+<p><strong>The redirect-vs-poller race is already safe</strong> via the §8 exactly-once layers: <code>jobId=settle:{paymentId}</code>
+dedups enqueues, the <code>FOR UPDATE</code> + <code>TERMINAL.has(status)</code> guard no-ops the loser, and journal dedup on
+<code>(reference_type='payment', reference_id)</code> makes a double-credit impossible. A late redirect after the
+poller settled is a non-event.</p>
+<p><strong>R4 is the financial backstop:</strong> the daily settlement-report reconcile (§6) <strong>force-settles</strong> any
+eSewa-settled <code>transaction_uuid</code> lacking a <code>succeeded</code> payment locally (the ultimate fix for premature
+expiry), and pages on any local <code>succeeded</code> absent from eSewa's export. Layers above are just for fast UX.</p>
+<pre class="mermaid"><code>flowchart TD
+    POLL["q.esewa-poll&lt;br/&gt;(repeatable ~60s)"] --&gt; SEL{"non-terminal eSewa payment&lt;br/&gt;&amp; next_poll_at ≤ now?"}
+    SEL -- no --&gt; SKIP["skip"]
+    SEL -- yes --&gt; SET["SettlementWorker: status-check pull"]
+    SET --&gt; ST{"eSewa status"}
+    ST -- COMPLETE --&gt; CR["journal gateway_clearing → user_available (net)&lt;br/&gt;mark succeeded · receipt outbox"]
+    ST -- "PENDING / AMBIGUOUS" --&gt; BK{"attempts &lt; max?"}
+    BK -- yes --&gt; SCHED["bump attempts · set next_poll_at (backoff)"]
+    BK -- no --&gt; PAGE["leave pending · alert human (never auto-fail)"]
+    ST -- NOT_FOUND --&gt; TTL{"past TTL?"}
+    TTL -- no --&gt; SCHED
+    TTL -- yes --&gt; EXP["cancelled · failure_code='expired_no_return'"]
+    ST -- CANCELED --&gt; CN["cancelled (no credit)"]
+    ST -- "FULL/PARTIAL_REFUND" --&gt; RF["refunded / partially_refunded&lt;br/&gt;reverse-journal if already credited"]
+    SCHED --&gt; POLL
+    PAGE -.escalates.-&gt; R4
+    EXP -.recoverable via.-&gt; R4["R4 daily settlement reconcile&lt;br/&gt;force-settle missed top-ups"]
+    R4 --&gt; CR</code></pre>
 <h2 id="7-aggregation-streaks-notifications">7. Aggregation, Streaks, Notifications<a class="headerlink" href="#7-aggregation-streaks-notifications" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>SnapshotWorker</strong> (per user at their <code>day_boundary_minutes</code>): folds <code>usage_events</code> into <code>daily_snapshots</code> + <code>daily_app_usage</code>. Idempotent on <code>(user_id, snapshot_date)</code>.</li>
