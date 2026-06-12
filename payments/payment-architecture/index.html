@@ -640,6 +640,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#top-up-economics-fees-gross-up-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top-up economics — fees, gross-up, limits
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1236,6 +1247,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#top-up-economics-fees-gross-up-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top-up economics — fees, gross-up, limits
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1516,6 +1538,37 @@ scheme and hijack the callback. Defense-in-depth: the app treats link params as 
     BR--&gt;&gt;App: verified App/Universal Link → app opens, tab closes
     App-&gt;&gt;API: GET /payments/{pid} (truth from server)
     API--&gt;&gt;App: status: succeeded → show new balance</code></pre>
+<h2 id="top-up-economics-fees-gross-up-limits">Top-up economics — fees, gross-up, limits<a class="headerlink" href="#top-up-economics-fees-gross-up-limits" title="Permanent link">&para;</a></h2>
+<p>A top-up is the user moving <strong>their own money</strong> into the wallet — we earn nothing on it, so every rupee
+of gateway fee is pure margin drag. Revenue comes from forfeits/penalties (+ possible subscription), not a
+top-up spread.</p>
+<p><strong>🔒 Locked decision — transparent gross-up (fee-neutral).</strong> The user chooses a <strong>wallet credit amount</strong>;
+we charge that amount <strong>plus a disclosed processing fee</strong> at the gateway. The wallet is credited the exact
+round amount the user asked for; we stay fee-neutral. A <em>silent net shortfall</em> ("paid 500, got 490") is
+rejected — it erodes trust at the cooperative moment. Absorbing the fee (credit gross) was considered as a
+growth lever but not adopted at launch.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>User wants Rs. 500 in wallet
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  eSewa total_amount  = 510   (wallet_credit 500 + processing fee 10)
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  user_available cr.  = 500   (the round amount requested)
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  system_fees         = actual fee from the settlement pull
+</code></pre></div>
+<ul>
+<li><strong>Charge math:</strong> <code>total_amount = wallet_credit + estimated_fee</code>. Credit <code>user_available</code> with
+  <code>wallet_credit</code>; post the <strong>actual</strong> fee (from the authoritative status pull, not the estimate) to
+  <code>system_fees</code>; reconcile estimate vs actual. Because the gateway's % applies to the grossed-up total, a
+  few paisa residual remains — <strong>round in the user's favour and absorb it.</strong></li>
+<li><strong>Per-provider fee config:</strong> eSewa ~2%, Khalti/Fonepay (local), Stripe intl ~2.9%+. Gross-up is computed
+  per route at initiation; <code>payments.fee_amount</code> / <code>net_amount</code> already carry it.</li>
+</ul>
+<p><strong>Limits:</strong>
+- <strong>Minimum top-up Rs. 200</strong>, with presets <strong>Rs. 200 / 500 / 1000</strong>. Sub-Rs.200 top-ups are margin-thin and
+  defeat the batching thesis; Rs. 200 also covers several Rs. 50 penalties.
+- <strong>Maximum / wallet-balance cap by KYC tier</strong> (start conservative, e.g. Rs. 25k unverified) — feeds the
+  stored-value/e-money legal blocker; balance caps reduce regulatory burden.</p>
+<p><strong>Anti-cycling (round-trip abuse):</strong> with gross-up the user already pays the inbound fee, but withdrawals
+must not become a fee-free money mover. Withdrawals bear their <strong>own payout fee</strong> (passed to user) + a
+<strong>minimum withdrawal</strong>, plus a <strong>cooling-off / cycle limit</strong>. (Returned deposits land in <em>available
+balance</em>, not auto-refunded — withdrawal is always explicit.)</p>
 <blockquote>
 <p><strong>iOS synergy:</strong> an extension cannot present a payment sheet, so on iOS "pay to unlock" is done
 as <strong>pre-authorized unlocks</strong> — the user buys unlock credit/time <em>in the app</em> (cooperative,
