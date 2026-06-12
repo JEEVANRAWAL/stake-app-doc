@@ -20,6 +20,7 @@ tags:
   - { name: Usage }
   - { name: Unlocks }
   - { name: Wallet }
+  - { name: Withdrawals }
   - { name: Deposits }
   - { name: Rules }
   - { name: RestrictedApps }
@@ -216,25 +217,58 @@ paths:
 
   /wallet/withdrawals:
     post:
-      tags: [Wallet]
-      summary: Withdraw available balance
+      tags: [Withdrawals]
+      summary: Request a withdrawal (two-phase hold; KYC-gated; gross-down fee)
+      description: >
+        Holds funds (user_available → user_payout_pending) and queues for review/disbursement.
+        Payout posts only when confirmed paid. Requires KYC ≥ tier 1 and a bank-name match.
       parameters: [ { $ref: '#/components/parameters/IdempotencyKey' } ]
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [amount, currency, provider]
-              properties:
-                amount: { $ref: '#/components/schemas/Money' }
-                currency: { $ref: '#/components/schemas/Currency' }
-                provider: { $ref: '#/components/schemas/PaymentProvider' }
+            schema: { $ref: '#/components/schemas/WithdrawalCreate' }
       responses:
         '201':
-          content: { application/json: { schema: { $ref: '#/components/schemas/PaymentIntent' } } }
-          description: Withdrawal initiated
-        '402': { $ref: '#/components/responses/Problem' }
+          description: Funds held, queued for review
+          content: { application/json: { schema: { $ref: '#/components/schemas/Withdrawal' } } }
+        '403':
+          description: KYC / bank-name verification required (WITHDRAWAL_KYC_REQUIRED)
+          content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+        '409':
+          description: Insufficient available balance, below minimum, or over velocity cap
+          content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+
+  /wallet/withdrawals/{id}:
+    get:
+      tags: [Withdrawals]
+      summary: Get a withdrawal's status
+      parameters: [ { $ref: '#/components/parameters/IdPath' } ]
+      responses:
+        '200':
+          description: Withdrawal
+          content: { application/json: { schema: { $ref: '#/components/schemas/Withdrawal' } } }
+        '404': { $ref: '#/components/responses/Problem' }
+
+  /wallet/withdrawals/{id}/cancel:
+    post:
+      tags: [Withdrawals]
+      summary: Cancel a withdrawal (only before processing); releases the hold
+      parameters: [ { $ref: '#/components/parameters/IdPath' }, { $ref: '#/components/parameters/IdempotencyKey' } ]
+      responses:
+        '200':
+          description: Cancelled, hold released
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  withdrawal_id: { type: string, format: uuid }
+                  status: { $ref: '#/components/schemas/WithdrawalStatus' }
+                  wallet: { $ref: '#/components/schemas/Wallet' }
+        '409':
+          description: Already in/after processing (WITHDRAWAL_NOT_CANCELLABLE)
+          content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
 
   /commitment-deposits:
     post:
@@ -464,7 +498,10 @@ components:
     OsPlatform: { type: string, enum: [android, ios] }
     PaymentProvider:
       type: string
-      enum: [stripe, esewa, khalti, fonepay, apple_iap, google_iap, wallet_internal]
+      enum: [stripe, esewa, khalti, fonepay, apple_iap, google_iap, wallet_internal, connectips, manual_bank]
+    WithdrawalStatus:
+      type: string
+      enum: [requested, under_review, approved, processing, paid, rejected, failed, cancelled]
     PaymentStatus:
       type: string
       enum: [initiated, pending, authorized, succeeded, failed, cancelled, refunded, partially_refunded, disputed]
@@ -691,6 +728,7 @@ components:
       properties:
         available_balance: { $ref: '#/components/schemas/Money' }
         locked_balance: { $ref: '#/components/schemas/Money' }
+        payout_pending_balance: { $ref: '#/components/schemas/Money' }
         currency: { $ref: '#/components/schemas/Currency' }
         status: { type: string, enum: [active, frozen, closed] }
     TopupCreate:
@@ -737,6 +775,38 @@ components:
         ledger_journal_id: { type: string, format: uuid }
         commitment_start: { type: string, format: date-time }
         commitment_end: { type: string, format: date-time, nullable: true }
+
+    WithdrawalDestination:
+      type: object
+      required: [bank_code, account_no, account_name]
+      properties:
+        bank_code: { type: string, description: Bank/PSP identifier (e.g. SWIFT/connectIPS code) }
+        account_no: { type: string }
+        account_name: { type: string, description: Must match the verified account holder (AML) }
+    WithdrawalCreate:
+      type: object
+      required: [amount, currency, destination]
+      properties:
+        amount: { $ref: '#/components/schemas/Money' }
+        currency: { $ref: '#/components/schemas/Currency' }
+        destination: { $ref: '#/components/schemas/WithdrawalDestination' }
+    Withdrawal:
+      type: object
+      properties:
+        withdrawal_id: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/WithdrawalStatus' }
+        amount: { $ref: '#/components/schemas/Money' }
+        fee_amount: { $ref: '#/components/schemas/Money' }
+        payout_amount: { $ref: '#/components/schemas/Money' }
+        currency: { $ref: '#/components/schemas/Currency' }
+        provider: { $ref: '#/components/schemas/PaymentProvider' }
+        disburse_reference: { type: string, nullable: true }
+        wallet: { $ref: '#/components/schemas/Wallet' }
+        ledger_journal_id: { type: string, format: uuid }
+        estimated_completion: { type: string }
+        requested_at: { type: string, format: date-time }
+        approved_at: { type: string, format: date-time, nullable: true }
+        paid_at: { type: string, format: date-time, nullable: true }
 
     ScreenTimeRule:
       type: object
