@@ -1293,8 +1293,11 @@ on day one, in parallel with everything else.</strong> Pace Android-first (riche
 </tr>
 </tbody>
 </table>
-<p><strong>Also Week 0 (lead-time):</strong> payment provider onboarding (eSewa/Khalti/Fonepay KYC + Stripe); Play Console +
-App Store accounts; Google's Accessibility/<code>PACKAGE_USAGE_STATS</code> declared-use review prep.</p>
+<p><strong>Also Week 0 (lead-time):</strong> payment provider onboarding (eSewa/Khalti/Fonepay KYC + Stripe); <strong>payout/
+disbursement rail onboarding — connectIPS/NPI agreement (NCHL) or a bulk-disbursement deal</strong> (collection
+gateways can't pay users out; contracts + NRB-regulated onboarding are slow — <em>not a hard blocker because
+MVP withdrawals run on manual batch bank transfer</em>); Play Console + App Store accounts; Google's
+Accessibility/<code>PACKAGE_USAGE_STATS</code> declared-use review prep.</p>
 <p>If either blocker slips, ship the <strong>Android-only, wallet-funded MVP</strong>; iOS + staked-deposit are fast-follows.</p>
 <h2 id="2-team-shape">2. Team Shape<a class="headerlink" href="#2-team-shape" title="Permanent link">&para;</a></h2>
 <table>
@@ -1357,6 +1360,7 @@ App Store accounts; Google's Accessibility/<code>PACKAGE_USAGE_STATS</code> decl
     Apple entitlement request        :crit, b1, 2026-06-15, 70d
     E-money legal + escrow accounts  :crit, b2, 2026-06-15, 84d
     Provider/Play onboarding         :b3, 2026-06-15, 56d
+    Payout rail (connectIPS/NPI)     :b4, 2026-06-15, 90d
     section Foundation
     Repo/CI/CD, envs, IaC            :f1, 2026-06-15, 21d
     DB schema + ledger primitive     :f2, after f1, 21d
@@ -1389,9 +1393,11 @@ App Store accounts; Google's Accessibility/<code>PACKAGE_USAGE_STATS</code> decl
 (FR-3/4) · block screen + paid <strong>5-min unlock</strong> from wallet (FR-2) · commitment-break fee (FR-4/5) · <strong>wallet
 (preload + auto-deduct)</strong> + one local provider + Stripe · anti-cheat (clock-monotonic, Play Integrity,
 heartbeat + silence-sweeper, grace→penalty) · double-entry ledger + nightly reconciliation · basic streaks + snapshot.</p>
+<p><strong>IN (withdrawals):</strong> KYC-gated <strong>manual-batch</strong> payout (two-phase hold, gross-down fee, double-pay guard, R5 recon).</p>
 <p><strong>OUT (fast-follows):</strong> iOS (until entitlement) · <strong>staked commitment-deposit lock</strong> (ship wallet first, add
-the lock once proven — it's incremental on the same ledger) · multiple unlock tiers, charity-forfeit,
-withdrawals polish · clone detection, Device Admin anti-uninstall, multi-device · rich analytics, social features.</p>
+the lock once proven — it's incremental on the same ledger) · <strong>automated payout rail (connectIPS/NPI)</strong> +
+multiple unlock tiers, charity-forfeit, withdrawals polish · clone detection, Device Admin anti-uninstall,
+multi-device · rich analytics, social features.</p>
 <h2 id="5-critical-path-dependencies">5. Critical-Path Dependencies<a class="headerlink" href="#5-critical-path-dependencies" title="Permanent link">&para;</a></h2>
 <p><pre class="mermaid"><code>flowchart LR
     F[Foundation: schema + ledger primitive] --&gt; M1[Wallet+settlement]
@@ -1449,6 +1455,18 @@ withdrawals polish · clone detection, Device Admin anti-uninstall, multi-device
 <td>wallet batches top-ups; min top-up sizing; fee SLI</td>
 </tr>
 <tr>
+<td>Payout rail onboarding slow (connectIPS/NPI)</td>
+<td>Med</td>
+<td>Med</td>
+<td><strong>manual batch bank transfer at MVP</strong>; start agreement Week 0; KYC-gated, two-phase hold</td>
+</tr>
+<tr>
+<td>Duplicate/fraudulent payout (real money lost)</td>
+<td>Low</td>
+<td>Critical</td>
+<td>idempotent disburse ref (UNIQUE); never blind-retry stuck payouts; R5 recon; KYC + bank-name match</td>
+</tr>
+<tr>
 <td>Deposit "pay before value" churn</td>
 <td>Med</td>
 <td>Med</td>
@@ -1473,6 +1491,7 @@ withdrawals polish · clone detection, Device Admin anti-uninstall, multi-device
 <li>[ ] Legal sign-off: stored value + e-money + forfeit destination; segregated account live.</li>
 <li>[ ] ≥1 local provider + Stripe in <strong>production</strong> with verified webhooks (raw-body sig + server-pull confirm).</li>
 <li>[ ] Reconciliation R1–R4 green in prod; <strong>auto-freeze</strong> wired + tested.</li>
+<li>[ ] Withdrawal path live: KYC-gated manual-batch payout, two-phase hold, <strong>R5 payout recon</strong> + double-pay guard tested.</li>
 <li>[ ] PITR restore drill passed with post-restore reconciliation.</li>
 <li>[ ] Ed25519 key in KMS; client pins current+next; rotation runbook tested.</li>
 <li>[ ] Enforcement verified on device matrix (Pixel + Samsung + Xiaomi/Oppo) incl. force-stop/reboot/clock-rollback.</li>
@@ -1490,7 +1509,7 @@ withdrawals polish · clone detection, Device Admin anti-uninstall, multi-device
 <p>Green → fund iOS + staked deposits + growth. Red → fix the model before scaling cost.</p>
 <h2 id="9-sequencing-summary">9. Sequencing Summary<a class="headerlink" href="#9-sequencing-summary" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Week 0:</strong> fire both blockers + provider/Play onboarding (long poles).</li>
+<li><strong>Week 0:</strong> fire both blockers + provider/Play onboarding + <strong>payout-rail (connectIPS/NPI) onboarding</strong> (long poles).</li>
 <li><strong>Sprints 0–2:</strong> foundation (CI, schema, ledger primitive, auth) <strong>and</strong> Android enforcement spike in parallel.</li>
 <li><strong>Sprints 3–6:</strong> money vertical slice + Android schedules/limits + OEM survival.</li>
 <li><strong>Sprints 7–8:</strong> anti-cheat integration, E2E + device matrix, <strong>Android closed beta</strong> (gated on legal).</li>
