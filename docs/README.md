@@ -15,6 +15,7 @@ bypass on Android or iOS.
 - **Mobile framework:** **Flutter** (native enforcement modules in Kotlin/Swift behind a Dart facade).
 - **Backend:** **NestJS (TypeScript)** + BullMQ workers.
 - **Database:** **PostgreSQL 15+** (+ Redis for cache/locks/queues; TimescaleDB/ClickHouse for analytics later).
+- **Data access:** **hybrid, no full ORM** — raw `pg` for the ledger/money paths; **Kysely** (type-safe query builder) for feature CRUD; hand-written SQL migrations via `node-pg-migrate`. Prisma/TypeORM rejected (they'd fight the isolated ledger schema, append-only triggers, partitioning, role split). See [architecture/system_design.md](architecture/system_design.md).
 - **Ledger:** Isolated `ledger` schema, append-only double-entry, journal-atomic, role-restricted.
 - **Forfeit destination:** forfeits/penalties → **company revenue** (`system_forfeit_revenue`), not charity — conditional on legal sign-off that revenue-forfeit is permissible (not gambling) in Nepal; charity is the fallback. See [payments/payment-architecture.md](payments/payment-architecture.md).
 - **Asymmetric rule edits:** reduce limit free/immediate; **increase/disable costs a commitment-break fee and takes effect *next logical day*** (anti-binge); immediate need uses paid unlocks (FR-2). See [product/prd.md](product/prd.md).

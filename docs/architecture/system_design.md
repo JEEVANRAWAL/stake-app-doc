@@ -47,6 +47,19 @@ usage logs; JSONB for flexible payloads; rich constraints.
 **Supporting stores:** **Redis** (cache, rate limits, idempotency keys, distributed locks, BullMQ queues)
 and an optional **time-series/analytics** path (TimescaleDB on the same Postgres, or ClickHouse later).
 
+**Data-access layer (hybrid, no full ORM) — locked.** Two tiers over one shared `pg` connection pool:
+
+| Tier | Tool | Why |
+|---|---|---|
+| **Ledger / money paths** | **raw `pg` (node-postgres)** | The posting primitive needs exact SQL: `SELECT … FOR UPDATE`, `pg_advisory_xact_lock`, append-only writes, `NUMERIC(14,4)` handled as scaled BigInt, hand-tuned reconciliation queries. No abstraction in the money path. |
+| **Feature CRUD** | **Kysely** (type-safe query builder, *not* an ORM) | Ergonomic, fully typed SQL for users/devices/rules/schedules/wallets/snapshots — without ceding schema ownership. Introduced incrementally on the same pool; raw `pg` remains available anywhere. |
+
+**Migrations:** hand-written SQL via **`node-pg-migrate`** (DDL mirrors `database/schema.md`). **Prisma and
+TypeORM are rejected:** both want to own the schema + migrations and don't cleanly support the isolated
+`ledger` schema with role separation, append-only triggers, range-partitioned tables (`usage_events`,
+`notifications`), or `btree_gist` exclusion constraints. Drizzle was the runner-up; Kysely chosen for being
+a pure query builder that never owns the schema. The ledger stays on raw `pg` permanently regardless.
+
 ## 3. System Architecture Diagram
 
 ```mermaid
