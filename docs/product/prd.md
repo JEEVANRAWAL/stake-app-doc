@@ -1,5 +1,5 @@
 # Phase 1 — Product Requirements Document (PRD)
-### Commitment-Based Digital Discipline App ("Stake")
+### Commitment-Based Digital Discipline App ("Bhaakal")
 
 > The single most important framing: **on consumer mobile devices you cannot technically
 > *force* a determined user to stay blocked.** Both Apple and Google deliberately make that
@@ -9,7 +9,7 @@
 ## 1. Vision & Positioning
 A behavior-change app that converts a user's *stated intention* to use distracting apps less
 into a **financial commitment with teeth**. Screen-time apps fail because their barriers are
-free to bypass (one tap to dismiss/extend). Stake makes bypassing **cost real money**, turning
+free to bypass (one tap to dismiss/extend). Bhaakal makes bypassing **cost real money**, turning
 loss-aversion into the enforcement mechanism.
 
 **Positioning:** *"Not a screen-time tracker. A commitment device. You set the rules; breaking them costs you."*
@@ -117,7 +117,7 @@ D7/D30 retention; **avg. days a commitment survives**; bypass-attempt rate; paid
 
 ## 10. Critical Decisions — Status
 1. ~~**Penalty money flow**~~ **Resolved:** → **company revenue** (`system_forfeit_revenue`), legal-gated (not gambling); charity is the fallback.
-2. ~~**Stake vs. charge-on-event**~~ **Resolved:** pre-funded **wallet/stake (Model A)**.
+2. ~~**Bhaakal vs. charge-on-event**~~ **Resolved:** pre-funded **wallet/stake (Model A)**.
 3. **iOS entitlement go/no-go** — *deferred with iOS:* Apple's Family Controls entitlement (gated, can be denied) is only relevant once iOS resumes; not in the active Android-only scope.
 4. ~~**Launch platform**~~ **Resolved:** **Android-only** for now (richer enforcement + custom pay screen); iOS deferred (fast-follow).
 5. ~~"Increase limit takes effect when?"~~ **Resolved:** next logical day (anti-binge); same-day need is served by paid unlocks (FR-2). See FR-4.

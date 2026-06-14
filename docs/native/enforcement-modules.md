@@ -1,5 +1,5 @@
 # Phase 4b — Native Enforcement Module Design
-### Commitment-Based Digital Discipline App ("Stake")
+### Commitment-Based Digital Discipline App ("Bhaakal")
 
 > 🎯 **Scope: Android-only.** Only the **Android (Kotlin)** module is in active scope. All **iOS** content
 > here (DeviceActivity / ManagedSettings / ShieldAction extensions, App Group, App Attest, pre-auth
@@ -18,7 +18,7 @@ flowchart TB
         DartFacade["EnforcementFacade (Dart)<br/>MethodChannel + EventChannel"]
     end
     subgraph AndroidNative["Android native (Kotlin)"]
-        ASvc["StakeAccessibilityService"]
+        ASvc["BhaakalAccessibilityService"]
         FSvc["EnforcementForegroundService"]
         USPoll["UsageStatsPoller"]
         Overlay["BlockOverlayController (WindowManager)"]
@@ -53,7 +53,7 @@ talk to the app only via the App Group container.
 | Component | Role |
 |---|---|
 | `EnforcementForegroundService` | Owner process; persistent notification; rule cache; coordinates poller+overlay; emits heartbeats. `START_STICKY`. |
-| `StakeAccessibilityService` | Primary foreground-app detector via `TYPE_WINDOW_STATE_CHANGED`; fastest path to the block screen. |
+| `BhaakalAccessibilityService` | Primary foreground-app detector via `TYPE_WINDOW_STATE_CHANGED`; fastest path to the block screen. |
 | `UsageStatsPoller` | Secondary detector + authoritative usage time via `UsageStatsManager.queryEvents`; fallback if Accessibility denied. |
 | `BlockOverlayController` | Block screen via `WindowManager` `TYPE_APPLICATION_OVERLAY`; Cancel / Pay tiers. |
 | `TokenVerifier` | Verifies server Ed25519 token locally before lifting a block. |
@@ -62,7 +62,7 @@ talk to the app only via the App Group container.
 
 **Foreground detection → block decision:**
 ```kotlin
-class StakeAccessibilityService : AccessibilityService() {
+class BhaakalAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val pkg = event.packageName?.toString() ?: return
@@ -121,7 +121,7 @@ try DeviceActivityCenter().startMonitoring(.init("restriction.window.1"),
 
 **Applying the shield (monitor extension):**
 ```swift
-final class StakeMonitor: DeviceActivityMonitor {
+final class BhaakalMonitor: DeviceActivityMonitor {
     private let store = ManagedSettingsStore(named: .init("stake.main"))
     override func intervalDidStart(for a: DeviceActivityName) {
         let sel = SharedStore.readSelection()
@@ -140,9 +140,9 @@ final class StakeMonitor: DeviceActivityMonitor {
 **Pay button (ShieldAction):** extensions **cannot present a payment sheet**. The "pay to unlock" flow on
 iOS is best done as **pre-authorized unlocks**: the user buys unlock credit/time *in the app* (cooperative,
 gateway-friendly — fits the wallet model), and the `ShieldAction` extension *verifies and consumes* a token
-already in the App Group. Fallback: `.defer` + a push notification "open Stake to unlock."
+already in the App Group. Fallback: `.defer` + a push notification "open Bhaakal to unlock."
 ```swift
-final class StakeShieldAction: ShieldActionDelegate {
+final class BhaakalShieldAction: ShieldActionDelegate {
     override func handle(action: ShieldAction, for app: ApplicationToken,
                          completionHandler: @escaping (ShieldActionResponse) -> Void) {
         switch action {

@@ -1,13 +1,13 @@
 openapi: 3.1.0
 info:
-  title: Stake API
+  title: Bhaakal API
   version: 1.0.0
   description: >
     Commitment-based digital discipline platform. The device is treated as
     untrusted; the server is the sole authority for time, balances, rule state,
     and unlock grants. All money-moving endpoints are idempotent and require
     request signing.
-  contact: { name: Stake Platform, email: api@stakeapp.io }
+  contact: { name: Bhaakal Platform, email: api@stakeapp.io }
 servers:
   - url: https://api.stakeapp.io/v1
     description: Production

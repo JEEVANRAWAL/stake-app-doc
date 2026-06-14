@@ -1,5 +1,5 @@
 # Phase 2 — Payment System & Architecture Analysis
-### Commitment-Based Digital Discipline App ("Stake")
+### Commitment-Based Digital Discipline App ("Bhaakal")
 
 ## Provider landscape & what it forces on the design
 
@@ -78,7 +78,7 @@ Worked example — Rs. 1000 top-up, stake Rs. 600, one Rs. 50 penalty:
 | Step | Available | Locked | Forfeited |
 |---|---|---|---|
 | Top up 1000 | 1000 | 0 | 0 |
-| Stake 600 | 400 | 600 | 0 |
+| Bhaakal 600 | 400 | 600 | 0 |
 | Rs. 50 penalty (locked first) | 400 | 550 | 50 |
 | Commitment kept | 950 | 0 | 50 |
 
@@ -93,7 +93,7 @@ and max penalty exposure is capped to the staked/pre-funded balance at creation.
 
 **Why stake more than a single penalty** (the common confusion — "if a slip is only Rs. 50, why lock Rs. 600?"):
 1. **A commitment spans many possible violations, not one.** Rs. 50 is one slip; a 30-day commitment can be
-   tempted dozens of times. Stake only Rs. 50 and the teeth vanish after the first slip — the stake must
+   tempted dozens of times. Bhaakal only Rs. 50 and the teeth vanish after the first slip — the stake must
    cover *cumulative* exposure over the whole period.
 2. **Loss aversion scales with what's at risk.** Rs. 50 is shruggable; Rs. 600 locked up and eroding with
    every slip is a far stronger deterrent. This is the product's behavioral engine.
@@ -104,14 +104,14 @@ and max penalty exposure is capped to the staked/pre-funded balance at creation.
 
 **The reframe:** a stake that only matches one penalty looks pointless *in hindsight* (you slip once, lose
 Rs. 50, get the rest back) — but the amount *at risk* is what deterred the *other* slips you never made. The
-stake's job is deterrence across the whole period, not to price a single violation. **Stake small = "cover
+stake's job is deterrence across the whole period, not to price a single violation. **Bhaakal small = "cover
 my penalties"; stake big = "make failure genuinely painful so I follow through."**
 
 ## Funds exhausted during a commitment (stake fully forfeited)
 
 When a commitment's stake is fully consumed by penalties — `available` **and** `locked` both reach 0 — the
 deposit closes as **`forfeited`**, a **`negative_commitment_balance`** flag is set, and the **wallet never
-goes negative** (a user can never *owe* Stake money; max loss is capped at what was staked).
+goes negative** (a user can never *owe* Bhaakal money; max loss is capped at what was staked).
 
 **🔒 Locked — enforcement continues for free.** Blocking and limits **keep enforcing until the commitment
 period ends**; enforcement is *not* gated on a balance (blocking costs nothing). Only the **money layer goes
@@ -302,7 +302,7 @@ scheme and hijack the callback. Defense-in-depth: the app treats link params as 
 | User closes the tab (no redirect) | App **must not assume cancelled** → `GET /payments/{pid}`; may be the "paid-but-didn't-return" case → §6b poller settles |
 | App killed during payment | Deep link **cold-starts** app; `app_links` initial-link handler routes to the confirm screen by `pid` |
 | Deep link fails entirely | Backend already has the callback; poller/R4 settle; user sees balance + push next open |
-| Lands in browser, not app | Backend return page renders an HTML "Open the Stake app" fallback, not a dead link |
+| Lands in browser, not app | Backend return page renders an HTML "Open the Bhaakal app" fallback, not a dead link |
 | Duplicate / replayed return URL | Callback inbox is idempotent; settlement no-ops if already terminal |
 | Concurrent top-ups | `pid` disambiguates; each tab session is bound to one `pid` |
 

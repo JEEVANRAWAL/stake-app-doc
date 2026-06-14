@@ -1,5 +1,5 @@
 # Anti-Cheating Strategy & Threat Model
-### Commitment-Based Digital Discipline App ("Stake")
+### Commitment-Based Digital Discipline App ("Bhaakal")
 
 Combines Phase 1 §6 (Commitment Integrity) with the Phase 4b native-layer threat handling.
 
@@ -52,6 +52,6 @@ Neither OS lets a consumer app *prevent* a determined bypass. Integrity comes fr
 
 ## Honest Limitation Statement (put in app + docs)
 > No consumer app — Android or iOS — can *guarantee* a user cannot bypass app blocking. A
-> sufficiently determined user can always uninstall or factory-reset. Stake's value is making
+> sufficiently determined user can always uninstall or factory-reset. Bhaakal's value is making
 > bypass **deliberate, visible, and financially costly**, not impossible. Marketing and
 > onboarding must set this expectation honestly.

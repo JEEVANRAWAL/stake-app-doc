@@ -1,5 +1,5 @@
 # Phase 5 — Project Plan & Delivery Cutline
-### Commitment-Based Digital Discipline App ("Stake")
+### Commitment-Based Digital Discipline App ("Bhaakal")
 
 > 🎯 **Scope: Android-only.** iOS is **deferred** (fast-follow after the Android launch). iOS rows below are
 > retained as deferred reference and struck from the active plan, team, and timeline.
@@ -40,7 +40,7 @@ If the blocker slips, narrow further (defer the staked-deposit lock, ship the si
 ## 3. Roadmap
 ```mermaid
 gantt
-    title Stake — Delivery Roadmap (illustrative)
+    title Bhaakal — Delivery Roadmap (illustrative)
     dateFormat  YYYY-MM-DD
     axisFormat  %b
     section Blockers (parallel, day 1)

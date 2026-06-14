@@ -1,5 +1,5 @@
 # Phase 4c — Ledger & State-Machine Worker Specifications
-### Commitment-Based Digital Discipline App ("Stake")
+### Commitment-Based Digital Discipline App ("Bhaakal")
 
 Server-side engine converting violations, silence, clock tamper, paid unlocks, and top-ups into
 **correct, idempotent, auditable money movements**. NestJS + BullMQ + PostgreSQL against the Phase 2 schema.
@@ -55,7 +55,7 @@ Journal templates (all net to zero):
 |---|---|---|
 | Top-up (net) | `system_gateway_clearing` | `user_available` |
 | Gateway fee | `system_fees` | `system_gateway_clearing` |
-| Stake a deposit | `user_available` | `user_locked` |
+| Bhaakal a deposit | `user_available` | `user_locked` |
 | Paid unlock (from available) | `user_available` | `system_forfeit_revenue` |
 | Penalty (locked first, then available) | `user_locked` / `user_available` | `system_forfeit_revenue` *(or `system_charity`)* |
 | Deposit forfeiture | `user_locked` | `system_forfeit_revenue` *(or `system_charity`)* |

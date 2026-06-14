@@ -1,5 +1,5 @@
 # Phase 3 — REST API Specification
-### Commitment-Based Digital Discipline App ("Stake")
+### Commitment-Based Digital Discipline App ("Bhaakal")
 
 Consistent with the Phase 2 schema (NestJS + PostgreSQL, wallet-substrate-with-deposit-lock, isolated
 double-entry ledger). See [openapi.yaml](openapi.yaml) for the machine-readable contract and

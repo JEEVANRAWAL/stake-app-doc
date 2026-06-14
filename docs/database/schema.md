@@ -1,5 +1,5 @@
 # Phase 2 — Comprehensive Database Design (PostgreSQL 15+)
-### Commitment-Based Digital Discipline App ("Stake")
+### Commitment-Based Digital Discipline App ("Bhaakal")
 
 Design principles:
 - **Money:** `NUMERIC(14,4)` everywhere; explicit `currency` (ISO-4217); no floats.

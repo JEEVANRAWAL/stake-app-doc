@@ -1,5 +1,5 @@
 # Phase 2 — Technology Stack & System Design
-### Commitment-Based Digital Discipline App ("Stake")
+### Commitment-Based Digital Discipline App ("Bhaakal")
 
 ## 1. Mobile Framework — Flutter vs. React Native
 

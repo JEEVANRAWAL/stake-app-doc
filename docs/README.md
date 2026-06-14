@@ -1,6 +1,6 @@
-# Stake — Documentation Index
+# Bhaakal — Documentation Index
 
-**Stake** is a commitment-based digital discipline app. Users voluntarily restrict
+**Bhaakal** is a commitment-based digital discipline app. Users voluntarily restrict
 distracting apps and pay a monetary penalty (from pre-funded/staked balance) if they
 break their commitment. The product makes bypassing restrictions *deliberate, visible,
 and financially costly* — because no consumer app can technically *prevent* a determined

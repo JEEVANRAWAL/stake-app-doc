@@ -1,5 +1,5 @@
 # Operations & SRE Plan
-### Commitment-Based Digital Discipline App ("Stake")
+### Commitment-Based Digital Discipline App ("Bhaakal")
 
 Theme: **the ledger is sacred** (any imbalance freezes writes and pages a human) and **the device is
 untrusted** (server-held funds are the backstop).

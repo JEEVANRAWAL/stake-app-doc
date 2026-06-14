@@ -1,5 +1,5 @@
 # Phase 1 — Mobile Platform Feasibility Matrix
-### Commitment-Based Digital Discipline App ("Stake")
+### Commitment-Based Digital Discipline App ("Bhaakal")
 
 ## Android
 

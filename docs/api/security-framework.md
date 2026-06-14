@@ -1,5 +1,5 @@
 # Phase 3 — Security Framework
-### Commitment-Based Digital Discipline App ("Stake")
+### Commitment-Based Digital Discipline App ("Bhaakal")
 
 Covers device clock manipulation, rooted/jailbroken devices, payment webhook verification, and the
 unlock-token verification spec. Companion to [rest-api-spec.md](rest-api-spec.md).

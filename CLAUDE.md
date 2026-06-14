@@ -1,6 +1,6 @@
-# Stake — Project Context
+# Bhaakal — Project Context
 
-**Stake** is a commitment-based digital discipline app (planning stage). Users restrict distracting
+**Bhaakal** is a commitment-based digital discipline app (planning stage). Users restrict distracting
 apps and pay a monetary penalty (from a pre-funded/staked balance) if they break the commitment.
 
 **Core thesis:** no consumer app can technically *prevent* a determined bypass on Android/iOS, so the
