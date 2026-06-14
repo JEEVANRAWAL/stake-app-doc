@@ -59,5 +59,19 @@ Read **`docs/README.md`** first — it's the index, the locked decisions, and th
 | Delivery plan & cutline | `docs/project/delivery-plan.md` |
 
 ## Status
-Planning complete (Phases 1–5). No code yet. Not yet a git repo. Next likely steps: `git init`,
-resolve the two launch blockers, then begin the Android enforcement spike + foundation (per `docs/project/delivery-plan.md`).
+Planning complete (Phases 1–5; `docs/` is the source of truth). Implementation underway across two
+sibling git repos — both still codenamed **`stake`** on disk (`stake-backend`, `stake-mobile`); the
+product/brand is **Bhaakal**.
+- **Backend** (`stake-backend`, NestJS + BullMQ): auth/devices, double-entry ledger + reconciliation
+  (R1/R2/R3/R5), wallet/settlement, commitment deposits (FR-6), penalty/forfeit engine, paid unlocks
+  (Ed25519), commitment-break fees + asymmetric rule edits (FR-4), restriction schedules (FR-1), usage
+  sync (FR-3), heartbeat + silence sweeper (M4), withdrawals (two-phase, KYC-gated), per-device HMAC
+  request signing, Play Integrity verdict, tiered KYC, usage partitioning.
+- **Mobile** (`stake-mobile`, Flutter shell + Android Kotlin): native enforcement spike **proven on the
+  emulator** — block <300 ms, reboot/kill survival, offline Ed25519 unlock verify, signed heartbeat,
+  device registration. Product UI: dark design system + full commitment-setup flow (apps → schedule/limits
+  → stake → review/arm → armed).
+
+**Still open:** day-1 legal launch blocker (e-money / revenue-forfeit-is-not-gambling, Nepal); Google
+Play Integrity decoder + real KYC vendor (externally gated, near launch); OEM-hardware enforcement testing;
+wiring the mobile UI to the backend. iOS deferred.
