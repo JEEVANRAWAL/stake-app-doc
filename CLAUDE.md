@@ -80,6 +80,6 @@ wiring the mobile UI to the backend. iOS deferred.
 with no refresh, so it 401'd ~10 min after the app was last opened → device looked *silent* → false
 forfeit risk. **Resolved** via device-signature auth: `DeviceAuthGuard` authenticates `/heartbeat` +
 `/usage/sync` by the per-device HMAC signature alone (no user JWT), so the FGS stays authenticated
-indefinitely and background usage-sync (FR-3) works while the app is killed. **Fast-follow:** move the
-device signing key from plaintext prefs → Android Keystore (now the sole background credential). Detail:
-`stake-mobile/docs/usage-progress-plan.md` §9.
+indefinitely and background usage-sync (FR-3) works while the app is killed. The device signing key now
+lives in the **Android Keystore** (non-exportable), and the FGS config no longer stores the key or a JWT —
+both plaintext secrets removed. Detail: `stake-mobile/docs/usage-progress-plan.md` §9.
