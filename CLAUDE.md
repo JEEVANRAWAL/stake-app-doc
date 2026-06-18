@@ -75,3 +75,10 @@ product/brand is **Bhaakal**.
 **Still open:** day-1 legal launch blocker (e-money / revenue-forfeit-is-not-gambling, Nepal); Google
 Play Integrity decoder + real KYC vendor (externally gated, near launch); OEM-hardware enforcement testing;
 wiring the mobile UI to the backend. iOS deferred.
+
+**Known bug (high — false-penalty risk):** the mobile foreground service authenticates background
+heartbeats with a stored **access token (10-min TTL)** and has **no refresh-token / refresh logic**, so
+~10 min after the app is last opened the heartbeat 401s → the device looks *silent* → the M4 silence
+sweeper can forfeit a user who did nothing wrong. Also blocks durable background usage-sync (FR-3). Fix =
+persist the refresh token to the FGS + refresh `/auth/refresh` in the loop. Detail: `stake-mobile/docs/
+usage-progress-plan.md` §9.
