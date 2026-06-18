@@ -76,9 +76,10 @@ product/brand is **Bhaakal**.
 Play Integrity decoder + real KYC vendor (externally gated, near launch); OEM-hardware enforcement testing;
 wiring the mobile UI to the backend. iOS deferred.
 
-**Known bug (high — false-penalty risk):** the mobile foreground service authenticates background
-heartbeats with a stored **access token (10-min TTL)** and has **no refresh-token / refresh logic**, so
-~10 min after the app is last opened the heartbeat 401s → the device looks *silent* → the M4 silence
-sweeper can forfeit a user who did nothing wrong. Also blocks durable background usage-sync (FR-3). Fix =
-persist the refresh token to the FGS + refresh `/auth/refresh` in the loop. Detail: `stake-mobile/docs/
-usage-progress-plan.md` §9.
+**Fixed (was high — false-penalty risk):** the FGS heartbeat used to depend on a 10-min access token
+with no refresh, so it 401'd ~10 min after the app was last opened → device looked *silent* → false
+forfeit risk. **Resolved** via device-signature auth: `DeviceAuthGuard` authenticates `/heartbeat` +
+`/usage/sync` by the per-device HMAC signature alone (no user JWT), so the FGS stays authenticated
+indefinitely and background usage-sync (FR-3) works while the app is killed. **Fast-follow:** move the
+device signing key from plaintext prefs → Android Keystore (now the sole background credential). Detail:
+`stake-mobile/docs/usage-progress-plan.md` §9.
