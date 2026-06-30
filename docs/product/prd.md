@@ -65,23 +65,24 @@ loss-aversion into the enforcement mechanism.
 
 ### FR-4 — Anti-Cheating Edit Rules (asymmetric editing)
 - **Reduce limit:** allowed, free, immediate.
-- **Increase / disable limit:** blocked unless **commitment-break fee** paid.
+- **Increase / disable limit:** blocked unless **commitment-break fee** paid. **🔒 Locked — the fee is drawn from that commitment's stake** (capped; if the remaining stake can't cover it, the commitment can't be loosened — the money layer is dormant, `422 COMMITMENT_STAKE_EXHAUSTED`). A legacy *un-staked* rule pays the fee from `user_available` instead. Same lever as penalties: deliberately weakening your own commitment eats the stake you put up.
 - **🔒 Locked — an increase takes effect at the *next logical day* (the rule's day-boundary reset), never same-day.** Paying the break fee *stages* the higher limit for the next period; it grants no extra time today. This is the anti-binge guarantee.
 - **Need-it-now is served by a paid unlock (FR-2)** — immediate, temporary, priced per use — so a next-day increase never feels like "paid for nothing." The two levers are deliberately distinct: *paid unlock = time now*; *limit increase = a higher cap from tomorrow*.
 - **UX:** the break-fee confirmation must state plainly "takes effect tomorrow" and offer the paid-unlock path for immediate access.
 - **Disable/remove** follows the same principle (FR-5): effective after the current active window, not mid-restriction.
 
 ### FR-5 — Remove App from Restriction List
-- Requires commitment-break fee (Rs. 50). After payment → removed.
+- Requires commitment-break fee (Rs. 50), **drawn from the commitment's stake** (see FR-4). On removing the last app the group retires and its remaining stake is released to `user_available`.
 - **Cooling-off:** removal takes effect after the current active window, not mid-restriction.
 
 ### FR-6 — Commitment Integrity
 - **🔒 Locked — minimum funding to create a commitment.** Arming a commitment (a staked deposit, **or**
   activating penalty-bearing restrictions) **requires available wallet balance ≥ a minimum backing
-  (default Rs. 100, configurable).** Max penalty/forfeit exposure is **capped to the pre-funded (or
-  staked) balance at creation time** — a commitment is only as strong as the money behind it; an
-  **unfunded commitment has no teeth and is not allowed.** Underfunded → creation blocked with a top-up
-  prompt (`402 COMMITMENT_FUNDING_REQUIRED`).
+  (default Rs. 100, configurable).** Max penalty/forfeit exposure is **capped to that commitment's own
+  staked balance at creation time** — each commitment (restriction group) is backed by its own deposit,
+  and penalties for it draw **only** from that stake, never from `user_available` or another commitment's
+  stake. A commitment is only as strong as the money behind it; an **unfunded commitment has no teeth and
+  is not allowed.** Underfunded → creation blocked with a top-up prompt (`402 COMMITMENT_FUNDING_REQUIRED`).
 - **🔒 Locked — enforcement continues for free if the stake is exhausted.** If a commitment's stake is
   fully forfeited mid-period, **blocking/limits keep enforcing until the period ends** (enforcement isn't
   gated on balance); the money layer goes dormant — no further penalties, paid unlocks/break-fees

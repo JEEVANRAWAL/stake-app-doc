@@ -40,8 +40,9 @@ Build **one ledger (Option B)** and implement **Option C as a *hold/lock* on wal
 ```mermaid
 flowchart TD
     TopUp["Top-up<br/>(Stripe / eSewa / Khalti)<br/><i>cooperative</i>"] --> Avail["Wallet:<br/>available balance"]
-    Avail -- "Create commitment:<br/>move N available → locked" --> Locked["Wallet:<br/>locked (hold entry)"]
-    Locked -- "Unlock / penalty:<br/>debit locked first, then available" --> Debit(["Debit applied"])
+    Avail -- "Create commitment:<br/>move N available → locked (per-commitment deposit)" --> Locked["Wallet:<br/>locked (hold entry)"]
+    Avail -- "Paid unlock:<br/>debit available" --> Debit(["Debit applied"])
+    Locked -- "Penalty:<br/>debit this commitment's stake (capped, no spill to available)" --> Debit
     Locked -- "Commitment success:<br/>release lock" --> Avail
 ```
 
@@ -66,12 +67,19 @@ Money lives in **two buckets** in the ledger: **`user_available`** (spendable �
 withdrawable) and **`user_locked`** (staked behind a commitment — frozen until it resolves). The **stake
 amount** is simply how much moves `available → locked` when a commitment is armed.
 
+**Per-commitment scoping** *(🔒 locked):* each commitment (restriction group) is backed by its **own**
+deposit (`commitment_deposits.group_id`). A penalty for an app in group G draws **only** from G's deposit,
+**capped at that stake** — it never spills into `user_available` or another commitment's stake. When G's
+stake is exhausted, no further penalty is charged (the money layer goes dormant for G); enforcement still
+runs for free until the period ends. This is FR-6's "exposure capped to the staked balance" made literal,
+per commitment rather than across the wallet.
+
 **Lifecycle of a stake:**
 - Top-up → `available`
-- Arm commitment → move the stake `available → locked`
+- Arm commitment → move the stake `available → locked` (one deposit per group)
 - **Keep it** → `locked → available` (stake returned in full)
-- **Break it** → penalty debits `locked` first (then `available`) → forfeited to `system_forfeit_revenue`;
-  any remainder released back to `available`
+- **Break it** → penalty debits **this commitment's** `locked` stake, capped at the stake (never spills to
+  `available`) → forfeited to `system_forfeit_revenue`; any remainder released back to `available` at the end
 
 Worked example — Rs. 1000 top-up, stake Rs. 600, one Rs. 50 penalty:
 
@@ -79,7 +87,7 @@ Worked example — Rs. 1000 top-up, stake Rs. 600, one Rs. 50 penalty:
 |---|---|---|---|
 | Top up 1000 | 1000 | 0 | 0 |
 | Bhaakal 600 | 400 | 600 | 0 |
-| Rs. 50 penalty (locked first) | 400 | 550 | 50 |
+| Rs. 50 penalty (from this commitment's stake) | 400 | 550 | 50 |
 | Commitment kept | 950 | 0 | 50 |
 
 `available + locked + forfeited` is conserved at every step (double-entry); the wallet never goes negative,

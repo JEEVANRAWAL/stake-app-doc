@@ -57,7 +57,9 @@ Journal templates (all net to zero):
 | Gateway fee | `system_fees` | `system_gateway_clearing` |
 | Bhaakal a deposit | `user_available` | `user_locked` |
 | Paid unlock (from available) | `user_available` | `system_forfeit_revenue` |
-| Penalty (locked first, then available) | `user_locked` / `user_available` | `system_forfeit_revenue` *(or `system_charity`)* |
+| Commitment-break fee — staked group (loosen/disable/remove) | `user_locked` | `system_forfeit_revenue` |
+| Commitment-break fee — un-staked/legacy rule | `user_available` | `system_forfeit_revenue` |
+| Penalty (this commitment's stake, capped — no available spill) | `user_locked` | `system_forfeit_revenue` *(or `system_charity`)* |
 | Deposit forfeiture | `user_locked` | `system_forfeit_revenue` *(or `system_charity`)* |
 | Deposit return | `user_locked` | `user_available` |
 | Withdrawal — request hold | `user_available` | `user_payout_pending` |
