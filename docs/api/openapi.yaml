@@ -372,12 +372,12 @@ paths:
                 code: COMMITMENT_FUNDING_REQUIRED
                 title: Minimum funding required to create a commitment
                 status: 402
-                detail: A commitment must be backed by at least NPR 100.00 of available balance.
+                detail: A commitment must be backed by at least NPR 10.00 of available balance.
                 instance: /v1/commitment-deposits
                 meta:
-                  minimum: "100.0000"
+                  minimum: "10.0000"
                   available_balance: "0.0000"
-                  shortfall: "100.0000"
+                  shortfall: "10.0000"
                   topup_endpoint: /v1/wallet/topup
     get:
       tags: [Deposits]
@@ -482,9 +482,9 @@ paths:
                 code: COMMITMENT_FUNDING_REQUIRED
                 title: Minimum funding required to create a commitment
                 status: 402
-                detail: Fund at least NPR 100.00 of available balance before arming a commitment.
+                detail: Fund at least NPR 10.00 of available balance before arming a commitment.
                 instance: /v1/user-restricted-apps
-                meta: { minimum: "100.0000", available_balance: "0.0000", topup_endpoint: /v1/wallet/topup }
+                meta: { minimum: "10.0000", available_balance: "0.0000", topup_endpoint: /v1/wallet/topup }
 
   /user-restricted-apps/{id}:
     delete:

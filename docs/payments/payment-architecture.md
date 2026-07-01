@@ -55,7 +55,7 @@ flowchart TD
 - **Provider routing:** Nepal → eSewa/Khalti/Fonepay; international cards/Apple/Google Pay → Stripe. One internal `payment_provider` abstraction; providers interchangeable.
 - **Forfeited money** routes to **`system_forfeit_revenue` (company revenue)** — *🔒 locked: revenue, not charity.* Conditional on legal sign-off that revenue-forfeit is permissible (commitment-contract, not gambling) in Nepal; **`system_charity` is the fallback** if counsel objects (the ledger already supports both, so the switch is a config change). The penalty-vs-subscription revenue mix is a tracked ethical guardrail (delivery-plan §8).
 - **Minimum funding to create a commitment** *(🔒 locked):* arming a commitment requires available
-  balance ≥ a minimum backing (default **Rs. 100**, configurable), and **max penalty/forfeit exposure is
+  balance ≥ a minimum backing (default **Rs. 10**, configurable), and **max penalty/forfeit exposure is
   capped to the pre-funded/staked balance at creation** — no money, no commitment. Underfunded →
   `402 COMMITMENT_FUNDING_REQUIRED` with a top-up prompt. This is what gives "capture money up front" teeth.
 - **Returned (un-forfeited) deposit** goes back to *available balance*, **not** auto-refunded to card (local-rail refunds are painful/lossy) — offer explicit withdrawal instead.
@@ -94,7 +94,7 @@ Worked example — Rs. 1000 top-up, stake Rs. 600, one Rs. 50 penalty:
 and max penalty exposure is capped to the staked/pre-funded balance at creation.
 
 **How much to stake — two intensities of the same plumbing:**
-- **Wallet-only (small balance):** keep just enough to *cover* penalties (≥ the Rs. 100 minimum). One
+- **Wallet-only (small balance):** keep just enough to *cover* penalties (≥ the Rs. 10 minimum). One
   violation debits Rs. 50; no large lock needed. **This is the MVP default.**
 - **Commitment deposit (large stake):** lock a deliberately large amount as a **behavioral device** — its
   value is psychological, not arithmetic. (Option C above; a fast-follow.)
