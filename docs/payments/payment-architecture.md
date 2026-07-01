@@ -20,7 +20,7 @@ in the local market — at that moment the user is hostile and won't complete a 
 
 ### Option A — Immediate payment per violation/unlock
 - **Pros:** no stored value; no pre-commitment friction; 1:1 event mapping.
-- **Cons (severe):** every enforcement moment = full redirect/3DS round-trip → **abysmal success rate**; **impossible for penalties** (can't charge after revoke/uninstall); broken-feeling latency; tiny Rs.50 charges are margin-negative.
+- **Cons (severe):** every enforcement moment = full redirect/3DS round-trip → **abysmal success rate**; **impossible for penalties** (can't charge after revoke/uninstall); broken-feeling latency; tiny Rs.10 charges are margin-negative.
 - **Verdict:** ❌ Disqualified as primary.
 
 ### Option B — Wallet (preload, auto-deduct)
@@ -81,29 +81,29 @@ per commitment rather than across the wallet.
 - **Break it** → penalty debits **this commitment's** `locked` stake, capped at the stake (never spills to
   `available`) → forfeited to `system_forfeit_revenue`; any remainder released back to `available` at the end
 
-Worked example — Rs. 1000 top-up, stake Rs. 600, one Rs. 50 penalty:
+Worked example — Rs. 1000 top-up, stake Rs. 600, one Rs. 10 penalty:
 
 | Step | Available | Locked | Forfeited |
 |---|---|---|---|
 | Top up 1000 | 1000 | 0 | 0 |
 | Bhaakal 600 | 400 | 600 | 0 |
-| Rs. 50 penalty (from this commitment's stake) | 400 | 550 | 50 |
-| Commitment kept | 950 | 0 | 50 |
+| Rs. 10 penalty (from this commitment's stake) | 400 | 590 | 10 |
+| Commitment kept | 990 | 0 | 10 |
 
 `available + locked + forfeited` is conserved at every step (double-entry); the wallet never goes negative,
 and max penalty exposure is capped to the staked/pre-funded balance at creation.
 
 **How much to stake — two intensities of the same plumbing:**
 - **Wallet-only (small balance):** keep just enough to *cover* penalties (≥ the Rs. 10 minimum). One
-  violation debits Rs. 50; no large lock needed. **This is the MVP default.**
+  violation debits Rs. 10; no large lock needed. **This is the MVP default.**
 - **Commitment deposit (large stake):** lock a deliberately large amount as a **behavioral device** — its
   value is psychological, not arithmetic. (Option C above; a fast-follow.)
 
-**Why stake more than a single penalty** (the common confusion — "if a slip is only Rs. 50, why lock Rs. 600?"):
-1. **A commitment spans many possible violations, not one.** Rs. 50 is one slip; a 30-day commitment can be
-   tempted dozens of times. Bhaakal only Rs. 50 and the teeth vanish after the first slip — the stake must
+**Why stake more than a single penalty** (the common confusion — "if a slip is only Rs. 10, why lock Rs. 600?"):
+1. **A commitment spans many possible violations, not one.** Rs. 10 is one slip; a 30-day commitment can be
+   tempted dozens of times. Bhaakal only Rs. 10 and the teeth vanish after the first slip — the stake must
    cover *cumulative* exposure over the whole period.
-2. **Loss aversion scales with what's at risk.** Rs. 50 is shruggable; Rs. 600 locked up and eroding with
+2. **Loss aversion scales with what's at risk.** Rs. 10 is shruggable; Rs. 600 locked up and eroding with
    every slip is a far stronger deterrent. This is the product's behavioral engine.
 3. **"Win your money back" is the reward.** A bigger stake returned on success = bigger motivation + a
    retention hook.
@@ -111,7 +111,7 @@ and max penalty exposure is capped to the staked/pre-funded balance at creation.
    attempt → Rs. 5,000.
 
 **The reframe:** a stake that only matches one penalty looks pointless *in hindsight* (you slip once, lose
-Rs. 50, get the rest back) — but the amount *at risk* is what deterred the *other* slips you never made. The
+Rs. 10, get the rest back) — but the amount *at risk* is what deterred the *other* slips you never made. The
 stake's job is deterrence across the whole period, not to price a single violation. **Bhaakal small = "cover
 my penalties"; stake big = "make failure genuinely painful so I follow through."**
 

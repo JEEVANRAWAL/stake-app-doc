@@ -48,12 +48,12 @@ loss-aversion into the enforcement mechanism.
 - Edge cases to specify: overlapping windows, windows crossing midnight, DST, edits scheduled to take effect *after* the active window (allowed) vs. immediate (blocked).
 
 ### FR-2 — Paid Unlock During Restriction
-- Block screen offers: **Cancel** | **Unlock by paying Rs. 50**.
+- Block screen offers: **Cancel** | **Unlock by paying Rs. 10**.
 - **Unlock duration — recommendation:** tiered set, default to shortest, price by friction:
 
   | Tier | Duration | Price | Rationale |
   |------|----------|-------|-----------|
-  | **Quick peek** (default) | 5 min | Rs. 50 | "Check one DM." Auto re-locks. |
+  | **Quick peek** (default) | 5 min | Rs. 10 | "Check one DM." Auto re-locks. |
   | Short | 15 min | Rs. 120 | Still painful. |
   | Session | 60 min | Rs. 400 | Deliberately expensive. |
 
@@ -72,7 +72,7 @@ loss-aversion into the enforcement mechanism.
 - **Disable/remove** follows the same principle (FR-5): effective after the current active window, not mid-restriction.
 
 ### FR-5 — Remove App from Restriction List
-- Requires commitment-break fee (Rs. 50), **drawn from the commitment's stake** (see FR-4). On removing the last app the group retires and its remaining stake is released to `user_available`.
+- Requires commitment-break fee (Rs. 10), **drawn from the commitment's stake** (see FR-4). On removing the last app the group retires and its remaining stake is released to `user_available`.
 - **Cooling-off:** removal takes effect after the current active window, not mid-restriction.
 
 ### FR-6 — Commitment Integrity
@@ -96,7 +96,7 @@ loss-aversion into the enforcement mechanism.
 | Model | How | Pros | Cons |
 |-------|-----|------|------|
 | **A. Pre-funded wallet / stake (recommended)** | Load balance up front; penalties/unlocks debit it. | Money already captured → integrity holds even after uninstall. | Top-up UX; stored-value regulation. |
-| **B. Charge-on-event** | Card on file, charge per event. | No pre-funding friction. | Fails on uninstall/revoke; chargebacks; high fees on Rs.50. |
+| **B. Charge-on-event** | Card on file, charge per event. | No pre-funding friction. | Fails on uninstall/revoke; chargebacks; high fees on Rs.10. |
 | **C. Charity-forfeit / anti-charity** | Penalty → charity, not you. | Strong motivator; cleaner store-policy optics. | Payout complexity. |
 
 **🔒 Locked:** **Model A — pre-funded wallet/stake** is the payment substrate, and **forfeits → company

@@ -109,7 +109,7 @@ conversions** (`PENALTY_CONVERSION_PAUSED`); roll back; resume only after device
 ## 11. Capacity & Cost
 - Dominant write cost: `usage_events` → batch size, partition granularity, archival.
 - Dominant compute: workers under load (KEDA on queue depth, money lanes prioritized).
-- **Fee guardrail:** Nepali per-txn fees on Rs.50 are brutal → wallet batches top-ups; monitor fee-as-%-of-volume; nudge minimum top-up sizes.
+- **Fee guardrail:** Nepali per-txn fees on Rs.10 are brutal → wallet batches top-ups; monitor fee-as-%-of-volume; nudge minimum top-up sizes.
 
 ## 12. DR Summary
 | Scenario | RTO | RPO | Mechanism |

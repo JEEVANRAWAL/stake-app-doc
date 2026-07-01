@@ -26,9 +26,9 @@ double-entry ledger). See [openapi.yaml](openapi.yaml) for the machine-readable 
   "code": "RULE_INCREASE_FORBIDDEN",
   "title": "Screen-time limit cannot be increased without a commitment-break fee",
   "status": 409,
-  "detail": "Increasing Instagram from 1800s to 2700s requires a commitment-break fee of NPR 50.00.",
+  "detail": "Increasing Instagram from 1800s to 2700s requires a commitment-break fee of NPR 10.00.",
   "instance": "/v1/screen-time-rules/0c2b…/limit",
-  "meta": { "required_fee": { "amount": "50.0000", "currency": "NPR" } }
+  "meta": { "required_fee": { "amount": "10.0000", "currency": "NPR" } }
 }
 ```
 
@@ -102,7 +102,7 @@ Response `200` (tamper suspected):
     { "type": "SHOW_WARNING", "message": "Your device clock looks off. Commitments use server time." },
     { "type": "REQUIRE_REATTESTATION" }
   ],
-  "grace": { "expires_at": "2026-06-12T04:38:31Z", "penalty_on_expiry": { "amount": "50.0000", "currency": "NPR" } },
+  "grace": { "expires_at": "2026-06-12T04:38:31Z", "penalty_on_expiry": { "amount": "10.0000", "currency": "NPR" } },
   "next_heartbeat_seconds": 30
 }
 ```
@@ -151,7 +151,7 @@ Response `200` (wallet funded → granted instantly):
 {
   "unlock_request_id": "ulr_7b2a91", "status": "granted",
   "user_restricted_app_id": "ura_3f2c9a", "duration_seconds": 300,
-  "fee": { "amount": "50.0000", "currency": "NPR", "source": "wallet" },
+  "fee": { "amount": "10.0000", "currency": "NPR", "source": "wallet" },
   "granted_at": "2026-06-12T04:10:02Z", "expires_at": "2026-06-12T04:15:02Z",
   "authorization_token": "eyJhbGciOiJFZERTQSIsImtpZCI6ImRrXzIwMjZfMDZfYSJ9…",
   "wallet": { "available_balance": "430.0000", "locked_balance": "200.0000", "currency": "NPR" },
@@ -168,7 +168,7 @@ Response `402` (wallet empty → fund via gateway first):
 ```json
 {
   "unlock_request_id": "ulr_7b2a91", "status": "payment_pending",
-  "fee": { "amount": "50.0000", "currency": "NPR" },
+  "fee": { "amount": "10.0000", "currency": "NPR" },
   "funding_required": {
     "reason": "insufficient_wallet_balance", "available_balance": "10.0000",
     "shortfall": "40.0000", "topup_endpoint": "/v1/wallet/topup"

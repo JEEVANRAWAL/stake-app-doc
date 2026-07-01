@@ -421,7 +421,7 @@ paths:
                   break_token: { type: string }
                   fee: { $ref: '#/components/schemas/MoneyAmount' }
                   expires_at: { type: string, format: date-time }
-              example: { break_token: brk_7c2a91, fee: { amount: "50.0000", currency: NPR }, expires_at: "2026-06-12T05:10:02Z" }
+              example: { break_token: brk_7c2a91, fee: { amount: "10.0000", currency: NPR }, expires_at: "2026-06-12T05:10:02Z" }
         '402': { $ref: '#/components/responses/Problem' }
 
   /screen-time-rules/{id}/limit:
@@ -601,7 +601,7 @@ components:
       type: string
       pattern: '^-?\d{1,10}(\.\d{1,4})?$'
       description: Decimal string, 4 dp. Never a float.
-      example: "50.0000"
+      example: "10.0000"
     Currency:
       type: string
       minLength: 3
@@ -914,7 +914,7 @@ components:
         status: granted
         user_restricted_app_id: 3f2c9a00-0000-4000-8000-000000000002
         duration_seconds: 300
-        fee: { amount: "50.0000", currency: NPR }
+        fee: { amount: "10.0000", currency: NPR }
         granted_at: "2026-06-12T04:10:02Z"
         expires_at: "2026-06-12T04:15:02Z"
         authorization_token: eyJhbGciOiJFZERTQSIsImtpZCI6ImRrXzIwMjZfMDZfYSJ9.payload.sig
@@ -936,7 +936,7 @@ components:
       example:
         unlock_request_id: 7b2a9100-0000-4000-8000-000000000003
         status: payment_pending
-        fee: { amount: "50.0000", currency: NPR }
+        fee: { amount: "10.0000", currency: NPR }
         funding_required:
           reason: insufficient_wallet_balance
           available_balance: "10.0000"
