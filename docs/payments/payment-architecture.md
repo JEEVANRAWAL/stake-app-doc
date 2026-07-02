@@ -151,6 +151,25 @@ untrusted**. The authoritative confirmation is always a **server-side status-che
   fires, the redirect path never runs. A cron sweep over `payments WHERE status IN
   ('initiated','pending')` (backed by `idx_payments_status`) pulls eSewa status and settles late.
 
+> **✅ Implemented (2026-07, `stake-backend` `EsewaProvider`/`EsewaController`) — dev/UAT verified live.**
+> Defaults target eSewa's public dev environment (`rc-epay.esewa.com.np`, merchant `EPAYTEST`);
+> production swaps in `ESEWA_PRODUCT_CODE`/`ESEWA_SECRET_KEY`/`ESEWA_FORM_URL`/`ESEWA_STATUS_URL`/
+> `PUBLIC_BASE_URL` via env. Implementation deltas from the diagram below:
+> - Initiation is a **backend-hosted auto-submitting signed form** (`GET /v1/payments/esewa/checkout/:id`
+>   — this is the `checkout.url` the app opens), not client-side signing: the secret never leaves the server.
+> - The signature message is comma-separated **`field=value` pairs** ordered by `signed_field_names`
+>   (HMAC-SHA256 → base64). **Gotcha:** the UAT secret is `8gBm/:&EnhH.1/q` — *no trailing `(`*; several
+>   doc copies misquote it (live-verified against rc-epay).
+> - The success redirect (`GET /v1/payments/esewa/return?data=<b64>`) is verified against eSewa's *raw*
+>   number formatting (JSON.parse would lose `"1000.0"`), inboxed like a webhook (deduped on
+>   `transaction_code`), then settlement re-pulls the authoritative status. `failure_url`
+>   (`GET /v1/payments/esewa/cancel/:id`) only triggers a status pull — it never terminally fails a
+>   payment on its own, so a false "failure" redirect after a completed payment still settles.
+> - The status pull echoes the expected amount on pending/errored lookups so the settlement
+>   amount-tamper check can only fire on a genuinely mismatched `COMPLETE`.
+> - The cron poller is still the client-kicked `POST /v1/payments/:id/poll` + app-resume polling for
+>   now; the dedicated §6b sweep lands with the BullMQ workers.
+
 ```mermaid
 sequenceDiagram
     autonumber

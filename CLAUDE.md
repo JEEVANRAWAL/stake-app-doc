@@ -63,7 +63,8 @@ Planning complete (Phases 1–5; `docs/` is the source of truth). Implementation
 sibling git repos — both still codenamed **`stake`** on disk (`stake-backend`, `stake-mobile`); the
 product/brand is **Bhaakal**.
 - **Backend** (`stake-backend`, NestJS + BullMQ): auth/devices, double-entry ledger + reconciliation
-  (R1/R2/R3/R5), wallet/settlement, commitment deposits (FR-6), penalty/forfeit engine, paid unlocks
+  (R1/R2/R3/R5), wallet/settlement, **eSewa ePay v2 top-up (dev/UAT live-verified; hosted signed
+  checkout + signed return + status-pull)**, commitment deposits (FR-6), penalty/forfeit engine, paid unlocks
   (Ed25519), commitment-break fees + asymmetric rule edits (FR-4), restriction schedules (FR-1), usage
   sync (FR-3), heartbeat + silence sweeper (M4), withdrawals (two-phase, KYC-gated), per-device HMAC
   request signing, Play Integrity verdict, tiered KYC, usage partitioning.
