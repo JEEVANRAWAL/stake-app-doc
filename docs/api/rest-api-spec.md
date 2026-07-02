@@ -181,7 +181,14 @@ Response `402` (wallet empty → fund via gateway first):
 { "applied_at": "2026-06-12T04:10:03Z", "shield_lifted": true }
 ```
 
-### E.3 Unlock state machine
+### E.3 List — `GET /v1/unlock-requests`
+The user's unlock requests, most recent first. Each row carries
+`user_restricted_app_id` + `expires_at` so the client can restore a live
+unlock's countdown after a process restart (`status: granted`, future
+`expires_at`); the in-app timer is display-only — expiry enforcement stays
+with the native module (offline token) and the server.
+
+### E.4 Unlock state machine
 ```mermaid
 stateDiagram-v2
     [*] --> requested

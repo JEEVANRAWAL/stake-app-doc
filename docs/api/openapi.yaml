@@ -138,6 +138,31 @@ paths:
         '401': { $ref: '#/components/responses/Problem' }
 
   /unlock-requests:
+    get:
+      tags: [Unlocks]
+      summary: List the user's unlock requests (most recent first)
+      description: >-
+        Includes `user_restricted_app_id` and `expires_at` so a client can
+        restore a live unlock's countdown after a process restart (filter to
+        `status: granted` with a future `expires_at`).
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string, format: uuid }
+                    status: { type: string, enum: [granted, payment_pending, denied, expired] }
+                    user_restricted_app_id: { type: string, format: uuid, nullable: true }
+                    duration_seconds: { type: integer }
+                    fee_amount: { type: string }
+                    currency: { type: string }
+                    granted_at: { type: string, format: date-time, nullable: true }
+                    expires_at: { type: string, format: date-time, nullable: true }
+                    requested_at: { type: string, format: date-time }
     post:
       tags: [Unlocks]
       summary: Request a paid temporary unlock during a restriction
