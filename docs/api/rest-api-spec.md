@@ -295,6 +295,23 @@ flight). Releases the hold (`user_payout_pending → user_available`).
 - `200` → new wallet balances.
 - `409 WITHDRAWAL_NOT_CANCELLABLE` — already in/after `processing`.
 
+## F½. Gamification — `GET /v1/gamification` (JWT)
+Basic streaks (delivery-plan MVP cutline). The GET lazily folds any complete,
+unevaluated **user-local** days (`core.user_today` boundary) into
+`engage.gamification_state`, then returns:
+```json
+{
+  "current_streak_days": 4, "longest_streak_days": 12,
+  "last_clean_date": "2026-07-03", "today": "2026-07-04", "armed_today": true
+}
+```
+Semantics (locked 2026-07-04): a complete day with ≥1 armed restricted app and
+no penalty **extends** the streak; a penalty (`enforcement_action:
+'penalty_applied'`) **resets** it; a day with nothing armed **pauses** it. Paid
+unlocks and paid commitment-breaks never break the streak (sanctioned spends).
+Today never accrues, but a penalty today zeroes `current_streak_days`
+immediately. Display-only for MVP — no server pushes on milestones yet.
+
 ## G. Request Signing & Replay Protection
 Per-device HMAC key (issued at registration, stored in Android Keystore / iOS Keychain — hardware-backed):
 ```

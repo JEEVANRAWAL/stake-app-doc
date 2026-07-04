@@ -469,12 +469,22 @@ CREATE TABLE engage.daily_app_usage (
 );
 
 -- ============ STREAKS & GAMIFICATION ============
+-- Folded lazily on read (GET /v1/gamification), user-local day boundary via
+-- core.user_today. Semantics (locked 2026-07-04): a complete day with >=1
+-- armed restricted app and no penalty EXTENDS the streak; a penalty
+-- (usage.violations enforcement_action='penalty_applied') RESETS it; a day
+-- with nothing armed PAUSES it (no advance, no reset — idle days can't farm
+-- streaks). Paid unlocks / paid commitment-breaks are sanctioned spends and
+-- never break the streak. Today never accrues (a day counts once complete),
+-- but a penalty today zeroes the display immediately.
+-- productivity_score / total_money_saved / level are dormant for MVP.
 CREATE TABLE engage.gamification_state (
     user_id                 UUID PRIMARY KEY REFERENCES core.users(id) ON DELETE CASCADE,
     current_streak_days     INTEGER NOT NULL DEFAULT 0,
     longest_streak_days     INTEGER NOT NULL DEFAULT 0,
     last_active_date        DATE,
     last_clean_date         DATE,
+    evaluated_through       DATE,           -- fold cursor: last evaluated local day
     productivity_score      NUMERIC(6,2) NOT NULL DEFAULT 0,
     total_money_saved       NUMERIC(14,4) NOT NULL DEFAULT 0,
     level                   INTEGER NOT NULL DEFAULT 1,

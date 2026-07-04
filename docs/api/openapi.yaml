@@ -538,6 +538,30 @@ paths:
               example: { status: removed, removed_at: "2026-06-15T00:00:00Z" }
         '402': { $ref: '#/components/responses/Problem' }
 
+  /gamification:
+    get:
+      tags: [Gamification]
+      summary: Basic streaks (folds unevaluated user-local days, then returns state)
+      responses:
+        '200':
+          description: Current streak state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current_streak_days: { type: integer }
+                  longest_streak_days: { type: integer }
+                  last_clean_date: { type: string, format: date, nullable: true }
+                  today: { type: string, format: date }
+                  armed_today: { type: boolean }
+              example:
+                current_streak_days: 4
+                longest_streak_days: 12
+                last_clean_date: "2026-07-03"
+                today: "2026-07-04"
+                armed_today: true
+
   /webhooks/{provider}:
     post:
       tags: [Webhooks]
