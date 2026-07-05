@@ -56,6 +56,7 @@ Read **`docs/README.md`** first — it's the index, the locked decisions, and th
 | Native enforcement | `docs/native/enforcement-modules.md` |
 | Ledger & workers | `docs/backend/ledger-workers.md` |
 | Ops / SRE | `docs/ops/sre-plan.md` |
+| Admin console & payout ops (future) | `docs/ops/admin-console.md` |
 | Delivery plan & cutline | `docs/project/delivery-plan.md` |
 
 ## Status

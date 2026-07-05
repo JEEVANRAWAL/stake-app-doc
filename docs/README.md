@@ -43,6 +43,7 @@ bypass on Android or iOS.
 | 4b | Native enforcement modules (Android + iOS) | [native/enforcement-modules.md](native/enforcement-modules.md) |
 | 4c | Ledger & state-machine workers | [backend/ledger-workers.md](backend/ledger-workers.md) |
 | Ops | Operations & SRE plan | [ops/sre-plan.md](ops/sre-plan.md) |
+| Ops | Admin console & manual payout ops *(future — deferred past launch)* | [ops/admin-console.md](ops/admin-console.md) |
 | 5 | Project plan & delivery cutline | [project/delivery-plan.md](project/delivery-plan.md) |
 
 ## Reading order
