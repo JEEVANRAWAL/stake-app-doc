@@ -40,6 +40,12 @@ The money mechanics are done; only the operator layer is missing.
 The ops transition methods (`approve`, `markProcessing`, `markPaid`, `reject`, `markFailed`)
 **exist but have no way to be invoked** — no admin endpoint, no UI. That is the gap this design fills.
 
+> 🔒 **Client entry is gated OFF until payouts ship.** Because the request path
+> *is* live (a completed withdrawal locks the user's balance in `user_payout_pending`
+> with nothing to fulfil it), the mobile **"Withdraw" + "Payout history"** entries are
+> hidden behind `FeatureFlags.withdrawalsEnabled = false` (stake-mobile). Flip that
+> flag when this ops surface + real KYC land.
+
 ## 3. Admin surface — a web dashboard on a general console shell
 
 **🔒 Decision: build a staff web dashboard** (not a CLI or shared-key API), structured as a
