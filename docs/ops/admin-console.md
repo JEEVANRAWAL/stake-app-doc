@@ -128,7 +128,26 @@ stateDiagram-v2
     under_review --> cancelled: user cancels (hold released)
 ```
 
-Draft procedure (cadence/SLA still open — see §8):
+### 7.1 Cadence & SLA 🔒
+
+- **Frequency:** the operator runs the loop **every Nepal business day** (Sun–Fri; banks are
+  **closed Saturday**, and Sunday **is** a working day).
+- **Cutoff — 12:00 noon NPT:** requests in **before** noon are processed that day; **after**
+  noon they roll to the next business day. Noon (not later) leaves margin to *initiate*
+  transfers before Friday's ~3 PM bank close; it's a config value, tune to taste.
+- **User promise (SLA): paid within 1–3 Nepal business days** — this is the
+  `estimated_completion` shown in-app. Deliberately conservative so bank **settlement lag** and
+  **holiday clusters** stay *inside* the promise (under-promise, over-deliver). The `paid`
+  confirmation is often **T+1** — the bank's settlement export typically lands the next business day.
+- **Weekend / holidays:** Saturday and public holidays are **not** business days; a request made
+  then starts the clock on the next business day. During multi-day closures (Dashain / Tihar),
+  the operator posts an **in-app notice** and the SLA is understood in *business* days.
+- **Continuity:** because payouts run daily, a **backup operator** (the second superadmin/admin
+  required by the ≥ 2 rule, §5) covers when the primary is away. A single missed day is absorbed
+  by the 1–3 day buffer.
+- **Cancellation window:** a user may cancel while `under_review` — in practice, until the next cutoff.
+
+### 7.2 Procedure
 
 1. **Review** — pull the `under_review` queue. Per request: verify the KYC name matches the
    bank account name, check fraud/velocity flags, sanity-check bank details. → **Approve** or
@@ -146,8 +165,6 @@ Draft procedure (cadence/SLA still open — see §8):
 
 ## 8. Open items (still to decide)
 
-- **Cadence & SLA** — e.g. "approved by 2 pm → paid same business day" vs a weekly batch. Drives
-  the `estimated_completion` shown to users.
 - **Two-person approval** threshold (if/when the reviewer-vs-finance split is adopted).
 - **Legal constraints** — Nepal e-money / KYC review (day-1 launch blocker) may dictate *who*
   may hold funds, payout SLA, and record-keeping more than product preference does.
