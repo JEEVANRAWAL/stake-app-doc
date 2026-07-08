@@ -156,20 +156,30 @@ async process({ violationId }) {
     }
     const fee = penaltyPolicy.amountFor(v.violation_type, v.user_id);
     const dest = forfeitPolicy.destination(v.user_id);
-    const legs = await buildDebitLegs(tx, v.user_id, fee, dest);     // locked-first waterfall
-    const { journalId } = await ledger.postJournal(tx, {
-      referenceType: 'penalty', referenceId: v.id, currency: fee.currency,
-      description: `Penalty: ${v.violation_type}`, legs });
+    // Stake-only & capped: charge the deposit backing the violated app up to its
+    // remaining headroom — the penalty draws from user_locked alone and never
+    // spills into user_available (FR-6). No backing deposit / exhausted stake →
+    // applied = 0 and nothing is posted (money layer dormant).
+    const applied = min(fee.amount, stakeHeadroomForApp(tx, v));
+    let journalId = null;
+    if (applied > 0) {
+      const legs = buildDebitLegs(v.user_id, applied, dest);         // user_locked → dest
+      ({ journalId } = await ledger.postJournal(tx, {
+        referenceType: 'penalty', referenceId: v.id, currency: fee.currency,
+        description: `Penalty: ${v.violation_type}`, legs }));
+      await outbox(tx, 'deposit-engine', { type: 'penalty_consumed_lock', userId: v.user_id,
+        amount: applied, journalId });
+      await outbox(tx, 'notification', { type: 'commitment_break', userId: v.user_id,
+        body: `Commitment broken — ${applied} ${fee.currency} forfeited from your stake.` });
+    }
     await setViolation(tx, v, { enforcement_action: 'penalty_applied',
-      fee_applied: fee.amount, related_journal_id: journalId });
-    await outbox(tx, 'deposit-engine', { type: 'penalty_consumed_lock', userId: v.user_id,
-      amount: fee.amount, journalId });
-    await outbox(tx, 'notification', { type: 'commitment_break', userId: v.user_id,
-      body: `Commitment broken — ${fee.amount} ${fee.currency} forfeited.` });
+      fee_applied: applied, related_journal_id: journalId,
+      negative_commitment_balance: applied < fee.amount });
   });
 }
 ```
-**Insufficient funds:** post what's available, record a `negative_commitment_balance` flag, block new
+**Insufficient stake:** post whatever the backing stake can still cover (capped at its headroom — never
+drawn from `user_available`), record a `negative_commitment_balance` flag, block new
 commitments + require top-up. Wallet never goes negative. Mitigated by **capping max penalty exposure to the
 pre-funded balance** at commitment-creation time — enforced by the **minimum-funding-to-create-a-commitment**
 rule (PRD FR-6 / `payments/payment-architecture.md`): a commitment can't be armed unless available balance ≥
