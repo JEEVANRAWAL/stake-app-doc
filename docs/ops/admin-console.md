@@ -43,8 +43,11 @@ The ops transition methods (`approve`, `markProcessing`, `markPaid`, `reject`, `
 > 🔒 **Client entry is gated OFF until payouts ship.** Because the request path
 > *is* live (a completed withdrawal locks the user's balance in `user_payout_pending`
 > with nothing to fulfil it), the mobile **"Withdraw" + "Payout history"** entries are
-> hidden behind `FeatureFlags.withdrawalsEnabled = false` (stake-mobile). Flip that
-> flag when this ops surface + real KYC land.
+> hidden behind `FeatureFlags.withdrawalsEnabled = false` (stake-mobile). The same
+> flag also hides the **Account → Identity (KYC) verification card** — KYC exists
+> only to satisfy payout rules, so there's nothing to verify *for* until withdrawals
+> exist. Flip that flag when this ops surface + real KYC land, and Withdraw, Payout
+> history, and Identity all reappear together.
 
 ## 3. Admin surface — a web dashboard on a general console shell
 
